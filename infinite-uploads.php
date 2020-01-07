@@ -14,11 +14,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 add_action( 'plugins_loaded', 'infinite_uploads_init' );
 
 function infinite_uploads_init() {
-	// Ensure the AWS SDK can be loaded.
-	if ( ! class_exists( '\\Aws\\S3\\S3Client' ) ) {
-		// Require AWS Autoloader file.
-		require_once dirname( __FILE__ ) . '/vendor/autoload.php';
-	}
+
+	require_once dirname( __FILE__ ) . '/lib/b2/B2_Client.php';
 
 	if ( ! infinite_uploads_check_requirements() ) {
 		return;

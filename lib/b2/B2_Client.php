@@ -1,16 +1,16 @@
 <?php
-
+/*
+ * Based on and adapted from https://github.com/bcarrella/backblaze-b2 licensed GPLv3. Rebuilt as a standalone class that requires only WordPress core as a dependency.
+ */
 namespace InfiniteUploads\B2;
 
-use InfiniteUploads\B2\Exceptions\CacheException;
-use InfiniteUploads\B2\Exceptions\NotFoundException;
-use InfiniteUploads\B2\Exceptions\ValidationException;
-use InfiniteUploads\B2\Http\Client as HttpClient;
+use WP_Error;
+use Exception;
 
-class Client {
+class B2_Client {
 	public $version = 2;
 	/**
-	 * If you setup CNAME records to point to backblaze servers (for white-label service)
+	 * If you setup CNAME records to point to b2 servers (for white-label service)
 	 * assign this property with the equivalent URLs
 	 * ['f0001.backblazeb2.com' => 'alias01.mydomain.com']
 	 *
@@ -32,30 +32,23 @@ class Client {
 	protected $apiUrl = '';
 	protected $downloadUrl;
 	protected $recommendedPartSize;
-	protected $client;
 
 	/**
 	 * Client constructor. Accepts the account ID, application key and an optional array of options.
 	 *
-	 * @param string $accountId
-	 * @param array  $authorizationValues
+	 * @param string $keyId
+	 * @param string $applicationKey
 	 * @param array  $options
 	 *
-	 * @throws CacheException
+	 * @throws Exception
 	 */
-	public function __construct( $accountId, $authorizationValues, $options = [] ) {
-		$this->accountId = $accountId;
-		$this->keyId           = $authorizationValues['keyId'] ?? $accountId;
-		$this->applicationKey  = $authorizationValues['applicationKey'];
+	public function __construct( $keyId, $applicationKey, $options = [] ) {
+
+		$this->keyId          = $keyId;
+		$this->applicationKey = $applicationKey;
 
 		if ( empty( $this->keyId ) or empty( $this->applicationKey ) ) {
 			throw new \Exception( 'Please provide "keyId" and "applicationKey"' );
-		}
-
-		if ( isset( $options['client'] ) ) {
-			$this->client = $options['client'];
-		} else {
-			$this->client = new HttpClient( [ 'exceptions' => false ] );
 		}
 
 		//init auth
@@ -68,6 +61,7 @@ class Client {
 	 * @param bool $refresh Whether to force refresh the url.
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	protected function getAuth( $refresh = false ) {
 		if ( $refresh || false === ( $auth = get_site_transient( 'iu-b2-auth' ) ) ) {
@@ -77,10 +71,11 @@ class Client {
 
 		$versionPath = '/b2api/v' . $this->version;
 
-		$this->authToken           = $auth['authorizationToken'];
-		$this->apiUrl              = $auth['apiUrl'] . $versionPath;
-		$this->downloadUrl         = $auth['downloadUrl'];
-		$this->recommendedPartSize = $auth['recommendedPartSize'];
+		$this->accountId           = $auth->accountId;
+		$this->authToken           = $auth->authorizationToken;
+		$this->apiUrl              = $auth->apiUrl . $versionPath;
+		$this->downloadUrl         = $auth->downloadUrl;
+		$this->recommendedPartSize = $auth->recommendedPartSize;
 
 		return $auth;
 	}
@@ -92,70 +87,86 @@ class Client {
 	 * @param string $applicationKey
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	protected function authorizeAccount( $keyId, $applicationKey ) {
 		$baseApiUrl  = 'https://api.backblazeb2.com';
 		$versionPath = '/b2api/v' . $this->version;
 
-		$response = $this->request( 'GET', $baseApiUrl . $versionPath . '/b2_authorize_account', [
-			'auth' => [ $keyId, $applicationKey ],
+		return $this->request( 'GET', $baseApiUrl . $versionPath . '/b2_authorize_account', [
+			'headers' => [ 'Authorization' => 'Basic ' . base64_encode( $keyId . ':' . $applicationKey ) ],
 		] );
-
-		return $response;
 	}
 
 	/**
-	 * Wrapper for $this->client->request
+	 * HTTP API request handler
 	 *
 	 * @param string $method
 	 * @param string $uri
 	 * @param array  $options
-	 * @param bool   $asJson
+	 * @param bool   $returnJson
 	 * @param bool   $wantsGetContents
 	 *
 	 * @return mixed|string
+	 * @throws Exception
 	 */
-	protected function request( $method, $uri = null, $options = [], $asJson = true, $wantsGetContents = true ) {
-		$headers = [];
+	protected function request( $method, $uri = null, $options = [], $returnJson = true, $wantsGetContents = true ) {
 
-		// Add Authorization token if defined
-		if ( $this->authToken ) {
-			$headers['Authorization'] = $this->authToken;
+		$args = wp_parse_args( $options, array(
+			'headers' => array(
+				'Content-Type' => 'application/json',
+			),
+			'method'  => $method,
+			'timeout' => 60,
+		) );
+
+		if ( empty( $args['headers']['Authorization'] ) && ! empty( $this->authToken ) ) {
+			$args['headers']['Authorization'] = $this->authToken;
 		}
 
-		$options = array_replace_recursive( [
-			'headers' => $headers,
-		], $options );
+		if ( isset( $args['json'] ) ) {
+			$args['body'] = json_encode( $args['json'] );
+			unset( $args['json'] );
+		}
 
-		$fullUri = $uri;
-
+		//use default api base only if special url not provided
+		$endpoint = $uri;
 		if ( substr( $uri, 0, 8 ) !== 'https://' ) {
-			$fullUri = $this->apiUrl . $uri;
+			$endpoint = $this->apiUrl . $uri;
 		}
 
-		return $this->client->request( $method, $fullUri, $options, $asJson, $wantsGetContents );
-	}
+		var_dump( 'API Call:', $endpoint, $args );
 
-	/**
-	 * Get the cached upload auth for single files. As per docs should be cached and valid for up to 24hrs unless a specific error is returned during upload.
-	 *
-	 * @param string $bucketId
-	 * @param bool $refresh Whether to force refresh the url.
-	 *
-	 * @return array
-	 */
-	protected function getUploadUrl( $bucketId, $refresh = false ) {
-		$key = 'iu-b2-upload' . $bucketId;
-		if ( $refresh || false === ( $auth = get_site_transient( $key ) ) ) {
-			$auth = $this->request( 'POST', '/b2_get_upload_url', [
-				'json' => [
-					'bucketId' => $bucketId,
-				],
-			] );
-			set_site_transient( $key, $auth, DAY_IN_SECONDS );
+		$result = wp_remote_request( $endpoint, $args );
+		if ( ! is_wp_error( $result ) ) {
+			$status = wp_remote_retrieve_response_code( $result );
+			$body   = wp_remote_retrieve_body( $result );
+
+			var_dump( 'API Response:', $status, $body );
+
+			if ( 200 != $status ) {
+				$error = json_decode( $body );
+			}
+
+			if ( 200 == $status ) {
+				if ( $returnJson ) {
+					return json_decode( $body );
+				}
+
+				return $body;
+			} elseif ( 401 == $status && 'expired_auth_token' == $error->code ) {
+				//if auth key is timed out, reissue and try this request again
+				$this->getAuth( true );
+				$this->request( $method, $uri, $options, $returnJson, $wantsGetContents );
+			} else {
+				throw new Exception( $error->code . ': ' . $error->message );
+			}
+		} else {
+			throw new Exception( $result->get_error_message() . ': ' . $result->get_error_code() );
 		}
 
-		return $auth;
+
+		return $result;
 	}
 
 	/**
@@ -163,13 +174,13 @@ class Client {
 	 *
 	 * @param array $options
 	 *
-	 * @return Bucket
-	 * @throws ValidationException
+	 * @return object
+	 * @throws Exception
 	 */
 	public function createBucket( $options ) {
-		if ( ! in_array( $options['BucketType'], [ Bucket::TYPE_PUBLIC, Bucket::TYPE_PRIVATE ] ) ) {
-			throw new ValidationException(
-				sprintf( 'Bucket type must be %s or %s', Bucket::TYPE_PRIVATE, Bucket::TYPE_PUBLIC )
+		if ( ! in_array( $options['BucketType'], [ 'allPublic', 'allPrivate' ] ) ) {
+			throw new Exception(
+				sprintf( 'Bucket type must be %s or %s', 'allPublic', 'allPrivate' )
 			);
 		}
 
@@ -181,7 +192,7 @@ class Client {
 			],
 		];
 
-		$response = $this->request( 'POST', '/b2_create_bucket', [
+		return $this->request( 'POST', '/b2_create_bucket', [
 			'json' => [
 				'accountId'      => $this->accountId,
 				'bucketName'     => $options['BucketName'],
@@ -189,8 +200,6 @@ class Client {
 				'lifecycleRules' => ( ( isset( $options['KeepLastVersionOnly'] ) && $options['KeepLastVersionOnly'] ) ? $lastVersionOnly : null ),
 			],
 		] );
-
-		return new Bucket( $response );
 	}
 
 	/**
@@ -198,13 +207,13 @@ class Client {
 	 *
 	 * @param array $options
 	 *
-	 * @return Bucket
-	 * @throws ValidationException
+	 * @return object
+	 * @throws Exception
 	 */
 	public function updateBucket( $options ) {
-		if ( ! in_array( $options['BucketType'], [ Bucket::TYPE_PUBLIC, Bucket::TYPE_PRIVATE ] ) ) {
-			throw new ValidationException(
-				sprintf( 'Bucket type must be %s or %s', Bucket::TYPE_PRIVATE, Bucket::TYPE_PUBLIC )
+		if ( ! in_array( $options['BucketType'], [ 'allPublic', 'allPrivate' ] ) ) {
+			throw new Exception(
+				sprintf( 'Bucket type must be %s or %s', 'allPublic', 'allPrivate' )
 			);
 		}
 
@@ -212,15 +221,13 @@ class Client {
 			$options['BucketId'] = $this->getBucketIdFromName( $options['BucketName'] );
 		}
 
-		$response = $this->request( 'POST', '/b2_update_bucket', [
+		return $this->request( 'POST', '/b2_update_bucket', [
 			'json' => [
 				'accountId'  => $this->accountId,
 				'bucketId'   => $options['BucketId'],
 				'bucketType' => $options['BucketType'],
 			],
 		] );
-
-		return new Bucket( $response );
 	}
 
 	/**
@@ -233,8 +240,8 @@ class Client {
 	public function getBucketIdFromName( $name ) {
 		$bucket = $this->getBucketFromName( $name );
 
-		if ( $bucket instanceof Bucket ) {
-			return $bucket->getId();
+		if ( isset( $bucket->bucketId ) ) {
+			return $bucket->bucketId;
 		}
 
 		return null;
@@ -243,14 +250,15 @@ class Client {
 	/**
 	 * @param $name
 	 *
-	 * @return Bucket|null
+	 * @return object|null
+	 * @throws Exception
 	 */
 	public function getBucketFromName( $name ) {
 
 		$buckets = $this->listBuckets( false, [ 'bucketName' => $name ] );
 
 		foreach ( $buckets as $bucket ) {
-			if ( $bucket->getName() === $name ) {
+			if ( $bucket->bucketName === $name ) {
 				return $bucket;
 			}
 		}
@@ -264,7 +272,8 @@ class Client {
 	 * @param bool  $refresh Refresh the cache or not, default FALSE
 	 * @param array $options List of options for b2_list_bucket request, bucketId, bucketName, bucketTypes
 	 *
-	 * @return Bucket[]
+	 * @return object
+	 * @throws Exception
 	 */
 	public function listBuckets( $refresh = false, $options = [] ) {
 		$cacheKey = 'iu-buckets';
@@ -283,15 +292,11 @@ class Client {
 					$req['json'][ $index ] = $option;
 				}
 			}
-			$buckets = $this->request( 'POST', '/b2_list_buckets', $req )['buckets'];
+			$buckets = $this->request( 'POST', '/b2_list_buckets', $req )->buckets;
 			wp_cache_set( $cacheKey, $buckets, HOUR_IN_SECONDS );
 		}
 
-		foreach ( $buckets as $bucket ) {
-			$bucketsObj[] = new Bucket( $bucket );
-		}
-
-		return $bucketsObj;
+		return $buckets;
 	}
 
 	/**
@@ -323,7 +328,7 @@ class Client {
 	 *
 	 * @param array $options
 	 *
-	 * @return File
+	 * @return object
 	 */
 	public function upload( $options ) {
 		// Clean the path if it starts with /.
@@ -416,14 +421,15 @@ class Client {
 	 *
 	 * @param array $options
 	 *
-	 * @return File
+	 * @return object
+	 * @throws Exception
 	 */
 	protected function uploadStandardFile( $options = array() ) {
 		// Retrieve the URL that we should be uploading to.
 		$response = $this->getUploadUrl( $options['BucketId'] );
 
-		$uploadEndpoint  = $response['uploadUrl'];
-		$uploadAuthToken = $response['authorizationToken'];
+		$uploadEndpoint  = $response->uploadUrl;
+		$uploadAuthToken = $response->authorizationToken;
 
 		$response = $this->request( 'POST', $uploadEndpoint, [
 			'headers' => [
@@ -439,7 +445,30 @@ class Client {
 
 		//TODO if specific error codes bad_auth_token, expired_auth_token, service_unavailable returned force refresh uploadUrl and try again.
 
-		return new File( $response );
+		return $response;
+	}
+
+	/**
+	 * Get the cached upload auth for single files. As per docs should be cached and valid for up to 24hrs unless a specific error is returned during upload.
+	 *
+	 * @param string $bucketId
+	 * @param bool   $refresh Whether to force refresh the url.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function getUploadUrl( $bucketId, $refresh = false ) {
+		$key = 'iu-b2-upload' . $bucketId;
+		if ( $refresh || false === ( $auth = get_site_transient( $key ) ) ) {
+			$auth = $this->request( 'POST', '/b2_get_upload_url', [
+				'json' => [
+					'bucketId' => $bucketId,
+				],
+			] );
+			set_site_transient( $key, $auth, DAY_IN_SECONDS );
+		}
+
+		return $auth;
 	}
 
 	/**
@@ -447,8 +476,9 @@ class Client {
 	 *
 	 * @param array $options
 	 *
-	 * @return File
+	 * @return object $file
 	 *
+	 * @throws Exception
 	 * @todo Fetch multiple upload part urls and upload in parallel.
 	 */
 	protected function uploadLargeFile( $options ) {
@@ -466,7 +496,7 @@ class Client {
 				 **/
 			],
 		] );
-		$fileId   = $response['fileId'];
+		$fileId   = $response->fileId;
 
 		$partsCount = ceil( $options['size'] / $this->recommendedPartSize );
 
@@ -483,8 +513,8 @@ class Client {
 				],
 			] );
 
-			$uploadEndpoint  = $response['uploadUrl'];
-			$uploadAuthToken = $response['authorizationToken'];
+			$uploadEndpoint  = $response->uploadUrl;
+			$uploadAuthToken = $response->authorizationToken;
 
 			list( $hash, $size ) = $this->getFileHashAndSize( $options['Body'], $bytesSent, $partSize );
 			$hashParts[] = $hash;
@@ -501,46 +531,43 @@ class Client {
 		}
 
 		// Finish upload of large file
-		$response = $this->request( 'POST', '/b2_finish_large_file', [
+		return $this->request( 'POST', '/b2_finish_large_file', [
 			'json' => [
 				'fileId'        => $fileId,
 				'partSha1Array' => $hashParts,
 			],
 		] );
-
-		return new File( $response );
 	}
 
 	/**
-	 * @param File $file
+	 * @param      $file
 	 * @param bool $appendToken
 	 * @param int  $tokenTimeout
 	 *
 	 * @return string
 	 */
-	public function getDownloadUrlForFile( File $file, $appendToken = false, $tokenTimeout = 60 ) {
-		return $this->getDownloadUrl( $file->getBucketId(), $file->getFileName(), $appendToken, $tokenTimeout );
+	public function getDownloadUrlForFile( $file, $appendToken = false, $tokenTimeout = 60 ) {
+		return $this->getDownloadUrl( $file->bucketId, $file->fileName, $appendToken, $tokenTimeout );
 	}
 
 	/**
-	 * @param Bucket|string $bucket
-	 * @param string        $filePath
-	 * @param bool          $appendToken
-	 * @param int           $tokenTimeout
+	 * @param string $bucketId
+	 * @param string $filePath
+	 * @param bool   $appendToken
+	 * @param int    $tokenTimeout
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	public function getDownloadUrl( $bucket, $filePath, $appendToken = false, $tokenTimeout = 60 ) {
-		if ( ! $bucket instanceof Bucket ) {
-			$bucket = $this->getBucketFromId( $bucket );
-		}
+	public function getDownloadUrl( $bucketId, $filePath, $appendToken = false, $tokenTimeout = 60 ) {
+		$bucket = $this->getBucketFromId( $bucketId );
 
 		$baseUrl = strtr( $this->downloadUrl, $this->domainAliases );
 		$path    = $baseUrl . '/file/' . $bucket->getName() . '/' . $filePath;
 
 		if ( $appendToken ) {
 			$path .= '?Authorization='
-			         . $this->getDownloadAuthorization( $bucket, dirname( $filePath ) . '/', $tokenTimeout );
+			         . $this->getDownloadAuthorization( $bucket->bucketId, dirname( $filePath ) . '/', $tokenTimeout );
 		}
 
 		return $path;
@@ -549,13 +576,14 @@ class Client {
 	/**
 	 * @param $bucketId
 	 *
-	 * @return Bucket|null
+	 * @return object|null
+	 * @throws Exception
 	 */
-	public function getBucketFromId( $id ) {
-		$buckets = $this->listBuckets( false, [ 'bucketId' => $id ] );
+	public function getBucketFromId( $bucketId ) {
+		$buckets = $this->listBuckets( false, [ 'bucketId' => $bucketId ] );
 
 		foreach ( $buckets as $bucket ) {
-			if ( $bucket->getId() === $id ) {
+			if ( $bucket->bucketId === $bucketId ) {
 				return $bucket;
 			}
 		}
@@ -569,13 +597,9 @@ class Client {
 	 * @param int $validDuration
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	public function getDownloadAuthorization( $bucket, $path, $validDuration = 60 ) {
-		if ( $bucket instanceof Bucket ) {
-			$bucketId = $bucket->getId();
-		} else {
-			$bucketId = $bucket;
-		}
+	public function getDownloadAuthorization( $bucketId, $path, $validDuration = 60 ) {
 
 		$response = $this->request( 'POST', '/b2_get_download_authorization', [
 			'json' => [
@@ -585,7 +609,7 @@ class Client {
 			],
 		] );
 
-		return $response['authorizationToken'];
+		return $response->authorizationToken;
 	}
 
 	/**
@@ -594,16 +618,15 @@ class Client {
 	 * @param array $options
 	 *
 	 * @return bool|mixed|string
+	 * @throws Exception
 	 */
 	public function download( $options ) {
 		$requestUrl     = null;
-		$requestOptions = [
-			'sink' => isset( $options['SaveAs'] ) ? $options['SaveAs'] : fopen( 'php://temp', 'w' ),
-		];
+		$requestOptions = [ 'timeout' => 300 ];
 
 		if ( isset( $options['FileId'] ) ) {
-			$requestOptions['query'] = [ 'fileId' => $options['FileId'] ];
-			$requestUrl              = $this->downloadUrl . '/b2api/v1/b2_download_file_by_id';
+			$requestUrl = $this->downloadUrl . '/b2api/v' . $this->version . '/b2_download_file_by_id';
+			$requestUrl = add_query_arg( [ 'fileId' => $options['FileId'] ], $requestUrl );
 		} else {
 			if ( ! isset( $options['BucketName'] ) && isset( $options['BucketId'] ) ) {
 				$options['BucketName'] = $this->getBucketNameFromId( $options['BucketId'] );
@@ -614,7 +637,11 @@ class Client {
 
 		if ( isset( $options['stream'] ) ) {
 			$requestOptions['stream'] = $options['stream'];
-			$response                 = $this->request( 'GET', $requestUrl, $requestOptions, false, false );
+			if ( isset( $options['SaveAs'] ) ) {
+				$requestOptions['filename'] = $options['SaveAs'];
+			}
+
+			$response = $this->request( 'GET', $requestUrl, $requestOptions, false, false );
 		} else {
 			$response = $this->request( 'GET', $requestUrl, $requestOptions, false );
 		}
@@ -628,12 +655,13 @@ class Client {
 	 * @param $id
 	 *
 	 * @return string|null
+	 * @throws Exception
 	 */
 	public function getBucketNameFromId( $id ) {
 		$bucket = $this->getBucketFromId( $id );
 
-		if ( $bucket instanceof Bucket ) {
-			return $bucket->getName();
+		if ( isset( $bucket->bucketName ) ) {
+			return $bucket->bucketName;
 		}
 
 		return null;
@@ -651,16 +679,59 @@ class Client {
 	/**
 	 * Test whether a file exists in B2 for the given bucket.
 	 *
-	 * @param array $options
+	 * @param array $options FileId or BucketName and FileName
 	 *
 	 * @return boolean
 	 *
-	 * @todo fetch file with HEAD to be more efficient
+	 * @throws Exception
 	 */
 	public function fileExists( $options ) {
-		$files = $this->listFiles( $options );
+		try {
+			$file = $this->getFile( $options );
+		} catch ( exception $e ) {
+			return false;
+		}
 
-		return ! empty( $files );
+		return $file;
+	}
+
+	/**
+	 * Returns a single File object representing a file stored on B2.
+	 *
+	 * @param array $options
+	 *
+	 * @return object
+	 * @throws Exception If no file id was provided and BucketName + FileName does not resolve to a file, a Exception is thrown.
+	 */
+	public function getFile( $options ) {
+		if ( ! isset( $options['FileId'] ) && isset( $options['BucketName'] ) && isset( $options['FileName'] ) ) {
+			$options['FileId'] = $this->getFileIdFromBucketAndFileName( $options['BucketName'], $options['FileName'] );
+
+			if ( ! $options['FileId'] ) {
+				throw new Exception();
+			}
+		}
+
+		return $this->request( 'POST', '/b2_get_file_info', [
+			'json' => [
+				'fileId' => $options['FileId'],
+			],
+		] );
+	}
+
+	protected function getFileIdFromBucketAndFileName( $bucketName, $fileName ) {
+		$files = $this->listFiles( [
+			'BucketName' => $bucketName,
+			'FileName'   => $fileName,
+		] );
+
+		foreach ( $files as $file ) {
+			if ( $file->fileName === $fileName ) {
+				return $file->fileId;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -669,6 +740,7 @@ class Client {
 	 * @param array $options
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	public function listFiles( $options ) {
 		// if FileName is set, we only attempt to retrieve information about that single file.
@@ -697,19 +769,19 @@ class Client {
 				],
 			] );
 
-			foreach ( $response['files'] as $file ) {
+			foreach ( $response->files as $file ) {
 				// if we have a file name set, only retrieve information if the file name matches
 				if ( ! $fileName || ( $fileName === $file['fileName'] ) ) {
-					$files[] = new File( $file );
+					$files[] = $file;
 				}
 			}
 
-			if ( $fileName || $response['nextFileName'] === null ) {
+			if ( $fileName || $response->nextFileName === null ) {
 				// We've got all the files - break out of loop.
 				break;
 			}
 
-			$nextFileName = $response['nextFileName'];
+			$nextFileName = $response->nextFileName;
 		}
 
 		return $files;
@@ -721,18 +793,19 @@ class Client {
 	 * @param array $options
 	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function deleteFile( $options ) {
 		if ( ! isset( $options['FileName'] ) ) {
 			$file = $this->getFile( $options );
 
-			$options['FileName'] = $file->getFileName();
+			$options['FileName'] = $file->fileName;
 		}
 
 		if ( ! isset( $options['FileId'] ) && isset( $options['BucketName'] ) && isset( $options['FileName'] ) ) {
-			$file = $this->getFile( $options ); //TODO only get headers
+			$file = $this->getFile( $options );
 
-			$options['FileId'] = $file->getFileId();
+			$options['FileId'] = $file->fileId;
 		}
 
 		$this->request( 'POST', '/b2_delete_file_version', [
@@ -746,52 +819,11 @@ class Client {
 	}
 
 	/**
-	 * Returns a single File object representing a file stored on B2.
-	 *
-	 * @param array $options
-	 *
-	 * @return File
-	 * @throws NotFoundException If no file id was provided and BucketName + FileName does not resolve to a file, a NotFoundException is thrown.
-	 */
-	public function getFile( $options ) {
-		if ( ! isset( $options['FileId'] ) && isset( $options['BucketName'] ) && isset( $options['FileName'] ) ) {
-			$options['FileId'] = $this->getFileIdFromBucketAndFileName( $options['BucketName'], $options['FileName'] );
-
-			if ( ! $options['FileId'] ) {
-				throw new NotFoundException();
-			}
-		}
-
-		$response = $this->request( 'POST', '/b2_get_file_info', [
-			'json' => [
-				'fileId' => $options['FileId'],
-			],
-		] );
-
-		return new File( $response );
-	}
-
-	protected function getFileIdFromBucketAndFileName( $bucketName, $fileName ) {
-		$files = $this->listFiles( [
-			'BucketName' => $bucketName,
-			'FileName'   => $fileName,
-		] );
-
-		foreach ( $files as $file ) {
-			if ( $file->getFileName() === $fileName ) {
-				return $file->getFileId();
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * @param Key $key
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function createKey( $key ) {
-		throw new \Exception( __FUNCTION__ . ' has not been implemented yet' );
+		throw new Exception( __FUNCTION__ . ' has not been implemented yet' );
 	}
 }

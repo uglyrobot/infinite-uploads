@@ -12,7 +12,7 @@ use GuzzleHttp\Psr7\CachingStream;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Amazon S3 stream wrapper to use "iu://<bucket>/<key>" files with PHP
+ * Infinite Uploads stream wrapper to use "iu://<bucket>/<key>" files with PHP
  * streams, supporting "r", "w", "a", "x".
  *
  * # Opening "r" (read only) streams:
@@ -21,37 +21,37 @@ use Psr\Http\Message\StreamInterface;
  * seek. This is because data read from the stream is not kept in memory or on
  * the local filesystem. You can force a "r" stream to be seekable by setting
  * the "seekable" stream context option true. This will allow true streaming of
- * data from Amazon S3, but will maintain a buffer of previously read bytes in
+ * data from Infinite Uploads, but will maintain a buffer of previously read bytes in
  * a 'php://temp' stream to allow seeking to previously read bytes from the
  * stream.
  *
  * You may pass any GetObject parameters as 's3' stream context options. These
- * options will affect how the data is downloaded from Amazon S3.
+ * options will affect how the data is downloaded from Infinite Uploads.
  *
  * # Opening "w" and "x" (write only) streams:
  *
- * Because Amazon S3 requires a Content-Length header, write only streams will
+ * Because Infinite Uploads requires a Content-Length header, write only streams will
  * maintain a 'php://temp' stream to buffer data written to the stream until
  * the stream is flushed (usually by closing the stream with fclose).
  *
  * You may pass any PutObject parameters as 's3' stream context options. These
- * options will affect how the data is uploaded to Amazon S3.
+ * options will affect how the data is uploaded to Infinite Uploads.
  *
- * When opening an "x" stream, the file must exist on Amazon S3 for the stream
+ * When opening an "x" stream, the file must exist on Infinite Uploads for the stream
  * to open successfully.
  *
  * # Opening "a" (write only append) streams:
  *
  * Similar to "w" streams, opening append streams requires that the data be
  * buffered in a "php://temp" stream. Append streams will attempt to download
- * the contents of an object in Amazon S3, seek to the end of the object, then
+ * the contents of an object in Infinite Uploads, seek to the end of the object, then
  * allow you to append to the contents of the object. The data will then be
  * uploaded using a PutObject operation when the stream is flushed (usually
  * with fclose).
  *
  * You may pass any GetObject and/or PutObject parameters as 's3' stream
  * context options. These options will affect how the data is downloaded and
- * uploaded from Amazon S3.
+ * uploaded from Infinite Uploads.
  *
  * Stream context options:
  *
@@ -465,7 +465,7 @@ class Infinite_Uploads_Stream_Wrapper
 	/**
 	 * Support for opendir().
 	 *
-	 * The opendir() method of the Amazon S3 stream wrapper supports a stream
+	 * The opendir() method of the Infinite Uploads stream wrapper supports a stream
 	 * context option of "listFilter". listFilter must be a callable that
 	 * accepts an associative array of object data and returns true if the
 	 * object should be yielded when iterating the keys in a bucket.
@@ -622,7 +622,7 @@ class Infinite_Uploads_Stream_Wrapper
 		$this->clearCacheKey($path_to);
 
 		if (!$partsFrom['Key'] || !$partsTo['Key']) {
-			return $this->triggerError('The Amazon S3 stream wrapper only '
+			return $this->triggerError('The Infinite Uploads stream wrapper only '
 				. 'supports copying objects');
 		}
 
@@ -679,7 +679,7 @@ class Infinite_Uploads_Stream_Wrapper
 				$this->getOptions(true)
 			)
 		) {
-			$errors[] = "{$path} already exists on Amazon S3";
+			$errors[] = "{$path} already exists on Infinite Uploads";
 		}
 
 		return $errors;
