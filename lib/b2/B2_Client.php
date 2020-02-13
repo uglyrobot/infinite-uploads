@@ -135,7 +135,7 @@ class B2_Client {
 			$endpoint = $this->apiUrl . $uri;
 		}
 
-		var_dump( 'API Call:', $endpoint, $args );
+		//var_dump( 'API Call:', $endpoint, $args );
 
 		$result = wp_remote_request( $endpoint, $args );
 		if ( ! is_wp_error( $result ) ) {
@@ -329,6 +329,7 @@ class B2_Client {
 	 * @param array $options
 	 *
 	 * @return object
+	 * @throws Exception
 	 */
 	public function upload( $options ) {
 		// Clean the path if it starts with /.
@@ -761,12 +762,25 @@ class B2_Client {
 
 		// B2 returns, at most, 1000 files per "page". Loop through the pages and compile an array of File objects.
 		while ( true ) {
+			$json = [
+				'bucketId'      => $options['BucketId'],
+				'startFileName' => $nextFileName,
+				'maxFileCount'  => $maxFileCount,
+			];
+
+			if ( isset( $options['prefix'] ) ) {
+				$json['prefix'] = $options['prefix'];
+			}
+
+			if ( isset( $options['delimiter'] ) ) {
+				$json['delimiter'] = $options['delimiter'];
+			}
+
 			$response = $this->request( 'POST', '/b2_list_file_names', [
-				'json' => [
-					'bucketId'      => $options['BucketId'],
-					'startFileName' => $nextFileName,
-					'maxFileCount'  => $maxFileCount,
+				'headers' => [
+					'Authorization' => $this->authToken,
 				],
+				'json'    => $json,
 			] );
 
 			foreach ( $response->files as $file ) {
