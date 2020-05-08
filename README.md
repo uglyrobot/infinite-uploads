@@ -15,7 +15,7 @@
 	</tr>
 	<tr>
 		<td>
-			A <strong><a href="https://hmn.md/">UglyRobot</a></strong> project.
+			A <strong><a href="https://uglyrobot.com/">UglyRobot</a></strong> project.
 		</td>
 		<td align="center">
 			<img src="https://miro.medium.com/fit/c/256/256/0*wLMglTa464-sq7Im.png" width="100" />
@@ -34,7 +34,7 @@ Getting Set Up
 **Install Using Composer**
 
 ```
-composer require humanmade/infinite-uploads
+composer require uglyrobot/infinite-uploads
 ```
 
 **Install Manually**

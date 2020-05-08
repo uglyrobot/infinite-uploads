@@ -2,7 +2,7 @@
 
 use Aws\S3\Transfer;
 
-class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
+class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 
 	/**
 	 * Verifies the API keys entered will work for writing and deleting from S3.
@@ -16,13 +16,13 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		// Get S3 Upload instance.
-		$instance = Infinite_Uploads::get_instance();
+		$instance = Infinite_uploads::get_instance();
 
 		// Create a path in the base directory, with a random file name to avoid potentially overwriting existing data.
 		$upload_dir = wp_upload_dir();
 		$s3_path    = $upload_dir['basedir'] . '/' . mt_rand() . '.txt';
 
-		// Attempt to copy the local Canola test file to the generated path on S3.
+		// Attempt to copy the local Canola test file to the generated path on Infinite Uploads cloud.
 		WP_CLI::print_value( 'Attempting to upload file ' . $s3_path );
 
 		$copy = copy(
@@ -32,14 +32,14 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 		// Check that the copy worked.
 		if ( ! $copy ) {
-			WP_CLI::error( 'Failed to copy / write to S3 - check your policy?' );
+			WP_CLI::error( 'Failed to copy / write to Infinite Uploads cloud - check your policy?' );
 
 			return;
 		}
 
-		WP_CLI::print_value( 'File uploaded to S3 successfully.' );
+		WP_CLI::print_value( 'File uploaded to Infinite Uploads cloud successfully.' );
 
-		// Delete the file off S3.
+		// Delete the file off Infinite Uploads cloud.
 		WP_CLI::print_value( 'Attempting to delete file. ' . $s3_path );
 		$delete = unlink( $s3_path );
 
@@ -50,123 +50,19 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			return;
 		}
 
-		WP_CLI::print_value( 'File deleted from S3 successfully.' );
+		WP_CLI::print_value( 'File deleted from Infinite Uploads cloud successfully.' );
 
 		WP_CLI::success( 'Looks like your configuration is correct.' );
 	}
 
 	/**
-	 * Create an AWS IAM user for Infinite Uploads to user
-	 *
-	 * @subcommand create-iam-user
-	 * @synopsis --admin-key=<key> --admin-secret=<secret> [--username=<username>] [--format=<format>]
-	 */
-	public function create_iam_user( $args, $args_assoc ) {
-
-		$args_assoc = wp_parse_args( $args_assoc, array(
-			'format' => 'table',
-		) );
-		if ( empty( $args_assoc['username'] ) ) {
-			$username = 'infinite-uploads-' . sanitize_title( home_url() );
-		} else {
-			$username = $args_assoc['username'];
-		}
-
-		try {
-			$iam = Aws\Common\Aws::factory( array( 'key' => $args_assoc['admin-key'], 'secret' => $args_assoc['admin-secret'] ) )->get( 'iam' );
-
-			$iam->createUser( array(
-				'UserName' => $username,
-			));
-
-			$credentials = $iam->createAccessKey( array(
-				'UserName' => $username,
-			));
-
-			$credentials = $credentials['AccessKey'];
-
-			$iam->putUserPolicy( array(
-				'UserName'       => $username,
-				'PolicyName'     => $username . '-policy',
-				'PolicyDocument' => $this->get_iam_policy(),
-			));
-
-		} catch ( Exception $e ) {
-			WP_CLI::error( $e->getMessage() );
-		}
-
-		WP_CLI\Utils\format_items( $args_assoc['format'], array( (object) $credentials ), array( 'AccessKeyId', 'SecretAccessKey' ) );
-
-	}
-
-	private function get_iam_policy() {
-
-		$bucket = strtok( INFINITE_UPLOADS_BUCKET, '/' );
-
-		$path = null;
-
-		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-			$path = str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET );
-		}
-
-		return '{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "Stmt1392016154000",
-      "Effect": "Allow",
-      "Action": [
-        "b2:AbortMultipartUpload",
-        "b2:DeleteObject",
-        "b2:GetBucketAcl",
-        "b2:GetBucketLocation",
-        "b2:GetBucketPolicy",
-        "b2:GetObject",
-        "b2:GetObjectAcl",
-        "b2:ListBucket",
-        "b2:ListBucketMultipartUploads",
-        "b2:ListMultipartUploadParts",
-        "b2:PutObject",
-        "b2:PutObjectAcl"
-      ],
-      "Resource": [
-        "arn:aws:b2:::' . INFINITE_UPLOADS_BUCKET . '/*"
-      ]
-    },
-    {
-      "Sid": "AllowRootAndHomeListingOfBucket",
-      "Action": ["b2:ListBucket"],
-      "Effect": "Allow",
-      "Resource": ["arn:aws:b2:::' . $bucket . '"],
-      "Condition":{"StringLike":{"b2:prefix":["' . ( $path ? $path . '/' : '' ) . '*"]}}
-    }
-  ]
-}';
-	}
-
-	/**
-	 * Create AWS IAM Policy that Infinite Uploads requires
-	 *
-	 * It's typically not a good idea to use access keys that have full access to your S3 account,
-	 * as if the keys are compromised through the WordPress site somehow, you don't
-	 * want to give full control via those keys.
-	 *
-	 * @subcommand generate-iam-policy
-	 */
-	public function generate_iam_policy() {
-
-		WP_Cli::print_value( $this->get_iam_policy() );
-
-	}
-
-	/**
-	 * List files in the S3 bukcet
+	 * List files in the Infinite Uploads cloud
 	 *
 	 * @synopsis [<path>]
 	 */
 	public function ls( $args ) {
 
-		$s3 = Infinite_Uploads::get_instance()->b2();
+		$s3 = Infinite_uploads::get_instance()->s3();
 
 		$prefix = '';
 
@@ -193,7 +89,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Copy files to / from the uploads directory. Use iu://bucket/location for S3
+	 * Copy files to / from the uploads directory. Use iu://bucket/location for Infinite Uploads cloud
 	 *
 	 * @synopsis <from> <to>
 	 */
@@ -212,7 +108,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Upload a directory to S3
+	 * Upload a directory to Infinite Uploads cloud
 	 *
 	 * @subcommand upload-directory
 	 * @synopsis <from> [<to>] [--concurrency=<concurrency>] [--verbose]
@@ -225,7 +121,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$to = $args[1];
 		}
 
-		$s3 = Infinite_Uploads::get_instance()->b2();
+		$s3 = Infinite_uploads::get_instance()->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 
 		$transfer_args = [
@@ -247,13 +143,13 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Delete files from S3
+	 * Delete files from Infinite Uploads cloud
 	 *
 	 * @synopsis <path> [--regex=<regex>]
 	 */
 	public function rm( $args, $args_assoc ) {
 
-		$s3 = Infinite_Uploads::get_instance()->b2();
+		$s3 = Infinite_uploads::get_instance()->s3();
 
 		$prefix = '';
 		$regex = isset( $args_assoc['regex'] ) ? $args_assoc['regex'] : '';
@@ -291,7 +187,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Ensable the auto-rewriting of media links to S3
+	 * Enable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function enable( $args, $assoc_args ) {
 		update_option( 'infinite_uploads_enabled', 'enabled' );
@@ -300,7 +196,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Disable the auto-rewriting of media links to S3
+	 * Disable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function disable( $args, $assoc_args ) {
 		delete_option( 'infinite_uploads_enabled' );
@@ -325,7 +221,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Verify that the required constants for the S3 connections are set.
+	 * Verify that the required constants for the Infinite Uploads cloud connections are set.
 	 *
 	 * @return bool true if all constants are set, else false.
 	 */
@@ -351,4 +247,4 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 }
 
-WP_CLI::add_command( 'infinite-uploads', 'Infinite_Uploads_WP_CLI_Command' );
+WP_CLI::add_command( 'infinite-uploads', 'Infinite_uploads_WP_CLI_Command' );

@@ -5,7 +5,7 @@
  *
  * This is for the most part taken from Drupal, with some modifications.
  */
-class Infinite_Uploads_Local_Stream_Wrapper {
+class Infinite_uploads_Local_Stream_Wrapper {
 	/**
 	 * Stream context resource.
 	 *
@@ -36,7 +36,7 @@ class Infinite_Uploads_Local_Stream_Wrapper {
 	 *   String specifying the path.
 	 */
 	static function getDirectoryPath() {
-		$upload_dir = Infinite_Uploads::get_instance()->get_original_upload_dir();
+		$upload_dir = Infinite_uploads::get_instance()->get_original_upload_dir();
 		return $upload_dir['basedir'] . '/iu';
 	}
 
