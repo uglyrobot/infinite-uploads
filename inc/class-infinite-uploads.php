@@ -19,30 +19,28 @@ class Infinite_Uploads {
 
 		if ( ! self::$instance ) {
 			self::$instance = new Infinite_Uploads(
-				INFINITE_UPLOADS_BUCKET,
-				defined( 'INFINITE_UPLOADS_KEY' ) ? INFINITE_UPLOADS_KEY : null,
-				defined( 'INFINITE_UPLOADS_SECRET' ) ? INFINITE_UPLOADS_SECRET : null,
-				defined( 'INFINITE_UPLOADS_BUCKET_URL' ) ? INFINITE_UPLOADS_BUCKET_URL : null,
-				INFINITE_UPLOADS_REGION
+				'5822983365ad6ee76ef30117',
+				'00082835de7e3170000000003',
+				'K000D4CZksbPWRd5ne/SgYXuA5rGADA'
 			);
 		}
 
 		return self::$instance;
 	}
 
-	public function __construct( $bucket, $key, $secret, $bucket_url = null, $region = null ) {
+	public function __construct( $bucket, $key, $secret, $bucket_url = null ) {
 
 		$this->bucket     = $bucket;
 		$this->key        = $key;
 		$this->secret     = $secret;
 		$this->bucket_url = $bucket_url;
-		$this->region     = $region;
 	}
 
 	/**
 	 * Setup the hooks, urls filtering etc for Infinite Uploads
 	 */
 	public function setup() {
+		return;
 		$this->register_stream_wrapper();
 
 		add_filter( 'upload_dir', array( $this, 'filter_upload_dir' ) );
@@ -52,7 +50,7 @@ class Infinite_Uploads {
 		add_filter( 'wp_resource_hints', array( $this, 'wp_filter_resource_hints' ), 10, 2 );
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
-		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
+		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_cloud' ) );
 	}
 
 	/**
@@ -60,25 +58,25 @@ class Infinite_Uploads {
 	 */
 	public function tear_down() {
 
-		stream_wrapper_unregister( 's3' );
+		stream_wrapper_unregister( 'iu' );
 		remove_filter( 'upload_dir', array( $this, 'filter_upload_dir' ) );
 		remove_filter( 'wp_image_editors', array( $this, 'filter_editors' ), 9 );
-		remove_filter( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
+		remove_filter( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_cloud' ) );
 	}
 
 	/**
-	 * Register the stream wrapper for s3
+	 * Register the stream wrapper
 	 */
 	public function register_stream_wrapper() {
 		if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
-			stream_wrapper_register( 's3', 'Infinite_Uploads_Local_Stream_Wrapper', STREAM_IS_URL );
+			stream_wrapper_register( 'iu', 'Infinite_Uploads_Local_Stream_Wrapper', STREAM_IS_URL );
 		} else {
-			Infinite_Uploads_Stream_Wrapper::register( $this->s3() );
+			Infinite_Uploads_Stream_Wrapper::register( $this->b2() );
 			$objectAcl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
-			stream_context_set_option( stream_context_get_default(), 's3', 'ACL', $objectAcl );
+			stream_context_set_option( stream_context_get_default(), 'iu', 'ACL', $objectAcl );
 		}
 
-		stream_context_set_option( stream_context_get_default(), 's3', 'seekable', true );
+		stream_context_set_option( stream_context_get_default(), 'iu', 'seekable', true );
 	}
 
 	public function filter_upload_dir( $dirs ) {
@@ -91,8 +89,8 @@ class Infinite_Uploads {
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 
 			if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
-				$dirs['url']     = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/s3/' . $this->bucket, $dirs['path'] );
-				$dirs['baseurl'] = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/s3/' . $this->bucket, $dirs['basedir'] );
+				$dirs['url']     = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['path'] );
+				$dirs['baseurl'] = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['basedir'] );
 
 			} else {
 				$dirs['url']     = str_replace( 'iu://' . $this->bucket, $this->get_s3_url(), $dirs['path'] );
@@ -104,13 +102,13 @@ class Infinite_Uploads {
 	}
 
 	/**
-	 * Delete all attachment files from S3 when an attachment is deleted.
+	 * Delete all attachment files from cloud when an attachment is deleted.
 	 *
 	 * WordPress Core's handling of deleting files for attachments via
 	 * wp_delete_attachment_files is not compatible with remote streams, as
 	 * it makes many assumptions about local file paths. The hooks also do
 	 * not exist to be able to modify their behavior. As such, we just clean
-	 * up the s3 files when an attachment is removed, and leave WordPress to try
+	 * up the iu files when an attachment is removed, and leave WordPress to try
 	 * a failed attempt at mangling the iu:// urls.
 	 *
 	 * @param $post_id
@@ -137,7 +135,7 @@ class Infinite_Uploads {
 		$bucket = strtok( $this->bucket, '/' );
 		$path   = substr( $this->bucket, strlen( $bucket ) );
 
-		return apply_filters( 'infinite_uploads_bucket_url', 'https://' . $bucket . '.s3.amazonaws.com' . $path );
+		return apply_filters( 'infinite_uploads_bucket_url', 'https://' . $bucket . '.b2.amazonaws.com' . $path );
 	}
 
 	/**
@@ -163,41 +161,18 @@ class Infinite_Uploads {
 	}
 
 	/**
-	 * @return Aws\S3\S3Client
+	 * @return InfiniteUploads\B2\B2_Client
+	 * @throws Exception
 	 */
-	public function s3() {
+	public function b2() {
 
-		if ( ! empty( $this->s3 ) ) {
-			return $this->s3;
+		if ( ! empty( $this->b2 ) ) {
+			return $this->b2;
 		}
 
-		$params = array( 'version' => 'latest' );
+		$this->b2 = new InfiniteUploads\B2\B2_Client( $this->key, $this->secret );
 
-		if ( $this->key && $this->secret ) {
-			$params['credentials']['key']    = $this->key;
-			$params['credentials']['secret'] = $this->secret;
-		}
-
-		if ( $this->region ) {
-			$params['signature'] = 'v4';
-			$params['region']    = $this->region;
-		}
-
-		if ( defined( 'WP_PROXY_HOST' ) && defined( 'WP_PROXY_PORT' ) ) {
-			$proxy_auth    = '';
-			$proxy_address = WP_PROXY_HOST . ':' . WP_PROXY_PORT;
-
-			if ( defined( 'WP_PROXY_USERNAME' ) && defined( 'WP_PROXY_PASSWORD' ) ) {
-				$proxy_auth = WP_PROXY_USERNAME . ':' . WP_PROXY_PASSWORD . '@';
-			}
-
-			$params['request.options']['proxy'] = $proxy_auth . $proxy_address;
-		}
-
-		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
-		$this->s3 = Aws\S3\S3Client::factory( $params );
-
-		return $this->s3;
+		return $this->b2;
 	}
 
 	public function filter_editors( $editors ) {
@@ -212,14 +187,14 @@ class Infinite_Uploads {
 	}
 
 	/**
-	 * Copy the file from /tmp to an s3 dir so handle_sideload doesn't fail due to
+	 * Copy the file from /tmp to an b2 dir so handle_sideload doesn't fail due to
 	 * trying to do a rename() on the file cross streams. This is somewhat of a hack
 	 * to work around the core issue https://core.trac.wordpress.org/ticket/29257
 	 *
 	 * @param array File array
 	 * @return array
 	 */
-	public function filter_sideload_move_temp_file_to_s3( array $file ) {
+	public function filter_sideload_move_temp_file_to_cloud( array $file ) {
 		$upload_dir = wp_upload_dir();
 		$new_path   = $upload_dir['basedir'] . '/tmp/' . basename( $file['tmp_name'] );
 
@@ -241,7 +216,7 @@ class Infinite_Uploads {
 	 */
 	public function wp_filter_read_image_metadata( $meta, $file ) {
 		remove_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10 );
-		$temp_file = $this->copy_image_from_s3( $file );
+		$temp_file = $this->copy_image_from_cloud( $file );
 		$meta      = wp_read_image_metadata( $temp_file );
 		add_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10, 2 );
 		unlink( $temp_file );
@@ -249,7 +224,7 @@ class Infinite_Uploads {
 	}
 
 	/**
-	 * Add the DNS address for the S3 Bucket to list for DNS prefetch.
+	 * Add the DNS address for the CDN to list for DNS prefetch.
 	 *
 	 * @param $hints
 	 * @param $relation_type
@@ -269,7 +244,7 @@ class Infinite_Uploads {
 	 * @param  string $file
 	 * @return string
 	 */
-	public function copy_image_from_s3( $file ) {
+	public function copy_image_from_cloud( $file ) {
 		if ( ! function_exists( 'wp_tempnam' ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		}

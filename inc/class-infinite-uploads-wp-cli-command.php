@@ -116,29 +116,29 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
       "Sid": "Stmt1392016154000",
       "Effect": "Allow",
       "Action": [
-        "s3:AbortMultipartUpload",
-        "s3:DeleteObject",
-        "s3:GetBucketAcl",
-        "s3:GetBucketLocation",
-        "s3:GetBucketPolicy",
-        "s3:GetObject",
-        "s3:GetObjectAcl",
-        "s3:ListBucket",
-        "s3:ListBucketMultipartUploads",
-        "s3:ListMultipartUploadParts",
-        "s3:PutObject",
-        "s3:PutObjectAcl"
+        "b2:AbortMultipartUpload",
+        "b2:DeleteObject",
+        "b2:GetBucketAcl",
+        "b2:GetBucketLocation",
+        "b2:GetBucketPolicy",
+        "b2:GetObject",
+        "b2:GetObjectAcl",
+        "b2:ListBucket",
+        "b2:ListBucketMultipartUploads",
+        "b2:ListMultipartUploadParts",
+        "b2:PutObject",
+        "b2:PutObjectAcl"
       ],
       "Resource": [
-        "arn:aws:s3:::' . INFINITE_UPLOADS_BUCKET . '/*"
+        "arn:aws:b2:::' . INFINITE_UPLOADS_BUCKET . '/*"
       ]
     },
     {
       "Sid": "AllowRootAndHomeListingOfBucket",
-      "Action": ["s3:ListBucket"],
+      "Action": ["b2:ListBucket"],
       "Effect": "Allow",
-      "Resource": ["arn:aws:s3:::' . $bucket . '"],
-      "Condition":{"StringLike":{"s3:prefix":["' . ( $path ? $path . '/' : '' ) . '*"]}}
+      "Resource": ["arn:aws:b2:::' . $bucket . '"],
+      "Condition":{"StringLike":{"b2:prefix":["' . ( $path ? $path . '/' : '' ) . '*"]}}
     }
   ]
 }';
@@ -166,7 +166,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function ls( $args ) {
 
-		$s3 = Infinite_Uploads::get_instance()->s3();
+		$s3 = Infinite_Uploads::get_instance()->b2();
 
 		$prefix = '';
 
@@ -225,7 +225,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$to = $args[1];
 		}
 
-		$s3 = Infinite_Uploads::get_instance()->s3();
+		$s3 = Infinite_Uploads::get_instance()->b2();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 
 		$transfer_args = [
@@ -253,7 +253,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function rm( $args, $args_assoc ) {
 
-		$s3 = Infinite_Uploads::get_instance()->s3();
+		$s3 = Infinite_Uploads::get_instance()->b2();
 
 		$prefix = '';
 		$regex = isset( $args_assoc['regex'] ) ? $args_assoc['regex'] : '';

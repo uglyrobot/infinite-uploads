@@ -77,7 +77,7 @@ class Infinite_Uploads_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 		unlink( $temp_filename );
 
 		if ( ! $copy_result ) {
-			return new WP_Error( 'unable-to-copy-to-s3', 'Unable to copy the temp image to S3' );
+			return new WP_Error( 'unable-to-copy-to-b2', 'Unable to copy the temp image to S3' );
 		}
 
 		return array(

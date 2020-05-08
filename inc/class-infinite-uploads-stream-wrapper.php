@@ -16,7 +16,7 @@ use InfiniteUploads\B2\B2_Client;
  * a 'php://temp' stream to allow seeking to previously read bytes from the
  * stream.
  *
- * You may pass any GetObject parameters as 's3' stream context options. These
+ * You may pass any GetObject parameters as 'b2' stream context options. These
  * options will affect how the data is downloaded from Infinite Uploads.
  *
  * # Opening "w" and "x" (write only) streams:
@@ -25,7 +25,7 @@ use InfiniteUploads\B2\B2_Client;
  * maintain a 'php://temp' stream to buffer data written to the stream until
  * the stream is flushed (usually by closing the stream with fclose).
  *
- * You may pass any PutObject parameters as 's3' stream context options. These
+ * You may pass any PutObject parameters as 'b2' stream context options. These
  * options will affect how the data is uploaded to Infinite Uploads.
  *
  * When opening an "x" stream, the file must exist on Infinite Uploads for the stream
@@ -40,7 +40,7 @@ use InfiniteUploads\B2\B2_Client;
  * uploaded using a PutObject operation when the stream is flushed (usually
  * with fclose).
  *
- * You may pass any GetObject and/or PutObject parameters as 's3' stream
+ * You may pass any GetObject and/or PutObject parameters as 'b2' stream
  * context options. These options will affect how the data is downloaded and
  * uploaded from Infinite Uploads.
  *
@@ -82,7 +82,7 @@ class Infinite_Uploads_Stream_Wrapper {
 	/** @var CacheInterface Cache for object and dir lookups */
 	private $cache;
 
-	/** @var string The opened protocol (e.g., "s3") */
+	/** @var string The opened protocol (e.g., "b2") */
 	private $protocol = 'iu';
 
 	/**
@@ -138,7 +138,7 @@ class Infinite_Uploads_Stream_Wrapper {
 				default:
 					/**
 					 * As we open a temp stream, we don't actually know if we have writing ability yet.
-					 * This means functions like copy() will not fail correctly, as the write to s3
+					 * This means functions like copy() will not fail correctly, as the write to b2
 					 * is only attempted on stream_flush() which is too late to report to copy()
 					 * et al that the write has failed.
 					 *
@@ -472,7 +472,7 @@ class Infinite_Uploads_Stream_Wrapper {
 			$bool = (bool) $this->getClient()->putObject( $params );
 
 			/**
-			 * Action when a new object has been uploaded to s3.
+			 * Action when a new object has been uploaded to b2.
 			 *
 			 * @param array $params S3Client::putObject parameters.
 			 */
@@ -940,7 +940,7 @@ class Infinite_Uploads_Stream_Wrapper {
 		}
 
 		// First we need to create a cache key. This key is the full path to
-		// then object in s3: protocol://bucket/key.
+		// then object in b2: protocol://bucket/key.
 		// Next we need to create a result value. The result value is the
 		// current value of the iterator without the opened bucket prefix to
 		// emulate how readdir() works on directories.

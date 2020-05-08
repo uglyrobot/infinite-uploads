@@ -281,7 +281,7 @@ class Infinite_Uploads_Local_Stream_Wrapper {
 		];
 
 		/**
-		 * Action when a new object has been uploaded to s3.
+		 * Action when a new object has been uploaded to b2.
 		 *
 		 * @param array  $params S3Client::putObject parameters.
 		 */

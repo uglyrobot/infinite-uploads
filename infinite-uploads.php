@@ -21,20 +21,8 @@ function infinite_uploads_init() {
 		return;
 	}
 
-	if ( ! defined( 'INFINITE_UPLOADS_BUCKET' ) ) {
-		return;
-	}
-
-	if ( ( ! defined( 'INFINITE_UPLOADS_KEY' ) || ! defined( 'INFINITE_UPLOADS_SECRET' ) ) && ! defined( 'INFINITE_UPLOADS_USE_INSTANCE_PROFILE' ) ) {
-		return;
-	}
-
 	if ( ! infinite_uploads_enabled() ) {
 		return;
-	}
-
-	if ( ! defined( 'INFINITE_UPLOADS_REGION' ) ) {
-		wp_die( 'INFINITE_UPLOADS_REGION constant is required. Please define it in your wp-config.php' );
 	}
 
 	$instance = Infinite_Uploads::get_instance();
@@ -52,7 +40,7 @@ function infinite_uploads_init() {
 	// Add filters to "wrap" the wp_privacy_personal_data_export_file function call as we need to
 	// switch out the personal_data directory to a local temp folder, and then upload after it's
 	// complete, as Core tries to write directly to the ZipArchive which won't work with the
-	// S3 streamWrapper.
+	// streamWrapper.
 	add_action( 'wp_privacy_personal_data_export_file', 'infinite_uploads_before_export_personal_data', 9 );
 	add_action( 'wp_privacy_personal_data_export_file', 'infinite_uploads_after_export_personal_data', 11 );
 	add_action( 'wp_privacy_personal_data_export_file_created', 'infinite_uploads_move_temp_personal_data_to_cloud', 1000 );

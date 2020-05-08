@@ -142,7 +142,7 @@ class B2_Client {
 			$status = wp_remote_retrieve_response_code( $result );
 			$body   = wp_remote_retrieve_body( $result );
 
-			var_dump( 'API Response:', $status, $body );
+			//var_dump( 'API Response:', $status, $body );
 
 			if ( 200 != $status ) {
 				$error = json_decode( $body );
@@ -295,7 +295,7 @@ class B2_Client {
 			$buckets = $this->request( 'POST', '/b2_list_buckets', $req )->buckets;
 			wp_cache_set( $cacheKey, $buckets, HOUR_IN_SECONDS );
 		}
-
+var_dump($buckets);
 		return $buckets;
 	}
 
@@ -593,7 +593,7 @@ class B2_Client {
 	}
 
 	/**
-	 * @param     $bucket
+	 * @param     $bucketId
 	 * @param     $path
 	 * @param int $validDuration
 	 *
@@ -634,6 +634,10 @@ class B2_Client {
 			}
 
 			$requestUrl = sprintf( '%s/file/%s/%s', $this->downloadUrl, $options['BucketName'], $options['FileName'] );
+		}
+
+		if ( isset( $options['SaveAs'] ) ) {
+			$options['stream'] = true;
 		}
 
 		if ( isset( $options['stream'] ) ) {
