@@ -53,6 +53,8 @@ class Infinite_uploads {
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
 		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
+
+		$admin = Infinite_uploads_admin::get_instance();
 	}
 
 	/**

@@ -26,7 +26,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 		WP_CLI::print_value( 'Attempting to upload file ' . $s3_path );
 
 		$copy = copy(
-			dirname( dirname( __FILE__ ) ) . '/verify.txt',
+			dirname( dirname( __FILE__ ) ) . '/readme.md',
 			$s3_path
 		);
 
@@ -80,7 +80,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 				'Prefix' => $prefix,
 			));
 			foreach ( $objects as $object ) {
-				WP_CLI::line( str_replace( $prefix, '', $object['Key'] ) );
+				WP_CLI::line( str_replace( $prefix, '', $object['Key'] ) . ' ' . size_format( $object['Size'] ) . ' ' . $object['LastModified']->__toString() );
 			}
 		} catch ( Exception $e ) {
 			WP_CLI::error( $e->getMessage() );
@@ -89,7 +89,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Copy files to / from the uploads directory. Use iu://bucket/location for Infinite Uploads cloud
+	 * Copy files to / from the uploads directory. Use s3://bucket/location for Infinite Uploads cloud
 	 *
 	 * @synopsis <from> <to>
 	 */
@@ -121,6 +121,11 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 			$to = $args[1];
 		}
 
+		/*$obj = new ArrayObject( [
+			'/srv/www/wordpress-one/public_html/wp-content/uploads/2020/04/test.txt'
+		] );
+		$from = $obj->getIterator();*/
+
 		$s3 = Infinite_uploads::get_instance()->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 
@@ -135,7 +140,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 			},
 		];
 		try {
-			$manager = new Transfer( $s3, $from, 'iu://' . INFINITE_UPLOADS_BUCKET . '/' . $to, $transfer_args );
+			$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/' . $to, $transfer_args );
 			$manager->transfer();
 		} catch ( Exception $e ) {
 			WP_CLI::error( $e->getMessage() );

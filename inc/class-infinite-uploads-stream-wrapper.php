@@ -156,6 +156,7 @@ class Infinite_uploads_Stream_Wrapper
 					 *
 					 * Added by Joe Hoyle
 					 */
+					/**
 					try {
 						$p = $this->params;
 						$p['Body'] = '';
@@ -164,7 +165,7 @@ class Infinite_uploads_Stream_Wrapper
 					} catch (Exception $e) {
 						return $this->triggerError($e->getMessage());
 					}
-
+					*/
 					return $this->openWriteStream($path);
 			}
 		});
@@ -219,6 +220,7 @@ class Infinite_uploads_Stream_Wrapper
 
 		$this->clearCacheKey("iu://{$params['Bucket']}/{$params['Key']}");
 		return $this->boolCall(function () use ($params) {
+			error_log( "InfUpl: putObject {$params['Key']}" );
 			$bool = (bool) $this->getClient()->putObject($params);
 
 			/**
@@ -268,6 +270,7 @@ class Infinite_uploads_Stream_Wrapper
 
 		return $this->boolCall(function () use ($path) {
 			$this->clearCacheKey($path);
+			error_log( "InfUpl: deleteObject " . $this->withPath($path) );
 			$this->getClient()->deleteObject($this->withPath($path));
 			return true;
 		});
@@ -371,6 +374,7 @@ class Infinite_uploads_Stream_Wrapper
 
 		return $this->boolCall(function () use ($parts, $path) {
 			try {
+				error_log( "InfUpl: headObject " . $parts['Key'] );
 				$result = $this->getClient()->headObject($parts);
 				if (substr($parts['Key'], -1, 1) == '/' &&
 					$result['ContentLength'] == 0
@@ -385,6 +389,7 @@ class Infinite_uploads_Stream_Wrapper
 			} catch (S3Exception $e) {
 				// Maybe this isn't an actual key, but a prefix. Do a prefix
 				// listing of objects to determine.
+				error_log( "InfUpl: listObjects " . rtrim($parts['Key'], '/') . '/' );
 				$result = $this->getClient()->listObjects([
 					'Bucket'  => $parts['Bucket'],
 					'Prefix'  => rtrim($parts['Key'], '/') . '/',
@@ -401,9 +406,13 @@ class Infinite_uploads_Stream_Wrapper
 	private function statDirectory($parts, $path, $flags)
 	{
 		// Stat "directories": buckets, or "iu://"
+		if ( $parts['Bucket'] ) {
+			error_log( "InfUpl: doesBucketExist " . $parts['Bucket'] );
+		}
 		if (!$parts['Bucket'] ||
 			$this->getClient()->doesBucketExist($parts['Bucket'])
 		) {
+
 			return $this->formatUrlStat($path);
 		}
 
@@ -455,6 +464,7 @@ class Infinite_uploads_Stream_Wrapper
 
 		return $this->boolCall(function () use ($params, $path, $client) {
 			if (!$params['Key']) {
+				error_log( "InfUpl: deleteBucket " . $params['Bucket'] );
 				$client->deleteBucket(['Bucket' => $params['Bucket']]);
 				return true;
 			}
@@ -503,6 +513,7 @@ class Infinite_uploads_Stream_Wrapper
 
 		$this->openedBucketPrefix = $params['Key'];
 
+		error_log( "InfUpl: ListObjects " . $op['Prefix'] );
 		// Filter our "/" keys added by the console as directories, and ensure
 		// that if a filter function is provided that it passes the filter.
 		$this->objectIterator = \Aws\flatmap(
@@ -630,6 +641,7 @@ class Infinite_uploads_Stream_Wrapper
 			$options = $this->getOptions(true);
 			// Copy the object and allow overriding default parameters if
 			// desired, but by default copy metadata
+			error_log( "InfUpl: copy " . $partsFrom['Key'] . ' to ' . $partsTo['Key'] );
 			$this->getClient()->copy(
 				$partsFrom['Bucket'],
 				$partsFrom['Key'],
@@ -638,7 +650,9 @@ class Infinite_uploads_Stream_Wrapper
 				isset($options['acl']) ? $options['acl'] : 'private',
 				$options
 			);
+
 			// Delete the original object
+			error_log( "InfUpl: deleteObject " . $partsFrom['Key'] );
 			$this->getClient()->deleteObject([
 				'Bucket' => $partsFrom['Bucket'],
 				'Key'    => $partsFrom['Key']
@@ -672,6 +686,9 @@ class Infinite_uploads_Stream_Wrapper
 
 		// When using mode "x" validate if the file exists before attempting
 		// to read
+		if ($mode == 'x') {
+			error_log( "InfUpl: doesObjectExist " . $this->getOption( 'Key' ) );
+		}
 		if ($mode == 'x' &&
 			$this->getClient()->doesObjectExist(
 				$this->getOption('Bucket'),
@@ -776,6 +793,7 @@ class Infinite_uploads_Stream_Wrapper
 
 	private function openReadStream()
 	{
+		error_log( "InfUpl: getObject (stream) " . $this->getOption('Key') );
 		$client = $this->getClient();
 		$command = $client->getCommand('GetObject', $this->getOptions(true));
 		$command['@http']['stream'] = true;
@@ -801,6 +819,7 @@ class Infinite_uploads_Stream_Wrapper
 	{
 		try {
 			// Get the body of the object and seek to the end of the stream
+			error_log( "InfUpl: getObject (append stream) " . $this->getOption('Key') );
 			$client = $this->getClient();
 			$this->body = $client->getObject($this->getOptions(true))['Body'];
 			$this->body->seek(0, SEEK_END);
@@ -882,11 +901,13 @@ class Infinite_uploads_Stream_Wrapper
 	 */
 	private function createBucket($path, array $params)
 	{
+		error_log( "InfUpl: doesBucketExist " . $params['Bucket'] );
 		if ($this->getClient()->doesBucketExist($params['Bucket'])) {
 			return $this->triggerError("Bucket already exists: {$path}");
 		}
 
 		return $this->boolCall(function () use ($params, $path) {
+			error_log( "InfUpl: createBucket " . $params['Bucket'] );
 			$this->getClient()->createBucket($params);
 			$this->clearCacheKey($path);
 			return true;
@@ -908,6 +929,7 @@ class Infinite_uploads_Stream_Wrapper
 		$params['Body'] = '';
 
 		// Fail if this pseudo directory key already exists
+		error_log( "InfUpl: doesObjectExist " . $params['Key'] );
 		if ($this->getClient()->doesObjectExist(
 			$params['Bucket'],
 			$params['Key'])
@@ -916,6 +938,7 @@ class Infinite_uploads_Stream_Wrapper
 		}
 
 		return $this->boolCall(function () use ($params, $path) {
+			error_log( "InfUpl: putObject " . $params['Key'] );
 			$this->getClient()->putObject($params);
 			$this->clearCacheKey($path);
 			return true;
@@ -934,6 +957,7 @@ class Infinite_uploads_Stream_Wrapper
 	{
 		// Use a key that adds a trailing slash if needed.
 		$prefix = rtrim($params['Key'], '/') . '/';
+		error_log( "InfUpl: ListObjects " . $prefix );
 		$result = $this->getClient()->listObjects([
 			'Bucket'  => $params['Bucket'],
 			'Prefix'  => $prefix,
