@@ -2,7 +2,7 @@
 
 use Aws\S3\Transfer;
 
-class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
+class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 	/**
 	 * Verifies the API keys entered will work for writing and deleting from S3.
@@ -134,8 +134,20 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 			'debug'       => (bool) $args_assoc['verbose'],
 			'before'      => function ( AWS\Command $command ) {
 				if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
-					$acl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
+					$acl            = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
 					$command['ACL'] = $acl;
+					/// Expires:
+					if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
+						$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
+					}
+					// Cache-Control:
+					if ( defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
+						if ( is_numeric( INFINITE_UPLOADS_HTTP_CACHE_CONTROL ) ) {
+							$command['CacheControl'] = 'max-age=' . INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+						} else {
+							$command['CacheControl'] = INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+						}
+					}
 				}
 			},
 		];
@@ -195,7 +207,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Enable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function enable( $args, $assoc_args ) {
-		update_option( 'infinite_uploads_enabled', 'enabled' );
+		update_site_option( 'iup_enabled', 'enabled' );
 
 		WP_CLI::success( 'Media URL rewriting enabled.' );
 	}
@@ -204,7 +216,7 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Disable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function disable( $args, $assoc_args ) {
-		delete_option( 'infinite_uploads_enabled' );
+		delete_site_option( 'iup_enabled' );
 
 		WP_CLI::success( 'Media URL rewriting disabled.' );
 	}
@@ -252,4 +264,4 @@ class Infinite_uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 }
 
-WP_CLI::add_command( 'infinite-uploads', 'Infinite_uploads_WP_CLI_Command' );
+WP_CLI::add_command( 'infinite-uploads', 'Infinite_Uploads_WP_CLI_Command' );

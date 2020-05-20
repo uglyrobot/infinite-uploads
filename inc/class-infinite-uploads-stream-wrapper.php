@@ -60,8 +60,7 @@ use Psr\Http\Message\StreamInterface;
  * - For "unlink" only: Any option that can be passed to the DeleteObject
  *   operation
  */
-class Infinite_uploads_Stream_Wrapper
-{
+class Infinite_Uploads_Stream_Wrapper {
 	/** @var resource|null Stream context (this is set by PHP) */
 	public $context;
 

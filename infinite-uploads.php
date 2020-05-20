@@ -1,11 +1,13 @@
 <?php
 /*
 Plugin Name: Infinite Uploads
-Description: Store uploads in S3
+Description: Store uploads in the cloud with unlimited storage
 Author: UglyRobot
-Version: 0.1
+Version: 0.1-alpha-2
 Author URI: https://uglyrobot.com
 */
+
+define( 'INFINITE_UPLOADS_VERSION', '0.1-alpha-2' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -117,7 +119,7 @@ function infinite_uploads_enabled() {
 	// Make sure the plugin is enabled when autoenable is on
 	$constant_autoenable_off = ( defined( 'INFINITE_UPLOADS_AUTOENABLE' ) && false === INFINITE_UPLOADS_AUTOENABLE );
 
-	if ( $constant_autoenable_off && 'enabled' !== get_option( 'infinite_uploads_enabled' ) ) {                         // If the plugin is not enabled, skip
+	if ( $constant_autoenable_off && 'enabled' !== get_site_option( 'infinite_uploads_enabled' ) ) {                         // If the plugin is not enabled, skip
 		return false;
 	}
 
@@ -132,7 +134,7 @@ function infinite_uploads_enabled() {
 function infinite_uploads_autoload( $class_name ) {
 	/*
 	 * Load plugin classes:
-	 * - Class name: Infinite_uploads_Image_Editor_Imagick.
+	 * - Class name: Infinite_Uploads_Image_Editor_Imagick.
 	 * - File name: class-infinite-uploads-image-editor-imagick.php.
 	 */
 	$class_file = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';

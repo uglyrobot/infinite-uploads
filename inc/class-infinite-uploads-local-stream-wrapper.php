@@ -5,7 +5,7 @@
  *
  * This is for the most part taken from Drupal, with some modifications.
  */
-class Infinite_uploads_Local_Stream_Wrapper {
+class Infinite_Uploads_Local_Stream_Wrapper {
 	/**
 	 * Stream context resource.
 	 *
