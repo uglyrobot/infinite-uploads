@@ -74,19 +74,25 @@ class Infinite_Uploads_admin {
 					$.post(ajaxurl + '?action=infinite-uploads-filelist', data, function (json) {
 						console.log(json.data);
 						if (json.success) {
-							$('#iup-sync-progress-bar .iup-local').text(json.data.remaining_size + " (" + json.data.remaining_files + " files)");
+							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+							$('.iup-progress-size').text(json.data.remaining_size);
+							$('.iup-progress-files').text(json.data.remaining_files);
+							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
+							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
 							if (!json.data.is_done) {
 								buildFilelist(json.data.remaining_dirs);
 							} else {
-								$('#iup-sync-progress .iup-cloud').show();
-								$('#iup-sync-progress .iup-local').hide();
+								$('#iup-scan-progress .iup-cloud').show();
+								$('#iup-scan-progress .iup-local').hide();
 								fetchRemoteFilelist('');
 							}
 
 						} else {
-							alert('Error');
-							$('#iup-sync-progress .iup-local, #iup-sync-progress .iup-cloud, #iup-sync-progress').hide();
-							$('#iup-sync').show();
+							$('#iup-error span').text(json.data);
+							$('#iup-error').show();
+
+							$('#iup-scan-progress .iup-local, #iup-scan-progress .iup-cloud, #iup-scan-progress').hide();
+							$('#iup-scan').show();
 						}
 					}, 'json');
 				};
@@ -96,31 +102,73 @@ class Infinite_Uploads_admin {
 					$.post(ajaxurl + '?action=infinite-uploads-prep-sync', data, function (json) {
 						console.log(json.data);
 						if (json.success) {
-							$('#iup-sync-progress-bar .iup-cloud').text(json.data.pcnt_complete + "% synced: " + json.data.cloud_size + " (" + json.data.cloud_files + " files)").css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-							$('#iup-sync-progress-bar .iup-local').text(json.data.remaining_size + " (" + json.data.remaining_files + " files)").css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
+							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+							$('.iup-progress-size').text(json.data.remaining_size);
+							$('.iup-progress-files').text(json.data.remaining_files);
+							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
+							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
 							if (!json.data.is_done) {
 								fetchRemoteFilelist(json.data.next_token);
 							} else {
-								$('#iup-sync-progress .iup-local, #iup-sync-progress .iup-cloud, #iup-sync-progress').hide();
-								$('#iup-sync').show();
+								$('#iup-scan-progress .iup-local, #iup-scan-progress .iup-cloud, #iup-scan-progress').hide();
+								$('#iup-scan').show();
 							}
 
 						} else {
-							alert('Error');
-							$('#iup-sync-progress .iup-local, #iup-sync-progress .iup-cloud, #iup-sync-progress').hide();
-							$('#iup-sync').show();
+							$('#iup-error span').text(json.data);
+							$('#iup-error').show();
+
+							$('#iup-scan-progress .iup-local, #iup-scan-progress .iup-cloud, #iup-scan-progress').hide();
+							$('#iup-scan').show();
 						}
 					}, 'json');
 				};
 
-				//Syncing
-				$('#iup-sync').on('click', function () {
-					$('#iup-sync').hide();
-					$('#iup-sync-progress .iup-cloud').hide();
-					$('#iup-sync-progress .iup-local, #iup-sync-progress').show();
+				var syncFilelist = function () {
+					$.post(ajaxurl + '?action=infinite-uploads-sync', {}, function (json) {
+						console.log(json.data);
+						if (json.success) {
+							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+							$('.iup-progress-size').text(json.data.remaining_size);
+							$('.iup-progress-files').text(json.data.remaining_files);
+							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
+							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
+							if (!json.data.is_done) {
+								syncFilelist();
+							} else {
+								$('#iup-sync').show();
+								$('#iup-sync-progress').hide();
+								$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
+							}
+
+						} else {
+							$('#iup-error span').text(json.data);
+							$('#iup-error').show();
+
+							$('#iup-sync').show();
+							$('#iup-sync-progress').hide();
+							$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
+						}
+					}, 'json');
+				};
+
+				//Scan
+				$('#iup-scan').on('click', function () {
+					$('#iup-scan').hide();
+					$('#iup-scan-progress .iup-cloud').hide();
+					$('#iup-scan-progress .iup-local, #iup-scan-progress').show();
 
 					buildFilelist([]);
+				});
 
+				//Syncing
+				$('#iup-sync').on('click', function () {
+					$('#iup-scan, #iup-sync').hide();
+					$('#iup-sync-progress').show();
+					$('#iup-sync-progress-bar .progress-bar').addClass('progress-bar-animated progress-bar-striped');
+
+
+					syncFilelist();
 				});
 			});
 		</script>
@@ -140,20 +188,44 @@ class Infinite_Uploads_admin {
 			<hr class="my-4">
 			<p>Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage.</p>
 
-			<!-- Button trigger modal -->
-			<button type="button" class="btn btn-primary" id="iup-sync">
-				Scan Uploads
-			</button>
-			<div class="row" id="iup-sync-progress" style="display:none;">
+			<?php
+			$instance = Infinite_uploads::get_instance();
+			$stats    = $instance->get_sync_stats();
+			?>
+			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="iup-error" style="display: none;">
+				<strong>Error!</strong> <span></span>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<ul class="list-group list-group-horizontal id=" iup-sync-progress
+			">
+			<li class="list-group-item list-group-item-success"><h3 class="m-0"><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%<small class="text-muted"> Synced</small></h3></li>
+			<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span><small class="text-muted"> Remaining</small></h3></li>
+			<li class="list-group-item list-group-item-info display-5"><h3 class="m-0"><span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span><small class="text-muted"> Files Remaining</small></h3></li>
+			</ul>
+			<div class="progress mt-4" id="iup-sync-progress-bar" style="height: 30px;">
+				<div class="progress-bar bg-info iup-cloud" role="progressbar" style="width: <?php echo esc_attr( $stats['pcnt_complete'] ); ?>%" aria-valuenow="<?php echo esc_attr( $stats['pcnt_complete'] ); ?>" aria-valuemin="0" aria-valuemax="100">
+					<div><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%</div>
+				</div>
+				<div class="progress-bar bg-warning iup-local" role="progressbar" style="width: <?php echo 100 - $stats['pcnt_complete']; ?>%" aria-valuenow="<?php echo 100 - $stats['pcnt_complete']; ?>" aria-valuemin="0" aria-valuemax="100">
+					<div><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span> (<span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span> files)</div>
+				</div>
+			</div>
+			<div class="row mt-4" id="iup-scan-progress" style="display:none;">
 				<div class="spinner-grow float-left mr-1" role="status">
 					<span class="sr-only">Loading...</span>
 				</div>
 				<h3 class="display-5 float-left iup-local">Scanning local filesystem...</h3>
 				<h3 class="display-5 float-left iup-cloud">Comparing to the cloud...</h3>
 			</div>
-			<div class="progress mt-4" id="iup-sync-progress-bar" style="height: 30px;">
-				<div class="progress-bar progress-bar-striped bg-info iup-cloud" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-				<div class="progress-bar bg-warning iup-local" role="progressbar" style="width: 100%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+			<div class="row mt-4">
+				<button type="button" class="btn btn-primary" id="iup-scan">
+					Scan Uploads
+				</button>
+				<button type="button" class="btn btn-primary ml-2" id="iup-sync">
+					Sync to Cloud
+				</button>
 			</div>
 		</div>
 

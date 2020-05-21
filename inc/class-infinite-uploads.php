@@ -1,12 +1,14 @@
 <?php
+use Aws\S3\Transfer;
 
 class Infinite_uploads {
 
 	private static $instance;
-	private        $bucket;
-	private        $bucket_url;
-	private        $key;
-	private        $secret;
+	private $bucket;
+	private $bucket_url;
+	private $key;
+	private $secret;
+	public $ajax_timelimit = 20;
 
 	public $original_upload_dir;
 	public $original_file;
@@ -115,7 +117,7 @@ class Infinite_uploads {
 			$remaining_dirs = [];
 		}
 
-		$filelist = new Infinite_Uploads_BFS_Filelist( $path, 5, $remaining_dirs );
+		$filelist = new Infinite_Uploads_Filelist( $path, $this->ajax_timelimit, $remaining_dirs );
 		$filelist->start();
 		$this_file_count = count( $filelist->file_list );
 		$remaining_dirs  = $filelist->paths_left;
@@ -173,7 +175,7 @@ class Infinite_uploads {
 					}
 				}
 
-				if ( ( $timer = timer_stop() ) >= 20 ) {
+				if ( ( $timer = timer_stop() ) >= $this->ajax_timelimit ) {
 					break;
 				}
 			}
@@ -191,7 +193,62 @@ class Infinite_uploads {
 	}
 
 	public function ajax_sync() {
+		global $wpdb;
 
+		$uploaded = 0;
+		$break    = false;
+		$path     = $this->get_original_upload_dir();
+		while ( ! $break ) {
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
+			//build full paths
+			$to_sync_full = [];
+			foreach ( $to_sync as $key => $file ) {
+				$to_sync_full[] = $path['basedir'] . $file;
+			}
+
+			$obj  = new ArrayObject( $to_sync_full );
+			$from = $obj->getIterator();
+
+			$s3            = $this->s3();
+			$transfer_args = [
+				'concurrency' => 5,
+				'base_dir'    => $path['basedir'],
+				'before'      => function ( AWS\Command $command ) {
+					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
+						$acl            = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
+						$command['ACL'] = $acl;
+						/// Expires:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
+							$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
+						}
+						// Cache-Control:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
+							if ( is_numeric( INFINITE_UPLOADS_HTTP_CACHE_CONTROL ) ) {
+								$command['CacheControl'] = 'max-age=' . INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							} else {
+								$command['CacheControl'] = INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							}
+						}
+					}
+				},
+			];
+			try {
+				$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/', $transfer_args );
+				$manager->transfer();
+				$uploaded += 10;
+				foreach ( $to_sync as $file ) {
+					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+				}
+			} catch ( Exception $e ) {
+				wp_send_json_error( $e->getMessage() );
+			}
+
+			if ( timer_stop() >= $this->ajax_timelimit ) {
+				$break   = true;
+				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done' ), $this->get_sync_stats() ) );
+			}
+		}
 	}
 
 	public function get_sync_stats() {
@@ -213,7 +270,7 @@ class Infinite_uploads {
 			'cloud_size'      => size_format( (int) $synced->size ),
 			'remaining_files' => number_format_i18n( $total->files - $synced->files ),
 			'remaining_size'  => size_format( $total->size - $synced->size ),
-			'pcnt_complete'   => round( ( $synced->files / $total->files ) * 100, 0 ),
+			'pcnt_complete'   => round( ( $synced->files / $total->files ) * 100, 2 ),
 		] );
 	}
 

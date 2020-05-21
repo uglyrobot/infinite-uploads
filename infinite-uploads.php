@@ -9,6 +9,16 @@ Author URI: https://uglyrobot.com
 
 define( 'INFINITE_UPLOADS_VERSION', '0.1-alpha-2' );
 
+add_filter( 'infinite_uploads_s3_client_params', function ( $params ) {
+	$params['endpoint']                = 'https://s3.us-west-000.backblazeb2.com';
+	$params['use_path_style_endpoint'] = true;
+	//$params['debug'] = [
+	//	'logfn'        => 'error_log',
+	//	'stream_size'  => 0,
+	//];
+	return $params;
+} );
+
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
 }

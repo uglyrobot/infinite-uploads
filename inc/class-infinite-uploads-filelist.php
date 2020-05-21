@@ -5,9 +5,9 @@
 
 
 /**
- * Infinite_Uploads_BFS_Filelist
+ * Infinite_Uploads_Filelist
  */
-class Infinite_Uploads_BFS_Filelist {
+class Infinite_Uploads_Filelist {
 
 	public $is_done = false;
 	public $paths_left = [];
@@ -20,7 +20,7 @@ class Infinite_Uploads_BFS_Filelist {
 	protected $insert_rows = 500;
 
 	/**
-	 * Infinite_Uploads_BFS_Filelist constructor.
+	 * Infinite_Uploads_Filelist constructor.
 	 *
 	 * @param string $root_path      The full path of the directory to iterate.
 	 * @param float  $timeout        Timeout in seconds.
