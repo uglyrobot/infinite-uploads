@@ -121,11 +121,6 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$to = $args[1];
 		}
 
-		/*$obj = new ArrayObject( [
-			'/srv/www/wordpress-one/public_html/wp-content/uploads/2020/04/test.txt'
-		] );
-		$from = $obj->getIterator();*/
-
 		$s3 = Infinite_uploads::get_instance()->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 

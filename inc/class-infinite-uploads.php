@@ -1,17 +1,26 @@
 <?php
+
 use Aws\S3\Transfer;
 
 class Infinite_uploads {
 
 	private static $instance;
+	public $ajax_timelimit = 20;
+	public $original_upload_dir;
+	public $original_file;
 	private $bucket;
 	private $bucket_url;
 	private $key;
 	private $secret;
-	public $ajax_timelimit = 20;
 
-	public $original_upload_dir;
-	public $original_file;
+	public function __construct( $bucket, $key, $secret, $bucket_url = null, $region = null ) {
+
+		$this->bucket     = $bucket;
+		$this->key        = $key;
+		$this->secret     = $secret;
+		$this->bucket_url = $bucket_url;
+		$this->region     = $region;
+	}
 
 	/**
 	 *
@@ -30,15 +39,6 @@ class Infinite_uploads {
 		}
 
 		return self::$instance;
-	}
-
-	public function __construct( $bucket, $key, $secret, $bucket_url = null, $region = null ) {
-
-		$this->bucket     = $bucket;
-		$this->key        = $key;
-		$this->secret     = $secret;
-		$this->bucket_url = $bucket_url;
-		$this->region     = $region;
 	}
 
 	/**
@@ -60,7 +60,7 @@ class Infinite_uploads {
 		Infinite_Uploads_admin::get_instance();
 
 		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
-		add_action( 'wp_ajax_infinite-uploads-prep-sync', array( &$this, 'ajax_prep_sync' ) );
+		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );
 		add_action( 'wp_ajax_infinite-uploads-sync', array( &$this, 'ajax_sync' ) );
 
 		// Install the needed DB table if not already.
@@ -88,6 +88,63 @@ class Infinite_uploads {
 	}
 
 	/**
+	 * Register the stream wrapper for s3
+	 */
+	public function register_stream_wrapper() {
+		if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
+			stream_wrapper_register( 'iu', 'Infinite_Uploads_Local_Stream_Wrapper', STREAM_IS_URL );
+		} else {
+			Infinite_Uploads_Stream_Wrapper::register( $this->s3() );
+			$objectAcl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
+			stream_context_set_option( stream_context_get_default(), 'iu', 'ACL', $objectAcl );
+		}
+
+		stream_context_set_option( stream_context_get_default(), 'iu', 'seekable', true );
+	}
+
+	/*
+	 *
+	 */
+
+	/**
+	 * @return Aws\S3\S3Client
+	 */
+	public function s3() {
+
+		if ( ! empty( $this->s3 ) ) {
+			return $this->s3;
+		}
+
+		$params = array( 'version' => 'latest' );
+
+		if ( $this->key && $this->secret ) {
+			$params['credentials']['key']    = $this->key;
+			$params['credentials']['secret'] = $this->secret;
+		}
+
+		if ( $this->region ) {
+			$params['signature'] = 'v4';
+			$params['region']    = $this->region;
+		}
+
+		if ( defined( 'WP_PROXY_HOST' ) && defined( 'WP_PROXY_PORT' ) ) {
+			$proxy_auth    = '';
+			$proxy_address = WP_PROXY_HOST . ':' . WP_PROXY_PORT;
+
+			if ( defined( 'WP_PROXY_USERNAME' ) && defined( 'WP_PROXY_PASSWORD' ) ) {
+				$proxy_auth = WP_PROXY_USERNAME . ':' . WP_PROXY_PASSWORD . '@';
+			}
+
+			$params['request.options']['proxy'] = $proxy_auth . $proxy_address;
+		}
+
+		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
+		$this->s3 = Aws\S3\S3Client::factory( $params );
+
+		return $this->s3;
+	}
+
+	/**
 	 * Tear down the hooks, url filtering etc for Infinite Uploads
 	 */
 	public function tear_down() {
@@ -98,9 +155,6 @@ class Infinite_uploads {
 		remove_filter( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
 	}
 
-	/*
-	 *
-	 */
 	public function ajax_filelist() {
 
 		// check caps
@@ -132,7 +186,7 @@ class Infinite_uploads {
 		wp_send_json_success( $data );
 	}
 
-	public function ajax_prep_sync() {
+	public function ajax_remote_filelist() {
 		global $wpdb;
 
 		// check caps
@@ -155,6 +209,10 @@ class Infinite_uploads {
 
 		if ( ! empty( $_POST['next_token'] ) ) {
 			$args['ContinuationToken'] = $_POST['next_token'];
+		} else {
+			$progress                    = get_site_option( 'iup_files_scanned' );
+			$progress['compare_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
 		}
 
 		try {
@@ -180,6 +238,12 @@ class Infinite_uploads {
 				}
 			}
 
+			if ( $is_done ) {
+				$progress                     = get_site_option( 'iup_files_scanned' );
+				$progress['compare_finished'] = time();
+				update_site_option( 'iup_files_scanned', $progress );
+			}
+
 			$data  = compact( 'file_count', 'req_count', 'is_done', 'next_token', 'timer' );
 			$stats = $this->get_sync_stats();
 			if ( $stats ) {
@@ -194,6 +258,12 @@ class Infinite_uploads {
 
 	public function ajax_sync() {
 		global $wpdb;
+
+		$progress = get_site_option( 'iup_files_scanned' );
+		if ( ! $progress['sync_started'] ) {
+			$progress['sync_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+		}
 
 		$uploaded = 0;
 		$break    = false;
@@ -242,13 +312,29 @@ class Infinite_uploads {
 			} catch ( Exception $e ) {
 				wp_send_json_error( $e->getMessage() );
 			}
-
+			//wp_send_json_error( 'bugugudklfjds dslkjl sjlds' );
 			if ( timer_stop() >= $this->ajax_timelimit ) {
 				$break   = true;
 				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+
+				if ( $is_done ) {
+					$progress                  = get_site_option( 'iup_files_scanned' );
+					$progress['sync_finished'] = time();
+					update_site_option( 'iup_files_scanned', $progress );
+				}
+
 				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done' ), $this->get_sync_stats() ) );
 			}
 		}
+	}
+
+	public function get_original_upload_dir() {
+
+		if ( empty( $this->original_upload_dir ) ) {
+			wp_upload_dir();
+		}
+
+		return $this->original_upload_dir;
 	}
 
 	public function get_sync_stats() {
@@ -257,36 +343,22 @@ class Infinite_uploads {
 		$total  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files`" );
 		$synced = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
 
-		if ( ! $total || ! $total->files || ! $total->size ) {
-			return false;
+		$progress    = get_site_option( 'iup_files_scanned' );
+		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+		foreach ( $progress as $key => $timestamp ) {
+			$progress[ $key ] = $timestamp ? date_i18n( $date_format, $progress[ $key ] ) : $timestamp;
 		}
-
-		$progress = get_site_option( 'iup_files_scanned' );
 
 		return array_merge( $progress, [
+			'is_data'         => (bool) $total->files,
 			'total_files'     => number_format_i18n( (int) $total->files ),
-			'total_size'      => size_format( (int) $total->size ),
+			'total_size'      => size_format( (int) $total->size, 2 ),
 			'cloud_files'     => number_format_i18n( (int) $synced->files ),
-			'cloud_size'      => size_format( (int) $synced->size ),
+			'cloud_size'      => size_format( (int) $synced->size, 2 ),
 			'remaining_files' => number_format_i18n( $total->files - $synced->files ),
-			'remaining_size'  => size_format( $total->size - $synced->size ),
-			'pcnt_complete'   => round( ( $synced->files / $total->files ) * 100, 2 ),
+			'remaining_size'  => size_format( $total->size - $synced->size, 2 ),
+			'pcnt_complete'   => ( $total->files ? round( ( $synced->files / $total->files ) * 100, 2 ) : 0 ),
 		] );
-	}
-
-	/**
-	 * Register the stream wrapper for s3
-	 */
-	public function register_stream_wrapper() {
-		if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
-			stream_wrapper_register( 'iu', 'Infinite_Uploads_Local_Stream_Wrapper', STREAM_IS_URL );
-		} else {
-			Infinite_Uploads_Stream_Wrapper::register( $this->s3() );
-			$objectAcl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
-			stream_context_set_option( stream_context_get_default(), 'iu', 'ACL', $objectAcl );
-		}
-
-		stream_context_set_option( stream_context_get_default(), 'iu', 'seekable', true );
 	}
 
 	public function filter_upload_dir( $dirs ) {
@@ -309,6 +381,17 @@ class Infinite_uploads {
 		}
 
 		return $dirs;
+	}
+
+	public function get_s3_url() {
+		if ( $this->bucket_url ) {
+			return $this->bucket_url;
+		}
+
+		$bucket = strtok( $this->bucket, '/' );
+		$path   = substr( $this->bucket, strlen( $bucket ) );
+
+		return apply_filters( 'infinite_uploads_bucket_url', 'https://' . $bucket . '.s3.amazonaws.com' . $path );
 	}
 
 	/**
@@ -337,17 +420,6 @@ class Infinite_uploads {
 		wp_delete_file( $file );
 	}
 
-	public function get_s3_url() {
-		if ( $this->bucket_url ) {
-			return $this->bucket_url;
-		}
-
-		$bucket = strtok( $this->bucket, '/' );
-		$path   = substr( $this->bucket, strlen( $bucket ) );
-
-		return apply_filters( 'infinite_uploads_bucket_url', 'https://' . $bucket . '.s3.amazonaws.com' . $path );
-	}
-
 	/**
 	 * Get the S3 bucket name
 	 *
@@ -359,53 +431,6 @@ class Infinite_uploads {
 
 	public function get_s3_bucket_region() {
 		return $this->region;
-	}
-
-	public function get_original_upload_dir() {
-
-		if ( empty( $this->original_upload_dir ) ) {
-			wp_upload_dir();
-		}
-
-		return $this->original_upload_dir;
-	}
-
-	/**
-	 * @return Aws\S3\S3Client
-	 */
-	public function s3() {
-
-		if ( ! empty( $this->s3 ) ) {
-			return $this->s3;
-		}
-
-		$params = array( 'version' => 'latest' );
-
-		if ( $this->key && $this->secret ) {
-			$params['credentials']['key']    = $this->key;
-			$params['credentials']['secret'] = $this->secret;
-		}
-
-		if ( $this->region ) {
-			$params['signature'] = 'v4';
-			$params['region']    = $this->region;
-		}
-
-		if ( defined( 'WP_PROXY_HOST' ) && defined( 'WP_PROXY_PORT' ) ) {
-			$proxy_auth    = '';
-			$proxy_address = WP_PROXY_HOST . ':' . WP_PROXY_PORT;
-
-			if ( defined( 'WP_PROXY_USERNAME' ) && defined( 'WP_PROXY_PASSWORD' ) ) {
-				$proxy_auth = WP_PROXY_USERNAME . ':' . WP_PROXY_PASSWORD . '@';
-			}
-
-			$params['request.options']['proxy'] = $proxy_auth . $proxy_address;
-		}
-
-		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
-		$this->s3 = Aws\S3\S3Client::factory( $params );
-
-		return $this->s3;
 	}
 
 	public function filter_editors( $editors ) {
@@ -425,6 +450,7 @@ class Infinite_uploads {
 	 * to work around the core issue https://core.trac.wordpress.org/ticket/29257
 	 *
 	 * @param array File array
+	 *
 	 * @return array
 	 */
 	public function filter_sideload_move_temp_file_to_s3( array $file ) {
@@ -445,6 +471,7 @@ class Infinite_uploads {
 	 *
 	 * @param array  $meta
 	 * @param string $file
+	 *
 	 * @return array|bool
 	 */
 	public function wp_filter_read_image_metadata( $meta, $file ) {
@@ -453,28 +480,15 @@ class Infinite_uploads {
 		$meta      = wp_read_image_metadata( $temp_file );
 		add_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10, 2 );
 		unlink( $temp_file );
+
 		return $meta;
-	}
-
-	/**
-	 * Add the DNS address for the S3 Bucket to list for DNS prefetch.
-	 *
-	 * @param $hints
-	 * @param $relation_type
-	 * @return array
-	 */
-	function wp_filter_resource_hints( $hints, $relation_type ) {
-		if ( 'dns-prefetch' === $relation_type ) {
-			$hints[] = $this->get_s3_url();
-		}
-
-		return $hints;
 	}
 
 	/**
 	 * Get a local copy of the file.
 	 *
-	 * @param  string $file
+	 * @param string $file
+	 *
 	 * @return string
 	 */
 	public function copy_image_from_s3( $file ) {
@@ -483,6 +497,23 @@ class Infinite_uploads {
 		}
 		$temp_filename = wp_tempnam( $file );
 		copy( $file, $temp_filename );
+
 		return $temp_filename;
+	}
+
+	/**
+	 * Add the DNS address for the S3 Bucket to list for DNS prefetch.
+	 *
+	 * @param $hints
+	 * @param $relation_type
+	 *
+	 * @return array
+	 */
+	function wp_filter_resource_hints( $hints, $relation_type ) {
+		if ( 'dns-prefetch' === $relation_type ) {
+			$hints[] = $this->get_s3_url();
+		}
+
+		return $hints;
 	}
 }

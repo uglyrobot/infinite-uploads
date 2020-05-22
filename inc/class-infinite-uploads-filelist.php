@@ -57,6 +57,8 @@ class Infinite_Uploads_Filelist {
 				'files_finished'   => false,
 				'compare_started'  => false,
 				'compare_finished' => false,
+				'sync_started'     => false,
+				'sync_finished'    => false,
 			] );
 		}
 
@@ -76,6 +78,8 @@ class Infinite_Uploads_Filelist {
 
 	/**
 	 * Runs a breadth-first iteration on all files and gathers the relevant info for each one.
+	 *
+	 * @todo test what happens if some files have no read permissions.
 	 */
 	protected function get_files() {
 
