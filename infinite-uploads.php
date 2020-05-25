@@ -3,7 +3,7 @@
 Plugin Name: Infinite Uploads
 Description: Store uploads in the cloud with unlimited storage
 Author: UglyRobot
-Version: 0.1-alpha-2
+Version: 0.1-alpha-3
 Author URI: https://uglyrobot.com
 */
 

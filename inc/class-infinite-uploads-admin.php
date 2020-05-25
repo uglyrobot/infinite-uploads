@@ -223,7 +223,7 @@ class Infinite_Uploads_admin {
 			<p class="lead">Create your free Infinite Uploads cloud account and connect this site.</p>
 			<hr class="my-4">
 			<p>Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.</p>
-			<a class="btn btn-primary btn-lg" href="#" role="button">Create Account or Login</a>
+			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button">Create Account or Login</a>
 		</div>
 
 		<div class="jumbotron">
@@ -298,10 +298,9 @@ class Infinite_Uploads_admin {
 			<h2 class="display-4">3. Enable</h2>
 			<p class="lead">Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.</p>
 			<hr class="my-4">
-			<p>Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage.</p>
 			<!-- Button trigger modal -->
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-				Copy to Cloud
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" disabled>
+				Enable Infinite Uploads
 			</button>
 		</div>
 

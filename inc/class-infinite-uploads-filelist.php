@@ -13,10 +13,15 @@ class Infinite_Uploads_Filelist {
 	public $paths_left = [];
 	public $file_count = 0;
 	public $file_list = [];
+	public $exclusions = [
+		'/et-cache/',
+		'/imports/',
+		'/cache/',
+		'/elementor/css/',
+	];
 	protected $root_path;
 	protected $timeout;
 	protected $start_time;
-	protected $excluded_files = [];
 	protected $insert_rows = 500;
 
 	/**
@@ -27,11 +32,10 @@ class Infinite_Uploads_Filelist {
 	 * @param array  $paths_left     Provide as returned if continuing the filelist after a timeout.
 	 * @param array  $excluded_files File patterns to exclude from the built filelist.
 	 */
-	public function __construct( $root_path, $timeout = 25.0, $paths_left = [], $excluded_files = [] ) {
-		$this->root_path      = rtrim( $root_path, '/' ); //expected no trailing slash.
-		$this->timeout        = $timeout;
-		$this->paths_left     = $paths_left;
-		$this->excluded_files = $excluded_files;
+	public function __construct( $root_path, $timeout = 25.0, $paths_left = [] ) {
+		$this->root_path  = rtrim( $root_path, '/' ); //expected no trailing slash.
+		$this->timeout    = $timeout;
+		$this->paths_left = $paths_left;
 	}
 
 	/**
@@ -138,10 +142,16 @@ class Infinite_Uploads_Filelist {
 	 * Checks path against excluded pattern.
 	 *
 	 * @return bool
-	 * @todo Make this work.
 	 *
 	 */
 	protected function is_excluded( $path ) {
+		$exclusions = apply_filters( 'infinite_uploads_sync_exclusions', $this->exclusions );
+		foreach ( $exclusions as $string ) {
+			if ( false !== strpos( $path, $string ) ) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
