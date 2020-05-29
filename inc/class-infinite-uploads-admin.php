@@ -214,30 +214,28 @@ class Infinite_Uploads_admin {
 			});
 		</script>
 		<h2 class="display-5">
-			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="30" width="30"/>
-			Infinite Uploads
-		</h2>
+			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="30" width="30"/><?php _e( 'Infinite Uploads', 'iup' ); ?></h2>
 
 		<div class="jumbotron">
-			<h2 class="display-4">1. Connect</h2>
-			<p class="lead">Create your free Infinite Uploads cloud account and connect this site.</p>
+			<h2 class="display-4"><?php _e( '1. Connect', 'iup' ); ?></h2>
+			<p class="lead"><?php _e( 'Create your free Infinite Uploads cloud account and connect this site.', 'iup' ); ?></p>
 			<hr class="my-4">
-			<p>Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.</p>
-			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button">Create Account or Login</a>
+			<p><?php _e( 'Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.', 'iup' ); ?></p>
+			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><?php _e( 'Create Account or Login', 'iup' ); ?></a>
 		</div>
 
 		<div class="jumbotron">
-			<h2 class="display-4">2. Sync</h2>
-			<p class="lead">Copy all your existing uploads the the cloud.</p>
+			<h2 class="display-4"><?php _e( '2. Sync', 'iup' ); ?></h2>
+			<p class="lead"><?php _e( 'Copy all your existing uploads the the cloud.', 'iup' ); ?></p>
 			<hr class="my-4">
-			<p>Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed.</p>
-			<p>If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command: <code>wp infinite-uploads sync</code></p>
+			<p><?php _e( 'Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed.', 'iup' ); ?></p>
+			<p><?php _e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'iup' ); ?> <code>wp infinite-uploads sync</code></p>
 			<?php
 			$instance = Infinite_uploads::get_instance();
 			$stats    = $instance->get_sync_stats();
 			?>
 			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="iup-error" style="display: none;">
-				<strong>Error!</strong> <span id="iup-error-msg"></span>
+				<strong><?php _e( 'Error!', 'iup' ); ?></strong> <span id="iup-error-msg"></span>
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -245,15 +243,15 @@ class Infinite_Uploads_admin {
 			<div class="container-fluid">
 				<div class="row mt-4 ml-1" id="iup-progress-gauges" <?php echo $stats['is_data'] ? '' : 'style="display: none;"'; ?>>
 					<ul class="list-group list-group-horizontal">
-						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-size"><?php echo esc_html( $stats['total_size'] ); ?></span><small class="text-muted"> Local</small></h3></li>
-						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-files"><?php echo esc_html( $stats['total_files'] ); ?></span><small class="text-muted"> Local Files</small></h3></li>
+						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-size"><?php echo esc_html( $stats['total_size'] ); ?></span><small class="text-muted"> <?php _e( 'Local', 'iup' ); ?></small></h3></li>
+						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-files"><?php echo esc_html( $stats['total_files'] ); ?></span><small class="text-muted"> <?php _e( 'Local Files', 'iup' ); ?></small></h3></li>
 					</ul>
 					<ul class="list-group list-group-horizontal iup-progress-gauges-cloud ml-4" <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>>
-						<li class="list-group-item list-group-item-success"><h3 class="m-0"><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%<small class="text-muted"> Synced</small></h3></li>
+						<li class="list-group-item list-group-item-success"><h3 class="m-0"><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%<small class="text-muted"> <?php _e( 'Synced', 'iup' ); ?></small></h3></li>
 					</ul>
 					<ul class="list-group list-group-horizontal iup-progress-gauges-cloud ml-4" <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>>
-						<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span><small class="text-muted"> Remaining</small></h3></li>
-						<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span><small class="text-muted"> Remaining Files</small></h3></li>
+						<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span><small class="text-muted"> <?php _e( 'Remaining', 'iup' ); ?></small></h3></li>
+						<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span><small class="text-muted"> <?php _e( 'Remaining Files', 'iup' ); ?></small></h3></li>
 					</ul>
 				</div>
 
@@ -264,61 +262,60 @@ class Infinite_Uploads_admin {
 						</div>
 					</div>
 					<div class="progress-bar bg-warning iup-local" role="progressbar" style="width: <?php echo 100 - $stats['pcnt_complete']; ?>%" aria-valuenow="<?php echo 100 - $stats['pcnt_complete']; ?>" aria-valuemin="0" aria-valuemax="100">
-						<div <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span> (<span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span> files)</div>
+						<div <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span> (<span
+								class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span> <?php _e( 'files', 'iup' ); ?>)
+						</div>
 					</div>
 				</div>
 
 				<div class="row mt-4 iup-scan-progress" style="display:none;">
 					<ul class="col-md">
 						<li class="iup-local">
-							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only">Loading...</span></div>
-							<h3 class="text-muted">Scanning local filesystem</h3></li>
+							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
+							<h3 class="text-muted"><?php _e( 'Scanning local filesystem', 'iup' ); ?></h3></li>
 						<li class="iup-cloud">
-							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only">Loading...</span></div>
-							<h3 class="text-muted">Comparing to the cloud</h3></li>
+							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
+							<h3 class="text-muted"><?php _e( 'Comparing to the cloud', 'iup' ); ?></h3></li>
 						<li class="iup-sync">
-							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only">Loading...</span></div>
-							<h3 class="text-muted">Copying to the cloud</h3></li>
+							<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
+							<h3 class="text-muted"><?php _e( 'Copying to the cloud', 'iup' ); ?></h3></li>
 					</ul>
 				</div>
-				<p class="iup-scan-progress text-muted" style="display:none;">Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later.</p>
+				<p class="iup-scan-progress text-muted" style="display:none;"><?php _e( 'Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later.', 'iup' ); ?></p>
 
 				<div class="row mt-4">
-					<button type="button" class="btn btn-primary" id="iup-sync">
-						Sync to Cloud
-					</button>
-					<button type="button" class="btn btn-primary" id="iup-continue-sync" style="display: none;">
-						Continue Sync
-					</button>
+					<button type="button" class="btn btn-primary" id="iup-sync"><?php _e( 'Sync to Cloud', 'iup' ); ?></button>
+					<button type="button" class="btn btn-primary" id="iup-continue-sync" style="display: none;"><?php _e( 'Continue Sync', 'iup' ); ?></button>
 				</div>
 			</div>
 		</div>
 
 		<div class="jumbotron">
-			<h2 class="display-4">3. Enable</h2>
-			<p class="lead">Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.</p>
+			<h2 class="display-4"><?php _e( '3. Enable', 'iup' ); ?></h2>
+			<p class="lead"><?php _e( 'Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.', 'iup' ); ?></p>
 			<hr class="my-4">
 			<!-- Button trigger modal -->
 			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" disabled>
-				Enable Infinite Uploads
+				<?php _e( 'Enable Infinite Uploads', 'iup' ); ?>
 			</button>
 		</div>
 
 
 		<div class="container">
-			<h2>Settings</h2>
+			<h2><?php _e( 'Settings', 'iup' ); ?></h2>
 			<form>
 				<div class="form-group custom-control custom-switch">
 					<input type="checkbox" class="custom-control-input" id="customSwitch1">
-					<label class="custom-control-label" for="customSwitch1">Keep a local copy of new uploads</label>
-					<small class="form-text text-muted">The default is to move all new uploads to the cloud to free up local storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this setting.</small>
+					<label class="custom-control-label" for="customSwitch1"><?php _e( 'Keep a local copy of new uploads', 'iup' ); ?></label>
+					<small
+						class="form-text text-muted"><?php _e( 'The default is to move all new uploads to the cloud to free up local storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this setting.', 'iup' ); ?></small>
 				</div>
 				<div class="form-group custom-control custom-switch">
 					<input type="checkbox" class="custom-control-input" id="customSwitch2">
-					<label class="custom-control-label" for="customSwitch2">Keep a local copy of new uploads</label>
-					<small class="form-text text-muted">The default is to move all new uploads to the cloud to free up storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this.</small>
+					<label class="custom-control-label" for="customSwitch2"><?php _e( 'Keep a local copy of new uploads', 'iup' ); ?></label>
+					<small class="form-text text-muted"><?php _e( 'The default is to move all new uploads to the cloud to free up storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this.', 'iup' ); ?></small>
 				</div>
-				<button type="submit" class="btn btn-primary">Save</button>
+				<button type="submit" class="btn btn-primary"><?php _e( 'Save', 'iup' ); ?></button>
 			</form>
 		</div>
 
@@ -328,7 +325,7 @@ class Infinite_Uploads_admin {
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+						<h5 class="modal-title" id="exampleModalLabel"><?php _e( 'Modal title', 'iup' ); ?></h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -337,8 +334,8 @@ class Infinite_Uploads_admin {
 						...
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal"><?php _e( 'Close', 'iup' ); ?></button>
+						<button type="button" class="btn btn-primary"><?php _e( 'Save changes', 'iup' ); ?></button>
 					</div>
 				</div>
 			</div>

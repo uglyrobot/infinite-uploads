@@ -1,0 +1,150 @@
+# Copyright (C) 2020 Infinite Uploads
+# This file is distributed under the same license as the Infinite Uploads package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Infinite Uploads\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: inc/class-infinite-uploads-admin.php:217
+msgid "Infinite Uploads"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:220
+msgid "1. Connect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:221
+msgid "Create your free Infinite Uploads cloud account and connect this site."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:223
+msgid "Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:224
+msgid "Create Account or Login"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:228
+msgid "2. Sync"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:229
+msgid "Copy all your existing uploads the the cloud."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:231
+msgid "Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:232
+msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:238
+msgid "Error!"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:246
+msgid "Local"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:247
+msgid "Local Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:250
+msgid "Synced"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:253
+msgid "Remaining"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:254
+msgid "Remaining Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:265
+msgid "files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:272, inc/class-infinite-uploads-admin.php:275, inc/class-infinite-uploads-admin.php:278
+msgid "Loading..."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:273
+msgid "Scanning local filesystem"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:276
+msgid "Comparing to the cloud"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:279
+msgid "Copying to the cloud"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:282
+msgid "Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:285
+msgid "Sync to Cloud"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:286
+msgid "Continue Sync"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:292
+msgid "3. Enable"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:293
+msgid "Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:297
+msgid "Enable Infinite Uploads"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:303
+msgid "Settings"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:307, inc/class-infinite-uploads-admin.php:312
+msgid "Keep a local copy of new uploads"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:308
+msgid "The default is to move all new uploads to the cloud to free up local storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this setting."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:313
+msgid "The default is to move all new uploads to the cloud to free up storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:315
+msgid "Save"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:325
+msgid "Modal title"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:334
+msgid "Close"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:335
+msgid "Save changes"
+msgstr ""

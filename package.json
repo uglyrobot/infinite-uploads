@@ -1,0 +1,32 @@
+{
+  "name": "infinite-uploads",
+  "version": "1.0.0",
+  "description": "Store uploads in the cloud with unlimited storage",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-wp-pot": "^2.4.3"
+  },
+  "scripts": {
+    "test": "phpunit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uglyrobot/infinite-uploads.git"
+  },
+  "keywords": [
+    "s3",
+    "storage",
+    "wordpress",
+    "plugin"
+  ],
+  "author": "UglyRobot",
+  "license": "GPL-2.0-only",
+  "bugs": {
+    "url": "https://github.com/uglyrobot/infinite-uploads/issues"
+  },
+  "homepage": "https://github.com/uglyrobot/infinite-uploads#readme"
+}
