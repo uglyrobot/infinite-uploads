@@ -36,7 +36,8 @@ class Infinite_Uploads_Local_Stream_Wrapper {
 	 *   String specifying the path.
 	 */
 	static function getDirectoryPath() {
-		$upload_dir = Infinite_uploads::get_instance()->get_original_upload_dir();
+		$upload_dir = Infinite_Uploads::get_instance()->get_original_upload_dir();
+
 		return $upload_dir['basedir'] . '/iu';
 	}
 

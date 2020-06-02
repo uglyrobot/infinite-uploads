@@ -1,6 +1,6 @@
 <?php
 
-class Infinite_Uploads_admin {
+class Infinite_Uploads_Admin {
 
 	private static $instance;
 
@@ -10,12 +10,12 @@ class Infinite_Uploads_admin {
 
 	/**
 	 *
-	 * @return Infinite_Uploads_admin
+	 * @return Infinite_Uploads_Admin
 	 */
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
-			self::$instance = new Infinite_Uploads_admin();
+			self::$instance = new Infinite_Uploads_Admin();
 		}
 
 		return self::$instance;
@@ -231,7 +231,7 @@ class Infinite_Uploads_admin {
 			<p><?php _e( 'Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed.', 'iup' ); ?></p>
 			<p><?php _e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'iup' ); ?> <code>wp infinite-uploads sync</code></p>
 			<?php
-			$instance = Infinite_uploads::get_instance();
+			$instance = Infinite_Uploads::get_instance();
 			$stats    = $instance->get_sync_stats();
 			?>
 			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="iup-error" style="display: none;">

@@ -55,7 +55,7 @@ function infinite_uploads_init() {
 		wp_die( 'INFINITE_UPLOADS_REGION constant is required. Please define it in your wp-config.php' );
 	}
 
-	$instance = Infinite_uploads::get_instance();
+	$instance = Infinite_Uploads::get_instance();
 	$instance->setup();
 
 	// Add filters to "wrap" the wp_privacy_personal_data_export_file function call as we need to

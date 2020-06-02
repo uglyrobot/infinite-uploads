@@ -2,7 +2,7 @@
 
 use Aws\S3\Transfer;
 
-class Infinite_uploads {
+class Infinite_Uploads {
 
 	private static $instance;
 	public $ajax_timelimit = 20;
@@ -24,12 +24,12 @@ class Infinite_uploads {
 
 	/**
 	 *
-	 * @return Infinite_uploads
+	 * @return Infinite_Uploads
 	 */
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
-			self::$instance = new Infinite_uploads(
+			self::$instance = new Infinite_Uploads(
 				INFINITE_UPLOADS_BUCKET,
 				defined( 'INFINITE_UPLOADS_KEY' ) ? INFINITE_UPLOADS_KEY : null,
 				defined( 'INFINITE_UPLOADS_SECRET' ) ? INFINITE_UPLOADS_SECRET : null,
@@ -57,7 +57,7 @@ class Infinite_uploads {
 
 		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
 
-		Infinite_Uploads_admin::get_instance();
+		Infinite_Uploads_Admin::get_instance();
 
 		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
 		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );

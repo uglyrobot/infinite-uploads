@@ -20,7 +20,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		// Get S3 Upload instance.
-		$instance = Infinite_uploads::get_instance();
+		$instance = Infinite_Uploads::get_instance();
 
 		// Create a path in the base directory, with a random file name to avoid potentially overwriting existing data.
 		$upload_dir = wp_upload_dir();
@@ -92,7 +92,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function ls( $args ) {
 
-		$s3 = Infinite_uploads::get_instance()->s3();
+		$s3 = Infinite_Uploads::get_instance()->s3();
 
 		$prefix = '';
 
@@ -167,7 +167,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$to = $args[1];
 		}
 
-		$s3         = Infinite_uploads::get_instance()->s3();
+		$s3         = Infinite_Uploads::get_instance()->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 
 		$transfer_args = [
@@ -206,7 +206,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function sync( $args, $args_assoc ) {
 		global $wpdb;
-		$instance   = Infinite_uploads::get_instance();
+		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false ] );
 
@@ -353,7 +353,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function rm( $args, $args_assoc ) {
 
-		$s3 = Infinite_uploads::get_instance()->s3();
+		$s3 = Infinite_Uploads::get_instance()->s3();
 
 		$prefix = '';
 		$regex  = isset( $args_assoc['regex'] ) ? $args_assoc['regex'] : '';
