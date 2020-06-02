@@ -1,6 +1,10 @@
 <?php
 
 use Aws\S3\Transfer;
+use Aws\Exception\AwsException;
+use Aws\Exception\S3Exception;
+use Aws\Middleware;
+use Aws\ResultInterface;
 
 class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
@@ -56,6 +60,32 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Verify that the required constants for the Infinite Uploads cloud connections are set.
+	 *
+	 * @return bool true if all constants are set, else false.
+	 */
+	private function verify_s3_access_constants() {
+		$required_constants = [
+			'INFINITE_UPLOADS_BUCKET',
+		];
+
+		// Credentials do not need to be set when using AWS Instance Profiles.
+		if ( ! defined( 'INFINITE_UPLOADS_USE_INSTANCE_PROFILE' ) || ! INFINITE_UPLOADS_USE_INSTANCE_PROFILE ) {
+			array_push( $required_constants, 'INFINITE_UPLOADS_KEY', 'INFINITE_UPLOADS_SECRET' );
+		}
+
+		$all_set = true;
+		foreach ( $required_constants as $constant ) {
+			if ( ! defined( $constant ) ) {
+				WP_CLI::error( sprintf( 'The required constant %s is not defined.', $constant ), false );
+				$all_set = false;
+			}
+		}
+
+		return $all_set;
+	}
+
+	/**
 	 * List files in the Infinite Uploads cloud
 	 *
 	 * @synopsis [<path>]
@@ -75,10 +105,10 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		try {
-			$objects = $s3->getIterator('ListObjects', array(
+			$objects = $s3->getIterator( 'ListObjects', array(
 				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
 				'Prefix' => $prefix,
-			));
+			) );
 			foreach ( $objects as $object ) {
 				WP_CLI::line( str_replace( $prefix, '', $object['Key'] ) . ' ' . size_format( $object['Size'] ) . ' ' . $object['LastModified']->__toString() );
 			}
@@ -96,7 +126,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	public function cp( $args ) {
 
 		$from = $args[0];
-		$to = $args[1];
+		$to   = $args[1];
 
 		if ( is_dir( $from ) ) {
 			$this->recurse_copy( $from, $to );
@@ -105,6 +135,22 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( sprintf( 'Completed copy from %s to %s', $from, $to ) );
+	}
+
+	private function recurse_copy( $src, $dst ) {
+		$dir = opendir( $src );
+		@mkdir( $dst );
+		while ( false !== ( $file = readdir( $dir ) ) ) {
+			if ( ( '.' !== $file ) && ( '..' !== $file ) ) {
+				if ( is_dir( $src . '/' . $file ) ) {
+					$this->recurse_copy( $src . '/' . $file, $dst . '/' . $file );
+				} else {
+					WP_CLI::line( sprintf( 'Copying from %s to %s', $src . '/' . $file, $dst . '/' . $file ) );
+					copy( $src . '/' . $file, $dst . '/' . $file );
+				}
+			}
+		}
+		closedir( $dir );
 	}
 
 	/**
@@ -116,12 +162,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	public function upload_directory( $args, $args_assoc ) {
 
 		$from = $args[0];
-		$to = '';
+		$to   = '';
 		if ( isset( $args[1] ) ) {
 			$to = $args[1];
 		}
 
-		$s3 = Infinite_uploads::get_instance()->s3();
+		$s3         = Infinite_uploads::get_instance()->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
 
 		$transfer_args = [
@@ -129,8 +175,6 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			'debug'       => (bool) $args_assoc['verbose'],
 			'before'      => function ( AWS\Command $command ) {
 				if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
-					$acl            = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
-					$command['ACL'] = $acl;
 					/// Expires:
 					if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
 						$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
@@ -155,6 +199,154 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Sync the uploads directory to Infinite Uploads cloud storage.
+	 *
+	 * @subcommand sync
+	 * @synopsis [--concurrency=<concurrency>] [--noscan]
+	 */
+	public function sync( $args, $args_assoc ) {
+		global $wpdb;
+		$instance   = Infinite_uploads::get_instance();
+		$s3         = $instance->s3();
+		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false ] );
+
+		$path = $instance->get_original_upload_dir();
+
+		if ( ! $args_assoc['noscan'] ) {
+
+			WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
+			$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
+			$filelist->start();
+
+			$stats = $instance->get_sync_stats();
+			WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['total_files'], $stats['total_size'] ) );
+
+			WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
+			$prefix = '';
+
+			if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
+				$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
+			}
+
+			$args = array(
+				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
+				'Prefix' => $prefix,
+			);
+
+			//set flag
+			$progress                    = get_site_option( 'iup_files_scanned' );
+			$progress['compare_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+
+			try {
+				$results = $s3->getPaginator( 'ListObjectsV2', $args );
+				foreach ( $results as $result ) {
+					foreach ( $result['Contents'] as $object ) {
+						$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
+						$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s AND synced = 0", $local_key ) );
+						if ( $file && $file->size == $object['Size'] ) {
+							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+						}
+					}
+				}
+
+				//set flag
+				$progress                     = get_site_option( 'iup_files_scanned' );
+				$progress['compare_finished'] = time();
+				update_site_option( 'iup_files_scanned', $progress );
+
+				$stats = $instance->get_sync_stats();
+				WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
+
+			} catch ( Exception $e ) {
+				WP_CLI::error( $e->getMessage() );
+			}
+		}
+
+		//begin transfer
+		$synced       = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+		$unsynced     = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+		$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Copying to the cloud...', 'iup' ), $unsynced );
+		for ( $i = 0; $i < $synced; $i ++ ) {
+			$progress_bar->tick();
+		}
+
+		$progress = get_site_option( 'iup_files_scanned' );
+		if ( ! $progress['sync_started'] ) {
+			$progress['sync_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+		}
+
+		$uploaded = 0;
+		$break    = false;
+		while ( ! $break ) {
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 1000" );
+			//build full paths
+			$to_sync_full = [];
+			foreach ( $to_sync as $key => $file ) {
+				$to_sync_full[] = $path['basedir'] . $file;
+			}
+
+			$obj  = new ArrayObject( $to_sync_full );
+			$from = $obj->getIterator();
+
+			$transfer_args = [
+				'concurrency' => $args_assoc['concurrency'],
+				'base_dir'    => $path['basedir'],
+				'before'      => function ( AWS\Command $command ) use ( $progress_bar, $wpdb, $unsynced, &$uploaded ) {
+					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
+						/// Expires:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
+							$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
+						}
+						// Cache-Control:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
+							if ( is_numeric( INFINITE_UPLOADS_HTTP_CACHE_CONTROL ) ) {
+								$command['CacheControl'] = 'max-age=' . INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							} else {
+								$command['CacheControl'] = INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							}
+						}
+					}
+					//add middleware to intercept result of each file upload
+					if ( in_array( $command->getName(), [ 'PutObject', 'CompleteMultipartUpload' ], true ) ) {
+						$command->getHandlerList()->appendSign(
+							Middleware::mapResult( function ( ResultInterface $result ) use ( $progress_bar, $command, $wpdb, $unsynced, &$uploaded ) {
+								$uploaded ++;
+								//\WP_CLI\Utils\report_batch_operation_results( 'file', 'sync', $unsynced, $uploaded, 0, null );
+								$progress_bar->tick();
+								$file = strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+
+								return $result;
+							} )
+						);
+					}
+				},
+			];
+			try {
+				$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/', $transfer_args );
+				$manager->transfer();
+			} catch ( Exception $e ) {
+				$file = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
+				WP_CLI::warning( sprintf( __( '%s error uploading %s. Will attempt again.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+			}
+
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+			if ( $is_done ) {
+				$break                     = true;
+				$progress                  = get_site_option( 'iup_files_scanned' );
+				$progress['sync_finished'] = time();
+				update_site_option( 'iup_files_scanned', $progress );
+
+				$progress_bar->finish();
+				WP_CLI::success( __( 'Sync complete!', 'iup' ) );
+			}
+
+		}
+	}
+
+	/**
 	 * Delete files from Infinite Uploads cloud
 	 *
 	 * @synopsis <path> [--regex=<regex>]
@@ -164,7 +356,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$s3 = Infinite_uploads::get_instance()->s3();
 
 		$prefix = '';
-		$regex = isset( $args_assoc['regex'] ) ? $args_assoc['regex'] : '';
+		$regex  = isset( $args_assoc['regex'] ) ? $args_assoc['regex'] : '';
 
 		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
 			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
@@ -185,7 +377,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$regex,
 				array(
 					'before_delete',
-					function() {
+					function () {
 						WP_CLI::line( sprintf( 'Deleting file' ) );
 					},
 				)
@@ -214,48 +406,6 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		delete_site_option( 'iup_enabled' );
 
 		WP_CLI::success( 'Media URL rewriting disabled.' );
-	}
-
-	private function recurse_copy( $src, $dst ) {
-		$dir = opendir( $src );
-		@mkdir( $dst );
-		while ( false !== ( $file = readdir( $dir ) ) ) {
-			if ( ( '.' !== $file ) && ( '..' !== $file ) ) {
-				if ( is_dir( $src . '/' . $file ) ) {
-					$this->recurse_copy( $src . '/' . $file,$dst . '/' . $file );
-				} else {
-					WP_CLI::line( sprintf( 'Copying from %s to %s', $src . '/' . $file, $dst . '/' . $file ) );
-					copy( $src . '/' . $file,$dst . '/' . $file );
-				}
-			}
-		}
-		closedir( $dir );
-	}
-
-	/**
-	 * Verify that the required constants for the Infinite Uploads cloud connections are set.
-	 *
-	 * @return bool true if all constants are set, else false.
-	 */
-	private function verify_s3_access_constants() {
-		$required_constants = [
-			'INFINITE_UPLOADS_BUCKET',
-		];
-
-		// Credentials do not need to be set when using AWS Instance Profiles.
-		if ( ! defined( 'INFINITE_UPLOADS_USE_INSTANCE_PROFILE' ) || ! INFINITE_UPLOADS_USE_INSTANCE_PROFILE ) {
-			array_push( $required_constants, 'INFINITE_UPLOADS_KEY', 'INFINITE_UPLOADS_SECRET' );
-		}
-
-		$all_set = true;
-		foreach ( $required_constants as $constant ) {
-			if ( ! defined( $constant ) ) {
-				WP_CLI::error( sprintf( 'The required constant %s is not defined.', $constant ), false );
-				$all_set = false;
-			}
-		}
-
-		return $all_set;
 	}
 }
 

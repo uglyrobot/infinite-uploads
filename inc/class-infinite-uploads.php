@@ -312,7 +312,7 @@ class Infinite_uploads {
 			} catch ( Exception $e ) {
 				wp_send_json_error( $e->getMessage() );
 			}
-			//wp_send_json_error( 'bugugudklfjds dslkjl sjlds' );
+
 			if ( timer_stop() >= $this->ajax_timelimit ) {
 				$break   = true;
 				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
