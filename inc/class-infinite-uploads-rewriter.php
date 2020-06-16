@@ -11,23 +11,19 @@ class Infinite_Uploads_Rewriter {
 	var $uploads_path = null;    // origin PATH
 	var $cdn_url = null;    // CDN URL
 
-	var $dirs = null;    // included directories
-	var $excludes = []; // excludes
-
 	/**
 	 * constructor
 	 *
-	 * @param string $uploads_url Source uploads url to replace
-	 * @param string $cdn_url     Destination CDN url
+	 * @param string $cdn_url Destination CDN url
 	 *
 	 * @since 1.0
 	 */
 
-	function __construct( $uploads_url, $cdn_url ) {
-
-		$this->uploads_url  = parse_url( $uploads_url, PHP_URL_HOST );
-		$this->uploads_path = trim( parse_url( $uploads_url, PHP_URL_PATH ), '/' );
-		$this->cdn_url      = $cdn_url;
+	function __construct( $cdn_url ) {
+		$uploads_url        = wp_get_upload_dir();
+		$this->uploads_url  = trailingslashit( $uploads_url['baseurl'] );
+		$this->uploads_path = trailingslashit( parse_url( $uploads_url['baseurl'], PHP_URL_PATH ) );
+		$this->cdn_url      = trailingslashit( $cdn_url );
 		//$this->excludes       = $excludes;
 
 		add_action( 'template_redirect', [ &$this, 'handle_rewrite_hook' ] );
@@ -69,17 +65,11 @@ class Infinite_Uploads_Rewriter {
 
 	public function rewrite( $html ) {
 
-		// get dir scope in regex format
-		$blog_url = '(https?:)?' . $this->relative_url( quotemeta( trailingslashit( $this->uploads_url ) ) );
+		// Check for full url
+		$regex_rule = '#((?:https?:)?' . $this->relative_url( quotemeta( $this->uploads_url ) );
 
-		// regex rule start
-		$regex_rule = '#(?<=[(\"\'])';
-
-		// check if relative paths
-		$regex_rule .= '(?:(?:' . $blog_url . ')?(?:\.?\/)?' . quotemeta( $this->uploads_path ) . ')?';
-
-		// regex rule end
-		$regex_rule .= '/(?:([^\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		// check for relative paths
+		$regex_rule .= '|(?<=[(\"\'=\s])' . quotemeta( $this->uploads_path ) . ')#';
 
 		// call the cdn rewriter callback
 		$cdn_html = preg_replace_callback( $regex_rule, [ $this, 'rewrite_url' ], $html );
@@ -103,70 +93,13 @@ class Infinite_Uploads_Rewriter {
 	/**
 	 * rewrite url
 	 *
-	 * @param string $asset current asset
+	 * @param string $matches the matches from regex
 	 *
 	 * @return  string  updated url if not excluded
 	 * @since   1.0
 	 *
 	 */
-	protected function rewrite_url( &$asset ) {
-		if ( $this->exclude_asset( $asset[0] ) ) {
-			return $asset[0];
-		}
-
-		$blog_url = $this->relative_url( trailingslashit( $this->uploads_url ) . $this->uploads_path );
-
-		$subst_urls = [
-			'http:' . $blog_url,
-			'https:' . $blog_url,
-		];
-
-		// is it a protocol independent URL?
-		if ( strpos( $asset[0], '//' ) === 0 ) {
-			return str_replace( $blog_url, $this->cdn_url, $asset[0] );
-		}
-
-		// is it a relative URL with ./?
-		if ( strpos( $asset[0], './' ) === 0 ) {
-			return str_replace( './' . $this->uploads_path, $this->cdn_url, $asset[0] );
-		}
-
-		// is it a relative URL with /?
-		if ( strpos( $asset[0], '/' ) === 0 ) {
-			return str_replace( '/' . $this->uploads_path, $this->cdn_url, $asset[0] );
-		}
-
-		// is it a relative URL with no root?
-		if ( strpos( $asset[0], $this->uploads_path ) === 0 ) {
-			return str_replace( $this->uploads_path, $this->cdn_url, $asset[0] );
-		}
-
-		// check if not a relative path
-		if ( strstr( $asset[0], $blog_url ) ) {
-			return str_replace( $subst_urls, $this->cdn_url, $asset[0] );
-		}
-
-		// relative URL
-		return $this->cdn_url . $asset[0];
-	}
-
-	/**
-	 * exclude assets that should not be rewritten
-	 *
-	 * @param string $asset current asset
-	 *
-	 * @return  boolean  true if need to be excluded
-	 * @since   1.0
-	 *
-	 */
-	protected function exclude_asset( &$asset ) {
-		// excludes
-		foreach ( $this->excludes as $exclude ) {
-			if ( ! ! $exclude && stristr( $asset, $exclude ) != false ) {
-				return true;
-			}
-		}
-
-		return false;
+	protected function rewrite_url( $matches ) {
+		return apply_filters( 'infinite_uploads_rewrite_url', $this->cdn_url, $matches[0] );
 	}
 }

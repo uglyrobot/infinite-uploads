@@ -1,11 +1,26 @@
 <?php
 
+use Aws\S3\Transfer;
+use Aws\Middleware;
+use Aws\ResultInterface;
+use Aws\Exception\AwsException;
+use Aws\Exception\S3Exception;
+
 class Infinite_Uploads_Admin {
 
 	private static $instance;
+	private $iup_instance;
+	public $ajax_timelimit = 20;
 
 	public function __construct() {
+		$this->iup_instance = Infinite_Uploads::get_instance();
+
 		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+
+		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
+		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );
+		add_action( 'wp_ajax_infinite-uploads-sync', array( &$this, 'ajax_sync' ) );
+		add_action( 'wp_ajax_infinite-uploads-toggle', array( &$this, 'ajax_toggle' ) );
 	}
 
 	/**
@@ -19,6 +34,202 @@ class Infinite_Uploads_Admin {
 		}
 
 		return self::$instance;
+	}
+
+	public function ajax_filelist() {
+
+		// check caps
+		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+
+		$path = $this->iup_instance->get_original_upload_dir();
+		$path = $path['basedir'];
+
+		if ( isset( $_POST['remaining_dirs'] ) && is_array( $_POST['remaining_dirs'] ) ) {
+			$remaining_dirs = $_POST['remaining_dirs'];
+		} else {
+			$remaining_dirs = [];
+		}
+
+		$filelist = new Infinite_Uploads_Filelist( $path, $this->ajax_timelimit, $remaining_dirs );
+		$filelist->start();
+		$this_file_count = count( $filelist->file_list );
+		$remaining_dirs  = $filelist->paths_left;
+		$is_done         = $filelist->is_done;
+
+		$data  = compact( 'this_file_count', 'is_done', 'remaining_dirs' );
+		$stats = $this->iup_instance->get_sync_stats();
+		if ( $stats ) {
+			$data = array_merge( $data, $stats );
+		}
+
+		wp_send_json_success( $data );
+	}
+
+	public function ajax_remote_filelist() {
+		global $wpdb;
+
+		// check caps
+		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+
+		$s3 = $this->iup_instance->s3();
+
+		$prefix = '';
+
+		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
+			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
+		}
+
+		$args = array(
+			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
+			'Prefix' => $prefix,
+		);
+
+		if ( ! empty( $_POST['next_token'] ) ) {
+			$args['ContinuationToken'] = $_POST['next_token'];
+		} else {
+			$progress                    = get_site_option( 'iup_files_scanned' );
+			$progress['compare_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+		}
+
+		try {
+			$results    = $s3->getPaginator( 'ListObjectsV2', $args );
+			$req_count  = $file_count = 0;
+			$is_done    = false;
+			$next_token = null;
+			foreach ( $results as $result ) {
+				$req_count ++;
+				$is_done    = ! $result['IsTruncated'];
+				$next_token = isset( $result['NextContinuationToken'] ) ? $result['NextContinuationToken'] : null;
+				foreach ( $result['Contents'] as $object ) {
+					$file_count ++;
+					$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
+					$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s AND synced = 0", $local_key ) );
+					if ( $file && $file->size == $object['Size'] ) {
+						$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+					}
+				}
+
+				if ( ( $timer = timer_stop() ) >= $this->ajax_timelimit ) {
+					break;
+				}
+			}
+
+			if ( $is_done ) {
+				$progress                     = get_site_option( 'iup_files_scanned' );
+				$progress['compare_finished'] = time();
+				update_site_option( 'iup_files_scanned', $progress );
+			}
+
+			$data  = compact( 'file_count', 'req_count', 'is_done', 'next_token', 'timer' );
+			$stats = $this->iup_instance->get_sync_stats();
+			if ( $stats ) {
+				$data = array_merge( $data, $stats );
+			}
+
+			wp_send_json_success( $data );
+		} catch ( Exception $e ) {
+			wp_send_json_error( $e->getMessage() );
+		}
+	}
+
+	public function ajax_sync() {
+		global $wpdb;
+
+		$progress = get_site_option( 'iup_files_scanned' );
+		if ( ! $progress['sync_started'] ) {
+			$progress['sync_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+		}
+
+		$uploaded = 0;
+		$errors   = [];
+		$break    = false;
+		$path     = $this->iup_instance->get_original_upload_dir();
+		while ( ! $break ) {
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
+			//build full paths
+			$to_sync_full = [];
+			foreach ( $to_sync as $key => $file ) {
+				$to_sync_full[] = $path['basedir'] . $file;
+			}
+
+			$obj  = new ArrayObject( $to_sync_full );
+			$from = $obj->getIterator();
+
+			$s3            = $this->iup_instance->s3();
+			$transfer_args = [
+				'concurrency' => 5,
+				'base_dir'    => $path['basedir'],
+				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$uploaded ) {
+					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
+						/// Expires:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
+							$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
+						}
+						// Cache-Control:
+						if ( defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
+							if ( is_numeric( INFINITE_UPLOADS_HTTP_CACHE_CONTROL ) ) {
+								$command['CacheControl'] = 'max-age=' . INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							} else {
+								$command['CacheControl'] = INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
+							}
+						}
+						//add middleware to intercept result of each file upload
+						if ( in_array( $command->getName(), [ 'PutObject', 'CompleteMultipartUpload' ], true ) ) {
+							$command->getHandlerList()->appendSign(
+								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
+									$uploaded ++;
+									$file = strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) );
+									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+
+									return $result;
+								} )
+							);
+						}
+					}
+				},
+			];
+			try {
+				$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/', $transfer_args );
+				$manager->transfer();
+			} catch ( Exception $e ) {
+				if ( method_exists( $e, 'getRequest' ) ) {
+					$file     = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
+					$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'iup' ), $file );
+				} else {
+					$errors[] = __( 'Error uploading file. Queued for retry.', 'iup' );
+				}
+			}
+
+			if ( timer_stop() >= $this->ajax_timelimit ) {
+				$break   = true;
+				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+
+				if ( $is_done ) {
+					$progress                  = get_site_option( 'iup_files_scanned' );
+					$progress['sync_finished'] = time();
+					update_site_option( 'iup_files_scanned', $progress );
+				}
+
+				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
+			}
+		}
+	}
+
+	public function ajax_toggle() {
+		$enabled = (bool) $_REQUEST['enabled'];
+		if ( is_multisite() ) {
+			update_site_option( 'iup_enabled', $enabled );
+		} else {
+			update_option( 'iup_enabled', $enabled, true );
+		}
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -98,14 +309,14 @@ class Infinite_Uploads_Admin {
 							}
 
 						} else {
-							$('#iup-error-msg').text(json.data.substr(0, 200));
+							$('#iup-error').text(json.data.substr(0, 200));
 							$('#iup-error').show();
 
 							$('.iup-scan-progress').hide();
 							$('#iup-sync').show();
 						}
 					}, 'json').fail(function () {
-						$('#iup-error-msg').text("Unknown Error");
+						$('#iup-error').text("Unknown Error");
 						$('#iup-error').show();
 
 						$('.iup-scan-progress').hide();
@@ -139,7 +350,7 @@ class Infinite_Uploads_Admin {
 							}
 
 						} else {
-							$('#iup-error-msg').text(json.data.substr(0, 200));
+							$('#iup-error').text(json.data.substr(0, 200));
 							$('#iup-error').show();
 
 							$('.iup-scan-progress').hide();
@@ -147,7 +358,7 @@ class Infinite_Uploads_Admin {
 						}
 					}, 'json')
 						.fail(function () {
-							$('#iup-error-msg').text("Unknown Error");
+							$('#iup-error').text("Unknown Error");
 							$('#iup-error').show();
 
 							$('.iup-scan-progress').hide();
@@ -179,9 +390,19 @@ class Infinite_Uploads_Admin {
 								$('.iup-scan-progress').hide();
 								$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
 							}
+							if (Array.isArray(json.data.errors) && json.data.errors.length) {
+								$('#iup-error').html('<ul>');
+								$.each(json.data.errors, function (i, value) {
+									$('#iup-error').append('<li>' + value + '</li>');
+								});
+								$('#iup-error').append('</ul>');
+								$('#iup-error').show();
+							} else {
+								$('#iup-error').hide();
+							}
 
 						} else {
-							$('#iup-error-msg').text(json.data.substr(0, 200));
+							$('#iup-error').text(json.data.substr(0, 200));
 							$('#iup-error').show();
 
 							$('#iup-continue-sync').show();
@@ -190,7 +411,7 @@ class Infinite_Uploads_Admin {
 						}
 					}, 'json')
 						.fail(function () {
-							$('#iup-error-msg').text("Unknown Error");
+							$('#iup-error').text("Unknown Error");
 							$('#iup-error').show();
 
 							$('#iup-continue-sync').show();
@@ -234,11 +455,7 @@ class Infinite_Uploads_Admin {
 			$instance = Infinite_Uploads::get_instance();
 			$stats    = $instance->get_sync_stats();
 			?>
-			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="iup-error" style="display: none;">
-				<strong><?php _e( 'Error!', 'iup' ); ?></strong> <span id="iup-error-msg"></span>
-				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
+			<div class="alert alert-danger fade show overflow-auto" role="alert" id="iup-error" style="display: none;max-height: 100px">
 			</div>
 			<div class="container-fluid">
 				<div class="row mt-4 ml-1" id="iup-progress-gauges" <?php echo $stats['is_data'] ? '' : 'style="display: none;"'; ?>>
@@ -285,7 +502,7 @@ class Infinite_Uploads_Admin {
 
 				<div class="row mt-4">
 					<button type="button" class="btn btn-primary" id="iup-sync"><?php _e( 'Sync to Cloud', 'iup' ); ?></button>
-					<button type="button" class="btn btn-primary" id="iup-continue-sync" style="display: none;"><?php _e( 'Continue Sync', 'iup' ); ?></button>
+					<button type="button" class="btn btn-primary" id="iup-continue-sync" style="display: n1one;"><?php _e( 'Continue Sync', 'iup' ); ?></button>
 				</div>
 			</div>
 		</div>

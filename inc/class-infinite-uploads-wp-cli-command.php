@@ -202,13 +202,13 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Sync the uploads directory to Infinite Uploads cloud storage.
 	 *
 	 * @subcommand sync
-	 * @synopsis [--concurrency=<concurrency>] [--noscan]
+	 * @synopsis [--concurrency=<concurrency>] [--noscan] [--verbose]
 	 */
 	public function sync( $args, $args_assoc ) {
 		global $wpdb;
 		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
-		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false ] );
+		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false, 'verbose' => false ] );
 
 		$path = $instance->get_original_upload_dir();
 
@@ -266,9 +266,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		//begin transfer
 		$synced       = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
 		$unsynced     = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
-		$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Copying to the cloud...', 'iup' ), $unsynced );
-		for ( $i = 0; $i < $synced; $i ++ ) {
-			$progress_bar->tick();
+		$progress_bar = null;
+		if ( ! $args_assoc['verbose'] ) {
+			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Copying to the cloud...', 'iup' ), $synced + $unsynced );
+			for ( $i = 0; $i < $synced; $i ++ ) {
+				$progress_bar->tick();
+			}
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -293,7 +296,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$transfer_args = [
 				'concurrency' => $args_assoc['concurrency'],
 				'base_dir'    => $path['basedir'],
-				'before'      => function ( AWS\Command $command ) use ( $progress_bar, $wpdb, $unsynced, &$uploaded ) {
+				'before'      => function ( AWS\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$uploaded ) {
 					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
 						/// Expires:
 						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
@@ -311,12 +314,16 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 					//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'PutObject', 'CompleteMultipartUpload' ], true ) ) {
 						$command->getHandlerList()->appendSign(
-							Middleware::mapResult( function ( ResultInterface $result ) use ( $progress_bar, $command, $wpdb, $unsynced, &$uploaded ) {
+							Middleware::mapResult( function ( ResultInterface $result ) use ( $args_assoc, $progress_bar, $command, $wpdb, $unsynced, &$uploaded ) {
 								$uploaded ++;
-								//\WP_CLI\Utils\report_batch_operation_results( 'file', 'sync', $unsynced, $uploaded, 0, null );
-								$progress_bar->tick();
 								$file = strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) );
 								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+
+								if ( $args_assoc['verbose'] ) {
+									WP_CLI::success( sprintf( __( '%s - Synced %s of %s files.', 'iup' ), $file, number_format_i18n( $uploaded ), number_format_i18n( $unsynced ) ) );
+								} else {
+									$progress_bar->tick();
+								}
 
 								return $result;
 							} )
@@ -329,7 +336,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				$file = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
-				WP_CLI::warning( sprintf( __( '%s error uploading %s. Will attempt again.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+				WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
 			}
 
 			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
@@ -338,8 +345,9 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$progress                  = get_site_option( 'iup_files_scanned' );
 				$progress['sync_finished'] = time();
 				update_site_option( 'iup_files_scanned', $progress );
-
-				$progress_bar->finish();
+				if ( ! $args_assoc['verbose'] ) {
+					$progress_bar->finish();
+				}
 				WP_CLI::success( __( 'Sync complete!', 'iup' ) );
 			}
 
@@ -394,7 +402,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Enable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function enable( $args, $assoc_args ) {
-		update_site_option( 'iup_enabled', 'enabled' );
+		if ( is_multisite() ) {
+			update_site_option( 'iup_enabled', true );
+		} else {
+			update_option( 'iup_enabled', true, true );
+		}
 
 		WP_CLI::success( 'Media URL rewriting enabled.' );
 	}
@@ -403,7 +415,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Disable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function disable( $args, $assoc_args ) {
-		delete_site_option( 'iup_enabled' );
+		if ( is_multisite() ) {
+			update_site_option( 'iup_enabled', false );
+		} else {
+			update_option( 'iup_enabled', false, true );
+		}
 
 		WP_CLI::success( 'Media URL rewriting disabled.' );
 	}

@@ -1,11 +1,8 @@
 <?php
 
-use Aws\S3\Transfer;
-
 class Infinite_Uploads {
 
 	private static $instance;
-	public $ajax_timelimit = 20;
 	public $original_upload_dir;
 	public $original_file;
 	private $bucket;
@@ -45,7 +42,14 @@ class Infinite_Uploads {
 	 * Setup the hooks, urls filtering etc for Infinite Uploads
 	 */
 	public function setup() {
-		global $wpdb;
+
+		Infinite_Uploads_Admin::get_instance();
+
+		// don't register all this until we've enabled rewriting.
+		if ( ! infinite_uploads_enabled() ) {
+			return;
+		}
+
 		$this->register_stream_wrapper();
 
 		add_filter( 'upload_dir', array( $this, 'filter_upload_dir' ) );
@@ -57,33 +61,16 @@ class Infinite_Uploads {
 
 		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
 
-		Infinite_Uploads_Admin::get_instance();
+		// Add filters to "wrap" the wp_privacy_personal_data_export_file function call as we need to
+		// switch out the personal_data directory to a local temp folder, and then upload after it's
+		// complete, as Core tries to write directly to the ZipArchive which won't work with the
+		// IU streamWrapper.
+		add_action( 'wp_privacy_personal_data_export_file', array( $this, 'before_export_personal_data', 9 ) );
+		add_action( 'wp_privacy_personal_data_export_file', array( $this, 'after_export_personal_data', 11 ) );
+		add_action( 'wp_privacy_personal_data_export_file_created', array( $this, 'move_temp_personal_data_to_s3', 1000 ) );
 
-		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
-		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );
-		add_action( 'wp_ajax_infinite-uploads-sync', array( &$this, 'ajax_sync' ) );
-
-		// Install the needed DB table if not already.
-		$installed = get_site_option( 'iup_installed' );
-		if ( INFINITE_UPLOADS_VERSION != $installed ) {
-			$charset_collate = $wpdb->get_charset_collate();
-
-			$sql = "CREATE TABLE {$wpdb->base_prefix}infinite_uploads_files (
-	            `file` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
-	            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
-	            `modified` INT UNSIGNED NOT NULL,
-	            `synced` BOOLEAN NOT NULL DEFAULT '0',
-	            PRIMARY KEY (`file`(255)),
-	            INDEX (`synced`)
-	        ) {$charset_collate};";
-
-			if ( ! function_exists( 'dbDelta' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-			}
-
-			dbDelta( $sql );
-
-			update_site_option( 'iup_installed', INFINITE_UPLOADS_VERSION );
+		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
+			new Infinite_Uploads_Rewriter( INFINITE_UPLOADS_BUCKET_URL );
 		}
 	}
 
@@ -155,179 +142,6 @@ class Infinite_Uploads {
 		remove_filter( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
 	}
 
-	public function ajax_filelist() {
-
-		// check caps
-		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
-			wp_send_json_error();
-		}
-
-		$path = $this->get_original_upload_dir();
-		$path = $path['basedir'];
-
-		if ( isset( $_POST['remaining_dirs'] ) && is_array( $_POST['remaining_dirs'] ) ) {
-			$remaining_dirs = $_POST['remaining_dirs'];
-		} else {
-			$remaining_dirs = [];
-		}
-
-		$filelist = new Infinite_Uploads_Filelist( $path, $this->ajax_timelimit, $remaining_dirs );
-		$filelist->start();
-		$this_file_count = count( $filelist->file_list );
-		$remaining_dirs  = $filelist->paths_left;
-		$is_done         = $filelist->is_done;
-
-		$data  = compact( 'this_file_count', 'is_done', 'remaining_dirs' );
-		$stats = $this->get_sync_stats();
-		if ( $stats ) {
-			$data = array_merge( $data, $stats );
-		}
-
-		wp_send_json_success( $data );
-	}
-
-	public function ajax_remote_filelist() {
-		global $wpdb;
-
-		// check caps
-		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
-			wp_send_json_error();
-		}
-
-		$s3 = $this->s3();
-
-		$prefix = '';
-
-		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
-		}
-
-		$args = array(
-			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
-			'Prefix' => $prefix,
-		);
-
-		if ( ! empty( $_POST['next_token'] ) ) {
-			$args['ContinuationToken'] = $_POST['next_token'];
-		} else {
-			$progress                    = get_site_option( 'iup_files_scanned' );
-			$progress['compare_started'] = time();
-			update_site_option( 'iup_files_scanned', $progress );
-		}
-
-		try {
-			$results    = $s3->getPaginator( 'ListObjectsV2', $args );
-			$req_count  = $file_count = 0;
-			$is_done    = false;
-			$next_token = null;
-			foreach ( $results as $result ) {
-				$req_count ++;
-				$is_done    = ! $result['IsTruncated'];
-				$next_token = isset( $result['NextContinuationToken'] ) ? $result['NextContinuationToken'] : null;
-				foreach ( $result['Contents'] as $object ) {
-					$file_count ++;
-					$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-					$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s AND synced = 0", $local_key ) );
-					if ( $file && $file->size == $object['Size'] ) {
-						$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
-					}
-				}
-
-				if ( ( $timer = timer_stop() ) >= $this->ajax_timelimit ) {
-					break;
-				}
-			}
-
-			if ( $is_done ) {
-				$progress                     = get_site_option( 'iup_files_scanned' );
-				$progress['compare_finished'] = time();
-				update_site_option( 'iup_files_scanned', $progress );
-			}
-
-			$data  = compact( 'file_count', 'req_count', 'is_done', 'next_token', 'timer' );
-			$stats = $this->get_sync_stats();
-			if ( $stats ) {
-				$data = array_merge( $data, $stats );
-			}
-
-			wp_send_json_success( $data );
-		} catch ( Exception $e ) {
-			wp_send_json_error( $e->getMessage() );
-		}
-	}
-
-	public function ajax_sync() {
-		global $wpdb;
-
-		$progress = get_site_option( 'iup_files_scanned' );
-		if ( ! $progress['sync_started'] ) {
-			$progress['sync_started'] = time();
-			update_site_option( 'iup_files_scanned', $progress );
-		}
-
-		$uploaded = 0;
-		$break    = false;
-		$path     = $this->get_original_upload_dir();
-		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
-			//build full paths
-			$to_sync_full = [];
-			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = $path['basedir'] . $file;
-			}
-
-			$obj  = new ArrayObject( $to_sync_full );
-			$from = $obj->getIterator();
-
-			$s3            = $this->s3();
-			$transfer_args = [
-				'concurrency' => 5,
-				'base_dir'    => $path['basedir'],
-				'before'      => function ( AWS\Command $command ) {
-					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
-						$acl            = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
-						$command['ACL'] = $acl;
-						/// Expires:
-						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
-							$command['Expires'] = INFINITE_UPLOADS_HTTP_EXPIRES;
-						}
-						// Cache-Control:
-						if ( defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
-							if ( is_numeric( INFINITE_UPLOADS_HTTP_CACHE_CONTROL ) ) {
-								$command['CacheControl'] = 'max-age=' . INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
-							} else {
-								$command['CacheControl'] = INFINITE_UPLOADS_HTTP_CACHE_CONTROL;
-							}
-						}
-					}
-				},
-			];
-			try {
-				$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/', $transfer_args );
-				$manager->transfer();
-				$uploaded += 10;
-				foreach ( $to_sync as $file ) {
-					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
-				}
-			} catch ( Exception $e ) {
-				wp_send_json_error( $e->getMessage() );
-			}
-
-			if ( timer_stop() >= $this->ajax_timelimit ) {
-				$break   = true;
-				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
-
-				if ( $is_done ) {
-					$progress                  = get_site_option( 'iup_files_scanned' );
-					$progress['sync_finished'] = time();
-					update_site_option( 'iup_files_scanned', $progress );
-				}
-
-				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done' ), $this->get_sync_stats() ) );
-			}
-		}
-	}
-
 	public function get_original_upload_dir() {
 
 		if ( empty( $this->original_upload_dir ) ) {
@@ -365,8 +179,8 @@ class Infinite_Uploads {
 
 		$this->original_upload_dir = $dirs;
 
-		$dirs['path']    = str_replace( WP_CONTENT_DIR, 'iu://' . $this->bucket, $dirs['path'] );
-		$dirs['basedir'] = str_replace( WP_CONTENT_DIR, 'iu://' . $this->bucket, $dirs['basedir'] );
+		$dirs['path']    = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['path'] );
+		$dirs['basedir'] = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['basedir'] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 
@@ -515,5 +329,62 @@ class Infinite_Uploads {
 		}
 
 		return $hints;
+	}
+
+	/**
+	 * Setup the filters for wp_privacy_exports_dir to use a temp folder location.
+	 */
+	function before_export_personal_data() {
+		add_filter( 'wp_privacy_exports_dir', array( $this, 'set_wp_privacy_exports_dir' ) );
+	}
+
+	/**
+	 * Remove the filters for wp_privacy_exports_dir as we only want it added in some cases.
+	 */
+	function after_export_personal_data() {
+		remove_filter( 'wp_privacy_exports_dir', array( $this, 'set_wp_privacy_exports_dir' ) );
+	}
+
+	/**
+	 * Override the wp_privacy_exports_dir location
+	 *
+	 * We don't want to use the default uploads folder location, as with Infinite Uploads this is
+	 * going to the a iu:// custom URL handler, which is going to fail with the use of ZipArchive.
+	 * Instgead we set to to sys_get_temp_dir and move the fail in the wp_privacy_personal_data_export_file_created
+	 * hook.
+	 *
+	 * @param string $dir
+	 *
+	 * @return string
+	 */
+	function set_wp_privacy_exports_dir( $dir ) {
+		if ( strpos( $dir, 'iu://' ) !== 0 ) {
+			return $dir;
+		}
+		$dir = sys_get_temp_dir() . '/wp_privacy_exports_dir/';
+		if ( ! is_dir( $dir ) ) {
+			mkdir( $dir );
+			file_put_contents( $dir . 'index.html', '' );
+		}
+
+		return $dir;
+	}
+
+	/**
+	 * Move the tmp personal data file to the true uploads location
+	 *
+	 * Once a personal data file has been written, move it from the overriden "temp"
+	 * location to the S3 location where it should have been stored all along, and where
+	 * the "natural" Core URL is going to be pointing to.
+	 */
+	function move_temp_personal_data_to_s3( $archive_pathname ) {
+		if ( strpos( $archive_pathname, sys_get_temp_dir() ) !== 0 ) {
+			return;
+		}
+		$upload_dir  = wp_upload_dir();
+		$exports_dir = trailingslashit( $upload_dir['basedir'] ) . 'wp-personal-data-exports/';
+		$destination = $exports_dir . pathinfo( $archive_pathname, PATHINFO_FILENAME ) . '.' . pathinfo( $archive_pathname, PATHINFO_EXTENSION );
+		copy( $archive_pathname, $destination );
+		unlink( $archive_pathname );
 	}
 }
