@@ -154,7 +154,8 @@ class Infinite_Uploads {
 	public function get_sync_stats() {
 		global $wpdb;
 
-		$total  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files`" );
+		$total  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
+		$local  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
 		$synced = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
 
 		$progress    = get_site_option( 'iup_files_scanned' );
@@ -167,11 +168,13 @@ class Infinite_Uploads {
 			'is_data'         => (bool) $total->files,
 			'total_files'     => number_format_i18n( (int) $total->files ),
 			'total_size'      => size_format( (int) $total->size, 2 ),
+			'local_files'     => number_format_i18n( (int) $local->files ),
+			'local_size'      => size_format( (int) $local->size, 2 ),
 			'cloud_files'     => number_format_i18n( (int) $synced->files ),
 			'cloud_size'      => size_format( (int) $synced->size, 2 ),
-			'remaining_files' => number_format_i18n( $total->files - $synced->files ),
-			'remaining_size'  => size_format( $total->size - $synced->size, 2 ),
-			'pcnt_complete'   => ( $total->files ? round( ( $synced->files / $total->files ) * 100, 2 ) : 0 ),
+			'remaining_files' => number_format_i18n( $local->files - $synced->files ),
+			'remaining_size'  => size_format( $local->size - $synced->size, 2 ),
+			'pcnt_complete'   => ( $local->files ? round( ( $synced->files / $local->files ) * 100, 2 ) : 0 ),
 		] );
 	}
 

@@ -20,6 +20,7 @@ class Infinite_Uploads_Admin {
 		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
 		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );
 		add_action( 'wp_ajax_infinite-uploads-sync', array( &$this, 'ajax_sync' ) );
+		add_action( 'wp_ajax_infinite-uploads-delete', array( &$this, 'ajax_delete' ) );
 		add_action( 'wp_ajax_infinite-uploads-toggle', array( &$this, 'ajax_toggle' ) );
 	}
 
@@ -103,15 +104,36 @@ class Infinite_Uploads_Admin {
 			$next_token = null;
 			foreach ( $results as $result ) {
 				$req_count ++;
-				$is_done    = ! $result['IsTruncated'];
-				$next_token = isset( $result['NextContinuationToken'] ) ? $result['NextContinuationToken'] : null;
+				$is_done          = ! $result['IsTruncated'];
+				$next_token       = isset( $result['NextContinuationToken'] ) ? $result['NextContinuationToken'] : null;
+				$cloud_only_files = [];
 				foreach ( $result['Contents'] as $object ) {
 					$file_count ++;
 					$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-					$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s AND synced = 0", $local_key ) );
-					if ( $file && $file->size == $object['Size'] ) {
+					$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
+					if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
 						$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
 					}
+					if ( ! $file ) {
+						$cloud_only_files[] = [
+							'name'  => $local_key,
+							'size'  => $object['Size'],
+							'mtime' => strtotime( $object['LastModified']->__toString() ),
+						];
+					}
+				}
+
+				//flush new files to db
+				if ( count( $cloud_only_files ) ) {
+					$values = array();
+					foreach ( $cloud_only_files as $file ) {
+						$values[] = $wpdb->prepare( "(%s,%d,%d,1,1)", $file['name'], $file['size'], $file['mtime'] );
+					}
+
+					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, synced, deleted) VALUES ";
+					$query .= implode( ",\n", $values );
+					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), synced = 1, deleted = 1";
+					$wpdb->query( $query );
 				}
 
 				if ( ( $timer = timer_stop() ) >= $this->ajax_timelimit ) {
@@ -150,8 +172,9 @@ class Infinite_Uploads_Admin {
 		$errors   = [];
 		$break    = false;
 		$path     = $this->iup_instance->get_original_upload_dir();
+		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND deleted = 0 LIMIT 10" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -161,7 +184,6 @@ class Infinite_Uploads_Admin {
 			$obj  = new ArrayObject( $to_sync_full );
 			$from = $obj->getIterator();
 
-			$s3            = $this->iup_instance->s3();
 			$transfer_args = [
 				'concurrency' => 5,
 				'base_dir'    => $path['basedir'],
@@ -208,7 +230,7 @@ class Infinite_Uploads_Admin {
 
 			if ( timer_stop() >= $this->ajax_timelimit ) {
 				$break   = true;
-				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND deleted = 0" );
 
 				if ( $is_done ) {
 					$progress                  = get_site_option( 'iup_files_scanned' );
@@ -217,6 +239,29 @@ class Infinite_Uploads_Admin {
 				}
 
 				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
+			}
+		}
+	}
+
+	public function ajax_delete() {
+		global $wpdb;
+
+		$deleted = 0;
+		$errors  = [];
+		$path    = $this->iup_instance->get_original_upload_dir();
+		$break   = false;
+		while ( ! $break ) {
+			$to_delete = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0 LIMIT 500" );
+			foreach ( $to_delete as $file ) {
+				@unlink( $path['basedir'] . $file );
+				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 1 ), array( 'file' => $file ) );
+				$deleted ++;
+			}
+
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0" );
+			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
+				$break = true;
+				wp_send_json_success( array_merge( compact( 'deleted', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
 			}
 		}
 	}
@@ -298,8 +343,8 @@ class Infinite_Uploads_Admin {
 							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
 							$('.iup-progress-size').text(json.data.remaining_size);
 							$('.iup-progress-files').text(json.data.remaining_files);
-							$('.iup-progress-total-size').text(json.data.total_size);
-							$('.iup-progress-total-files').text(json.data.total_files);
+							$('.iup-progress-total-size').text(json.data.local_size);
+							$('.iup-progress-total-files').text(json.data.local_files);
 							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
 							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
 							if (!json.data.is_done) {
@@ -432,6 +477,21 @@ class Infinite_Uploads_Admin {
 
 					syncFilelist();
 				});
+				//Enable infinite uploads
+				$('#iup-enable').on('click', function () {
+					$('#iup-enable-spinner').removeClass('text-hide');
+					$.post(ajaxurl + '?action=infinite-uploads-toggle', {'enabled': true}, function (json) {
+						if (json.success) {
+							$('#iup-enable').hide();
+							$('#iup-enable-spinner').addClass('text-hide');
+						}
+					}, 'json')
+						.fail(function () {
+							$('#iup-error').text("Unknown Error");
+							$('#iup-error').show();
+							$('#iup-enable-spinner').addClass('text-hide');
+						});
+				});
 			});
 		</script>
 		<h2 class="display-5">
@@ -460,8 +520,8 @@ class Infinite_Uploads_Admin {
 			<div class="container-fluid">
 				<div class="row mt-4 ml-1" id="iup-progress-gauges" <?php echo $stats['is_data'] ? '' : 'style="display: none;"'; ?>>
 					<ul class="list-group list-group-horizontal">
-						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-size"><?php echo esc_html( $stats['total_size'] ); ?></span><small class="text-muted"> <?php _e( 'Local', 'iup' ); ?></small></h3></li>
-						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-files"><?php echo esc_html( $stats['total_files'] ); ?></span><small class="text-muted"> <?php _e( 'Local Files', 'iup' ); ?></small></h3></li>
+						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-size"><?php echo esc_html( $stats['local_size'] ); ?></span><small class="text-muted"> <?php _e( 'Local', 'iup' ); ?></small></h3></li>
+						<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-files"><?php echo esc_html( $stats['local_files'] ); ?></span><small class="text-muted"> <?php _e( 'Local Files', 'iup' ); ?></small></h3></li>
 					</ul>
 					<ul class="list-group list-group-horizontal iup-progress-gauges-cloud ml-4" <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>>
 						<li class="list-group-item list-group-item-success"><h3 class="m-0"><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%<small class="text-muted"> <?php _e( 'Synced', 'iup' ); ?></small></h3></li>
@@ -507,16 +567,18 @@ class Infinite_Uploads_Admin {
 			</div>
 		</div>
 
-		<div class="jumbotron">
-			<h2 class="display-4"><?php _e( '3. Enable', 'iup' ); ?></h2>
-			<p class="lead"><?php _e( 'Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.', 'iup' ); ?></p>
-			<hr class="my-4">
-			<!-- Button trigger modal -->
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" disabled>
-				<?php _e( 'Enable Infinite Uploads', 'iup' ); ?>
-			</button>
-		</div>
-
+		<?php if ( ! infinite_uploads_enabled() ) { ?>
+			<div class="jumbotron">
+				<h2 class="display-4"><?php _e( '3. Enable', 'iup' ); ?></h2>
+				<p class="lead"><?php _e( 'Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.', 'iup' ); ?></p>
+				<hr class="my-4">
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-primary" id="iup-enable">
+					<?php _e( 'Enable Infinite Uploads', 'iup' ); ?>
+				</button>
+				<div class="spinner-border text-hide" id="iup-enable-spinner" role="status"><span class="sr-only"><?php _e( 'Enabling...', 'iup' ); ?></span></div>
+			</div>
+		<?php } ?>
 
 		<div class="container">
 			<h2><?php _e( 'Settings', 'iup' ); ?></h2>

@@ -58,8 +58,10 @@ function infinite_uploads_install() {
 	            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
 	            `modified` INT UNSIGNED NOT NULL,
 	            `synced` BOOLEAN NOT NULL DEFAULT '0',
+	            `deleted` BOOLEAN NOT NULL DEFAULT '0',
 	            PRIMARY KEY (`file`(255)),
-	            INDEX (`synced`)
+	            INDEX (`synced`),
+	            INDEX (`deleted`)
 	        ) {$charset_collate};";
 
 		if ( ! function_exists( 'dbDelta' ) ) {
