@@ -181,6 +181,66 @@ class Infinite_Uploads {
 		] );
 	}
 
+	public function get_file_type( $filename ) {
+		$extensions = array(
+			'image'    => array( 'jpg', 'jpeg', 'jpe', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'svgz', 'webp' ),
+			'audio'    => array( 'aac', 'ac3', 'aif', 'aiff', 'flac', 'm3a', 'm4a', 'm4b', 'mka', 'mp1', 'mp2', 'mp3', 'ogg', 'oga', 'ram', 'wav', 'wma' ),
+			'video'    => array( '3g2', '3gp', '3gpp', 'asf', 'avi', 'divx', 'dv', 'flv', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'mpv', 'ogm', 'ogv', 'qt', 'rm', 'vob', 'wmv', 'webm' ),
+			'document' => array(
+				'log',
+				'asc',
+				'csv',
+				'tsv',
+				'txt',
+				'doc',
+				'docx',
+				'docm',
+				'dotm',
+				'odt',
+				'pages',
+				'pdf',
+				'xps',
+				'oxps',
+				'rtf',
+				'wp',
+				'wpd',
+				'psd',
+				'xcf',
+				'swf',
+				'key',
+				'ppt',
+				'pptx',
+				'pptm',
+				'pps',
+				'ppsx',
+				'ppsm',
+				'sldx',
+				'sldm',
+				'odp',
+				'numbers',
+				'ods',
+				'xls',
+				'xlsx',
+				'xlsm',
+				'xlsb',
+			),
+			'archive'  => array( 'bz2', 'cab', 'dmg', 'gz', 'rar', 'sea', 'sit', 'sqx', 'tar', 'tgz', 'zip', '7z', 'data', 'bin', 'bak' ),
+			'code'     => array( 'css', 'htm', 'html', 'php', 'js', 'md' ),
+		);
+
+		$ext = preg_replace( '/^.+?\.([^.]+)$/', '$1', $filename );
+		if ( ! empty( $ext ) ) {
+			$ext = strtolower( $ext );
+			foreach ( $extensions as $type => $exts ) {
+				if ( in_array( $ext, $exts, true ) ) {
+					return $type;
+				}
+			}
+
+			return 'other';
+		}
+	}
+
 	public function filter_upload_dir( $dirs ) {
 
 		$this->original_upload_dir = $dirs;

@@ -120,6 +120,7 @@ class Infinite_Uploads_Admin {
 								'name'  => $local_key,
 								'size'  => $object['Size'],
 								'mtime' => strtotime( $object['LastModified']->__toString() ),
+								'type'  => $this->iup_instance->get_file_type( $local_key ),
 							];
 						}
 					}
@@ -129,12 +130,12 @@ class Infinite_Uploads_Admin {
 				if ( count( $cloud_only_files ) ) {
 					$values = array();
 					foreach ( $cloud_only_files as $file ) {
-						$values[] = $wpdb->prepare( "(%s,%d,%d,1,1)", $file['name'], $file['size'], $file['mtime'] );
+						$values[] = $wpdb->prepare( "(%s,%d,%d,%s,1,1)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 					}
 
-					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, synced, deleted) VALUES ";
+					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type, synced, deleted) VALUES ";
 					$query .= implode( ",\n", $values );
-					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), synced = 1, deleted = 1";
+					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1";
 					$wpdb->query( $query );
 				}
 

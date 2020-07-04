@@ -57,9 +57,11 @@ function infinite_uploads_install() {
 	            `file` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
 	            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
 	            `modified` INT UNSIGNED NOT NULL,
+	            `type` VARCHAR(20) NOT NULL,
 	            `synced` BOOLEAN NOT NULL DEFAULT '0',
 	            `deleted` BOOLEAN NOT NULL DEFAULT '0',
 	            PRIMARY KEY (`file`(255)),
+	            INDEX (`type`),
 	            INDEX (`synced`),
 	            INDEX (`deleted`)
 	        ) {$charset_collate};";

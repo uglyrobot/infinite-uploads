@@ -22,6 +22,7 @@ class Infinite_Uploads_Filelist {
 	protected $root_path;
 	protected $timeout;
 	protected $start_time;
+	protected $instance;
 	protected $insert_rows = 500;
 
 	/**
@@ -36,6 +37,7 @@ class Infinite_Uploads_Filelist {
 		$this->root_path  = rtrim( $root_path, '/' ); //expected no trailing slash.
 		$this->timeout    = $timeout;
 		$this->paths_left = $paths_left;
+		$this->instance   = Infinite_Uploads::get_instance();
 	}
 
 	/**
@@ -57,12 +59,14 @@ class Infinite_Uploads_Filelist {
 			}
 
 			update_site_option( 'iup_files_scanned', [
-				'files_started'    => time(),
-				'files_finished'   => false,
-				'compare_started'  => false,
-				'compare_finished' => false,
-				'sync_started'     => false,
-				'sync_finished'    => false,
+				'files_started'     => time(),
+				'files_finished'    => false,
+				'compare_started'   => false,
+				'compare_finished'  => false,
+				'sync_started'      => false,
+				'sync_finished'     => false,
+				'download_started'  => false,
+				'download_finished' => false,
 			] );
 		}
 
@@ -167,6 +171,7 @@ class Infinite_Uploads_Filelist {
 		$file['mtime'] = filemtime( $item );
 		//$file['md5']   = md5_file( $item );
 		$file['size'] = filesize( $item );
+		$file['type'] = $this->instance->get_file_type( $item );
 
 		if ( empty( $file['mtime'] ) && empty( $file['size'] ) ) {
 			return false;
@@ -213,12 +218,12 @@ class Infinite_Uploads_Filelist {
 		if ( count( $this->file_list ) ) {
 			$values = array();
 			foreach ( $this->file_list as $file ) {
-				$values[] = $wpdb->prepare( "(%s,%d,%d)", $file['name'], $file['size'], $file['mtime'] );
+				$values[] = $wpdb->prepare( "(%s,%d,%d,%s)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 			}
 
-			$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified) VALUES ";
+			$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type) VALUES ";
 			$query .= implode( ",\n", $values );
-			$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified)";
+			$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type)";
 			if ( $wpdb->query( $query ) ) {
 				$this->file_list = [];
 			}

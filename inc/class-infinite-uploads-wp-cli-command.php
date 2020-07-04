@@ -213,76 +213,9 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$path = $instance->get_original_upload_dir();
 
 		if ( ! $args_assoc['noscan'] ) {
-
-			WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
-			$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
-			$filelist->start();
-
+			$this->build_scan();
 			$stats = $instance->get_sync_stats();
-			WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['local_files'], $stats['local_size'] ) );
-
-			WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
-			$prefix = '';
-
-			if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-				$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
-			}
-
-			$args = array(
-				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
-				'Prefix' => $prefix,
-			);
-
-			//set flag
-			$progress                    = get_site_option( 'iup_files_scanned' );
-			$progress['compare_started'] = time();
-			update_site_option( 'iup_files_scanned', $progress );
-
-			try {
-				$results = $s3->getPaginator( 'ListObjectsV2', $args );
-				foreach ( $results as $result ) {
-					$cloud_only_files = [];
-					if ( $result['Contents'] ) {
-						foreach ( $result['Contents'] as $object ) {
-							$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-							$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
-							if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
-							}
-							if ( ! $file ) {
-								$cloud_only_files[] = [
-									'name'  => $local_key,
-									'size'  => $object['Size'],
-									'mtime' => strtotime( $object['LastModified']->__toString() ),
-								];
-							}
-						}
-					}
-					//flush new files to db
-					if ( count( $cloud_only_files ) ) {
-						$values = array();
-						foreach ( $cloud_only_files as $file ) {
-							$values[] = $wpdb->prepare( "(%s,%d,%d,1,1)", $file['name'], $file['size'], $file['mtime'] );
-						}
-
-						$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, synced, deleted) VALUES ";
-						$query .= implode( ",\n", $values );
-						$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), synced = 1, deleted = 1";
-						$wpdb->query( $query );
-					}
-				}
-
-				//set flag
-				$progress                     = get_site_option( 'iup_files_scanned' );
-				$progress['compare_finished'] = time();
-				update_site_option( 'iup_files_scanned', $progress );
-
-				$stats = $instance->get_sync_stats();
-				WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
-
-			} catch ( Exception $e ) {
-				WP_CLI::error( $e->getMessage() );
-			}
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
 		}
 
 		//begin transfer
@@ -376,6 +309,81 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 	}
 
+	private function build_scan() {
+		global $wpdb;
+		$instance = Infinite_Uploads::get_instance();
+		$s3       = $instance->s3();
+		$path     = $instance->get_original_upload_dir();
+
+		WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
+		$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
+		$filelist->start();
+
+		$stats = $instance->get_sync_stats();
+		WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['local_files'], $stats['local_size'] ) );
+
+		WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
+		$prefix = '';
+
+		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
+			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
+		}
+
+		$args = array(
+			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
+			'Prefix' => $prefix,
+		);
+
+		//set flag
+		$progress                    = get_site_option( 'iup_files_scanned' );
+		$progress['compare_started'] = time();
+		update_site_option( 'iup_files_scanned', $progress );
+
+		try {
+			$results = $s3->getPaginator( 'ListObjectsV2', $args );
+			foreach ( $results as $result ) {
+				$cloud_only_files = [];
+				if ( $result['Contents'] ) {
+					foreach ( $result['Contents'] as $object ) {
+						$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
+						$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
+						if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
+							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+						}
+						if ( ! $file ) {
+							$cloud_only_files[] = [
+								'name'  => $local_key,
+								'size'  => $object['Size'],
+								'mtime' => strtotime( $object['LastModified']->__toString() ),
+								'type'  => $instance->get_file_type( $local_key ),
+							];
+						}
+					}
+				}
+				//flush new files to db
+				if ( count( $cloud_only_files ) ) {
+					$values = array();
+					foreach ( $cloud_only_files as $file ) {
+						$values[] = $wpdb->prepare( "(%s,%d,%d,%s,1,1)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
+					}
+
+					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type, synced, deleted) VALUES ";
+					$query .= implode( ",\n", $values );
+					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1";
+					$wpdb->query( $query );
+				}
+			}
+
+			//set flag
+			$progress                     = get_site_option( 'iup_files_scanned' );
+			$progress['compare_finished'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+
+		} catch ( Exception $e ) {
+			WP_CLI::error( $e->getMessage() );
+		}
+	}
+
 	/**
 	 * Delete all files from the uploads directory that have been synced to Infinite Uploads cloud storage.
 	 *
@@ -385,82 +393,14 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	public function delete( $args, $args_assoc ) {
 		global $wpdb;
 		$instance   = Infinite_Uploads::get_instance();
-		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'noscan' => false, 'verbose' => false ] );
 
 		$path = $instance->get_original_upload_dir();
 
 		if ( ! $args_assoc['noscan'] ) {
-
-			WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
-			$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
-			$filelist->start();
-
+			$this->build_scan();
 			$stats = $instance->get_sync_stats();
-			WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['local_files'], $stats['local_size'] ) );
-
-			WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
-			$prefix = '';
-
-			if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-				$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
-			}
-
-			$args = array(
-				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
-				'Prefix' => $prefix,
-			);
-
-			//set flag
-			$progress                    = get_site_option( 'iup_files_scanned' );
-			$progress['compare_started'] = time();
-			update_site_option( 'iup_files_scanned', $progress );
-
-			try {
-				$results = $s3->getPaginator( 'ListObjectsV2', $args );
-				foreach ( $results as $result ) {
-					$cloud_only_files = [];
-					if ( $result['Contents'] ) {
-						foreach ( $result['Contents'] as $object ) {
-							$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-							$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
-							if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
-							}
-							if ( ! $file ) {
-								$cloud_only_files[] = [
-									'name'  => $local_key,
-									'size'  => $object['Size'],
-									'mtime' => strtotime( $object['LastModified']->__toString() ),
-								];
-							}
-						}
-					}
-					//flush new files to db
-					if ( count( $cloud_only_files ) ) {
-						$values = array();
-						foreach ( $cloud_only_files as $file ) {
-							$values[] = $wpdb->prepare( "(%s,%d,%d,1,1)", $file['name'], $file['size'], $file['mtime'] );
-						}
-
-						$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, synced, deleted) VALUES ";
-						$query .= implode( ",\n", $values );
-						$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), synced = 1, deleted = 1";
-						$wpdb->query( $query );
-					}
-				}
-
-				//set flag
-				$progress                     = get_site_option( 'iup_files_scanned' );
-				$progress['compare_finished'] = time();
-				update_site_option( 'iup_files_scanned', $progress );
-
-				$stats = $instance->get_sync_stats();
-				WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
-
-			} catch ( Exception $e ) {
-				WP_CLI::error( $e->getMessage() );
-			}
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
 		}
 
 		//begin deleting
@@ -491,7 +431,6 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		WP_CLI::success( __( 'Delete complete!', 'iup' ) );
 	}
 
-
 	/**
 	 * Download all files only in Infinite Uploads cloud storage to the local uploads directory.
 	 *
@@ -507,76 +446,9 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$path = $instance->get_original_upload_dir();
 
 		if ( ! $args_assoc['noscan'] ) {
-
-			WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
-			$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
-			$filelist->start();
-
+			$this->build_scan();
 			$stats = $instance->get_sync_stats();
-			WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['local_files'], $stats['local_size'] ) );
-
-			WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
-			$prefix = '';
-
-			if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-				$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
-			}
-
-			$args = array(
-				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
-				'Prefix' => $prefix,
-			);
-
-			//set flag
-			$progress                    = get_site_option( 'iup_files_scanned' );
-			$progress['compare_started'] = time();
-			update_site_option( 'iup_files_scanned', $progress );
-
-			try {
-				$results = $s3->getPaginator( 'ListObjectsV2', $args );
-				foreach ( $results as $result ) {
-					$cloud_only_files = [];
-					if ( $result['Contents'] ) {
-						foreach ( $result['Contents'] as $object ) {
-							$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-							$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
-							if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
-							}
-							if ( ! $file ) {
-								$cloud_only_files[] = [
-									'name'  => $local_key,
-									'size'  => $object['Size'],
-									'mtime' => strtotime( $object['LastModified']->__toString() ),
-								];
-							}
-						}
-					}
-					//flush new files to db
-					if ( count( $cloud_only_files ) ) {
-						$values = array();
-						foreach ( $cloud_only_files as $file ) {
-							$values[] = $wpdb->prepare( "(%s,%d,%d,1,1)", $file['name'], $file['size'], $file['mtime'] );
-						}
-
-						$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, synced, deleted) VALUES ";
-						$query .= implode( ",\n", $values );
-						$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), synced = 1, deleted = 1";
-						$wpdb->query( $query );
-					}
-				}
-
-				//set flag
-				$progress                     = get_site_option( 'iup_files_scanned' );
-				$progress['compare_finished'] = time();
-				update_site_option( 'iup_files_scanned', $progress );
-
-				$stats = $instance->get_sync_stats();
-				WP_CLI::line( sprintf( __( '%s files (%s) remaining to be downloaded.', 'iup' ), $stats['deleted_files'], $stats['deleted_size'] ) );
-
-			} catch ( Exception $e ) {
-				WP_CLI::error( $e->getMessage() );
-			}
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be downloaded.', 'iup' ), $stats['deleted_files'], $stats['deleted_size'] ) );
 		}
 
 		//begin transfer
