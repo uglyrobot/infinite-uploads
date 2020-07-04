@@ -154,9 +154,10 @@ class Infinite_Uploads {
 	public function get_sync_stats() {
 		global $wpdb;
 
-		$total  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
-		$local  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
-		$synced = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+		$total   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
+		$local   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
+		$synced  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+		$deleted = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
 
 		$progress    = get_site_option( 'iup_files_scanned' );
 		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
@@ -172,9 +173,11 @@ class Infinite_Uploads {
 			'local_size'      => size_format( (int) $local->size, 2 ),
 			'cloud_files'     => number_format_i18n( (int) $synced->files ),
 			'cloud_size'      => size_format( (int) $synced->size, 2 ),
-			'remaining_files' => number_format_i18n( $local->files - $synced->files ),
-			'remaining_size'  => size_format( $local->size - $synced->size, 2 ),
-			'pcnt_complete'   => ( $local->files ? round( ( $synced->files / $local->files ) * 100, 2 ) : 0 ),
+			'deleted_files'   => number_format_i18n( (int) $deleted->files ),
+			'deleted_size'    => size_format( (int) $deleted->size, 2 ),
+			'remaining_files' => number_format_i18n( max( $total->files - $synced->files, 0 ) ),
+			'remaining_size'  => size_format( max( $total->size - $synced->size, 0 ), 2 ),
+			'pcnt_complete'   => ( $local->files ? round( ( $synced->files / $total->files ) * 100, 2 ) : 0 ),
 		] );
 	}
 

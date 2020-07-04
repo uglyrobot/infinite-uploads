@@ -107,19 +107,21 @@ class Infinite_Uploads_Admin {
 				$is_done          = ! $result['IsTruncated'];
 				$next_token       = isset( $result['NextContinuationToken'] ) ? $result['NextContinuationToken'] : null;
 				$cloud_only_files = [];
-				foreach ( $result['Contents'] as $object ) {
-					$file_count ++;
-					$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
-					$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
-					if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-						$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
-					}
-					if ( ! $file ) {
-						$cloud_only_files[] = [
-							'name'  => $local_key,
-							'size'  => $object['Size'],
-							'mtime' => strtotime( $object['LastModified']->__toString() ),
-						];
+				if ( $result['Contents'] ) {
+					foreach ( $result['Contents'] as $object ) {
+						$file_count ++;
+						$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
+						$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
+						if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
+							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+						}
+						if ( ! $file ) {
+							$cloud_only_files[] = [
+								'name'  => $local_key,
+								'size'  => $object['Size'],
+								'mtime' => strtotime( $object['LastModified']->__toString() ),
+							];
+						}
 					}
 				}
 
@@ -174,7 +176,7 @@ class Infinite_Uploads_Admin {
 		$path     = $this->iup_instance->get_original_upload_dir();
 		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND deleted = 0 LIMIT 10" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -206,7 +208,7 @@ class Infinite_Uploads_Admin {
 							$command->getHandlerList()->appendSign(
 								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
 									$uploaded ++;
-									$file = strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) );
+									$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
 									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
 
 									return $result;
@@ -228,9 +230,9 @@ class Infinite_Uploads_Admin {
 				}
 			}
 
-			if ( timer_stop() >= $this->ajax_timelimit ) {
-				$break   = true;
-				$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND deleted = 0" );
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
+				$break = true;
 
 				if ( $is_done ) {
 					$progress                  = get_site_option( 'iup_files_scanned' );
@@ -262,6 +264,75 @@ class Infinite_Uploads_Admin {
 			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
 				$break = true;
 				wp_send_json_success( array_merge( compact( 'deleted', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
+			}
+		}
+	}
+
+	public function ajax_download() {
+		global $wpdb;
+
+		$progress = get_site_option( 'iup_files_scanned' );
+		if ( empty( $progress['download_started'] ) ) {
+			$progress['download_started'] = time();
+			update_site_option( 'iup_files_scanned', $progress );
+		}
+
+		$downloaded = 0;
+		$errors     = [];
+		$break      = false;
+		$path       = $this->iup_instance->get_original_upload_dir();
+		$s3         = $this->iup_instance->s3();
+		while ( ! $break ) {
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 LIMIT 10" );
+			//build full paths
+			$to_sync_full = [];
+			foreach ( $to_sync as $key => $file ) {
+				$to_sync_full[] = 's3://' . INFINITE_UPLOADS_BUCKET . $file;
+			}
+
+			$obj  = new ArrayObject( $to_sync_full );
+			$from = $obj->getIterator();
+
+			$transfer_args = [
+				'concurrency' => 5,
+				'base_dir'    => 's3://' . INFINITE_UPLOADS_BUCKET,
+				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$downloaded ) {//add middleware to intercept result of each file upload
+					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
+						$command->getHandlerList()->appendSign(
+							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {
+								$downloaded ++;
+								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 0 ), array( 'file' => $file ) );
+
+								return $result;
+							} )
+						);
+					}
+				},
+			];
+			try {
+				$manager = new Transfer( $s3, $from, $path['basedir'], $transfer_args );
+				$manager->transfer();
+			} catch ( Exception $e ) {
+				if ( method_exists( $e, 'getRequest' ) ) {
+					$file     = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
+					$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file );
+				} else {
+					$errors[] = __( 'Error downloading file. Queued for retry.', 'iup' );
+				}
+			}
+
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
+			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
+				$break = true;
+
+				if ( $is_done ) {
+					$progress                      = get_site_option( 'iup_files_scanned' );
+					$progress['download_finished'] = time();
+					update_site_option( 'iup_files_scanned', $progress );
+				}
+
+				wp_send_json_success( array_merge( compact( 'downloaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
 			}
 		}
 	}
