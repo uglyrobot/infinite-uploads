@@ -181,6 +181,46 @@ class Infinite_Uploads {
 		] );
 	}
 
+	public function get_local_filetypes( $is_chart = false ) {
+		global $wpdb;
+
+		$types  = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0 GROUP BY type ORDER BY size DESC" );
+		$labels = array(
+			'image'    => [ 'color' => 'cyan', 'label' => __( 'Images', 'iup' ) ],
+			'audio'    => [ 'color' => 'green', 'label' => __( 'Audio', 'iup' ) ],
+			'video'    => [ 'color' => 'purple', 'label' => __( 'Video', 'iup' ) ],
+			'document' => [ 'color' => 'orange', 'label' => __( 'Documents', 'iup' ) ],
+			'archive'  => [ 'color' => 'pink', 'label' => __( 'Archives', 'iup' ) ],
+			'code'     => [ 'color' => 'blue', 'label' => __( 'Code', 'iup' ) ],
+			'other'    => [ 'color' => 'gray', 'label' => __( 'Other', 'iup' ) ],
+		);
+
+		$data = [];
+		foreach ( $types as $type ) {
+			if ( isset( $labels[ $type->type ] ) ) {
+				$data[ $type->type ] = [
+					'color' => $labels[ $type->type ]['color'],
+					'label' => $labels[ $type->type ]['label'],
+					'size'  => $type->size,
+					'files' => $type->files,
+				];
+			}
+		}
+
+		$chart = [];
+		if ( $is_chart ) {
+			foreach ( $data as $item ) {
+				$chart['datasets'][0]['data'][]            = $item['size'];
+				$chart['datasets'][0]['backgroundColor'][] = $item['color'];
+				$chart['labels'][]                         = $item['label'] . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item['files'], 'iup' ), number_format_i18n( $item['files'] ), size_format( $item['size'], 1 ) );
+			}
+
+			return $chart;
+		}
+
+		return $data;
+	}
+
 	public function get_file_type( $filename ) {
 		$extensions = array(
 			'image'    => array( 'jpg', 'jpeg', 'jpe', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'svgz', 'webp' ),

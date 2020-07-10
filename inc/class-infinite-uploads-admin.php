@@ -364,21 +364,26 @@ class Infinite_Uploads_Admin {
 			)
 		);
 
-		add_action( 'admin_print_scripts-' . $page, array( &$this, 'bootstrap_script' ) );
-		add_action( 'admin_print_styles-' . $page, array( &$this, 'bootstrap_style' ) );
+		add_action( 'admin_print_scripts-' . $page, array( &$this, 'admin_scripts' ) );
+		add_action( 'admin_print_styles-' . $page, array( &$this, 'admin_styles' ) );
 	}
 
 	/**
 	 *
 	 */
-	function bootstrap_script() {
+	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), array( 'jquery' ), INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), array(), INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), array(), INFINITE_UPLOADS_VERSION );
+
+		$types = $this->iup_instance->get_local_filetypes( true );
+		wp_localize_script( 'iup-js', 'local_types', $types );
 	}
 
 	/**
 	 *
 	 */
-	function bootstrap_style() {
+	function admin_styles() {
 
 		wp_enqueue_style( 'iup-bootstrap', plugins_url( 'assets/bootstrap/css/bootstrap.min.css', __FILE__ ), false, INFINITE_UPLOADS_VERSION );
 
@@ -392,182 +397,75 @@ class Infinite_Uploads_Admin {
 	 * Settings page display callback.
 	 */
 	function settings_page() {
+
+		$stats = $this->iup_instance->get_sync_stats();
+		$types = $this->iup_instance->get_local_filetypes();
 		echo '<div id="container" class="wrap">';
 		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function ($) {
-
-				var buildFilelist = function (remaining_dirs) {
-
-					//progress indication
-					$('.iup-scan-progress').show();
-					$('.iup-scan-progress .spinner-border').addClass('text-hide');
-					$('.iup-scan-progress .iup-local .spinner-border').removeClass('text-hide');
-					$('.iup-scan-progress h3').addClass('text-muted');
-					$('.iup-scan-progress .iup-local h3').removeClass('text-muted');
-
-					var data = {"remaining_dirs": remaining_dirs};
-					$.post(ajaxurl + '?action=infinite-uploads-filelist', data, function (json) {
-						if (json.success) {
-							if (json.data.is_data) {
-								$('#iup-progress-gauges').show();
-							}
-							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
-							$('.iup-progress-size').text(json.data.remaining_size);
-							$('.iup-progress-files').text(json.data.remaining_files);
-							$('.iup-progress-total-size').text(json.data.local_size);
-							$('.iup-progress-total-files').text(json.data.local_files);
-							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
-							if (!json.data.is_done) {
-								buildFilelist(json.data.remaining_dirs);
-							} else {
-								fetchRemoteFilelist('');
-							}
-
-						} else {
-							$('#iup-error').text(json.data.substr(0, 200));
-							$('#iup-error').show();
-
-							$('.iup-scan-progress').hide();
-							$('#iup-sync').show();
-						}
-					}, 'json').fail(function () {
-						$('#iup-error').text("Unknown Error");
-						$('#iup-error').show();
-
-						$('.iup-scan-progress').hide();
-						$('#iup-sync').show();
-					});
-				};
-
-				var fetchRemoteFilelist = function (next_token) {
-
-					//progress indication
-					$('.iup-scan-progress').show();
-					$('.iup-scan-progress .spinner-border').addClass('text-hide');
-					$('.iup-scan-progress .iup-cloud .spinner-border').removeClass('text-hide');
-					$('.iup-scan-progress h3').addClass('text-muted');
-					$('.iup-scan-progress .iup-cloud h3').removeClass('text-muted');
-
-					var data = {"next_token": next_token};
-					$.post(ajaxurl + '?action=infinite-uploads-remote-filelist', data, function (json) {
-						if (json.success) {
-							$('.iup-progress-gauges-cloud, .iup-sync-progress-bar .iup-local div').show();
-							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
-							$('.iup-progress-size').text(json.data.remaining_size);
-							$('.iup-progress-files').text(json.data.remaining_files);
-							$('#iup-sync-progress-bar').show();
-							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
-							if (!json.data.is_done) {
-								fetchRemoteFilelist(json.data.next_token);
-							} else {
-								syncFilelist();
-							}
-
-						} else {
-							$('#iup-error').text(json.data.substr(0, 200));
-							$('#iup-error').show();
-
-							$('.iup-scan-progress').hide();
-							$('#iup-sync').show();
-						}
-					}, 'json')
-						.fail(function () {
-							$('#iup-error').text("Unknown Error");
-							$('#iup-error').show();
-
-							$('.iup-scan-progress').hide();
-							$('#iup-sync').show();
-						});
-				};
-
-				var syncFilelist = function () {
-
-					//progress indication
-					$('.iup-scan-progress').show();
-					$('.iup-scan-progress .spinner-border').addClass('text-hide');
-					$('.iup-scan-progress .iup-sync .spinner-border').removeClass('text-hide');
-					$('.iup-scan-progress h3').addClass('text-muted');
-					$('.iup-scan-progress .iup-sync h3').removeClass('text-muted');
-					$('#iup-sync-progress-bar .progress-bar').addClass('progress-bar-animated progress-bar-striped');
-
-					$.post(ajaxurl + '?action=infinite-uploads-sync', {}, function (json) {
-						if (json.success) {
-							$('.iup-progress-pcnt').text(json.data.pcnt_complete);
-							$('.iup-progress-size').text(json.data.remaining_size);
-							$('.iup-progress-files').text(json.data.remaining_files);
-							$('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-							$('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
-							if (!json.data.is_done) {
-								syncFilelist();
-							} else {
-								$('#iup-continue-sync').show();
-								$('.iup-scan-progress').hide();
-								$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
-							}
-							if (Array.isArray(json.data.errors) && json.data.errors.length) {
-								$('#iup-error').html('<ul>');
-								$.each(json.data.errors, function (i, value) {
-									$('#iup-error').append('<li>' + value + '</li>');
-								});
-								$('#iup-error').append('</ul>');
-								$('#iup-error').show();
-							} else {
-								$('#iup-error').hide();
-							}
-
-						} else {
-							$('#iup-error').text(json.data.substr(0, 200));
-							$('#iup-error').show();
-
-							$('#iup-continue-sync').show();
-							$('.iup-scan-progress').hide();
-							$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
-						}
-					}, 'json')
-						.fail(function () {
-							$('#iup-error').text("Unknown Error");
-							$('#iup-error').show();
-
-							$('#iup-continue-sync').show();
-							$('.iup-scan-progress').hide();
-							$('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
-						});
-				};
-
-				//Syncing
-				$('#iup-sync').on('click', function () {
-					$('#iup-sync, #iup-continue-sync, #iup-error').hide();
-
-					buildFilelist([]);
-				});
-				//Resync in case of error
-				$('#iup-continue-sync').on('click', function () {
-					$('#iup-sync, #iup-continue-sync, #iup-error').hide();
-
-					syncFilelist();
-				});
-				//Enable infinite uploads
-				$('#iup-enable').on('click', function () {
-					$('#iup-enable-spinner').removeClass('text-hide');
-					$.post(ajaxurl + '?action=infinite-uploads-toggle', {'enabled': true}, function (json) {
-						if (json.success) {
-							$('#iup-enable').hide();
-							$('#iup-enable-spinner').addClass('text-hide');
-						}
-					}, 'json')
-						.fail(function () {
-							$('#iup-error').text("Unknown Error");
-							$('#iup-error').show();
-							$('#iup-enable-spinner').addClass('text-hide');
-						});
-				});
-			});
-		</script>
+		<style type="text/css">
+			.card {
+				margin-top: inherit;
+				padding: inherit;
+				min-width: inherit;
+				max-width: inherit;
+				box-shadow: inherit;
+				background: inherit;
+				box-sizing: inherit;
+			}
+		</style>
 		<h2 class="display-5">
 			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="30" width="30"/><?php _e( 'Infinite Uploads', 'iup' ); ?></h2>
+
+		<div class="jumbotron">
+			<div class="card-header"><?php _e( 'Local File Overview', 'iup' ); ?></div>
+			<p class="lead"><?php _e( 'Create your free Infinite Uploads cloud account and connect this site.', 'iup' ); ?></p>
+			<hr class="my-4">
+			<p><?php _e( 'Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.', 'iup' ); ?></p>
+			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><?php _e( 'Create Account or Login', 'iup' ); ?></a>
+		</div>
+
+		<div class="card">
+			<div class="card-header"><?php _e( 'Local File Overview', 'iup' ); ?></div>
+			<div class="card-body">
+				<div class="row align-items-center justify-content-center">
+					<div class="col">
+						<h5>Total Bytes/Files</h5>
+						<h1 class="display-1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></h1>
+
+						<div class="container">
+							<?php foreach ( $types as $type ) { ?>
+								<div class="row mt-2">
+									<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
+									<div class="col-3 lead"><?php echo $type['label']; ?></div>
+									<div class="col-3"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
+								</div>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="col">
+						<canvas id="iup-local-pie"></canvas>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-2">
+					<div class="col text-center">
+						<h4><?php _e( 'Ready to Connect!', 'iup' ); ?></h4>
+						<p class="lead"><?php _e( 'Get smart plan recommendations, create or connect to existing account, and sync to the cloud.', 'iup' ); ?></p>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-2">
+					<div class="col-2 text-center">
+						<button type="button" class="btn btn-primary btn-lg btn-block" id=""><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></button>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="col-2 text-center">
+						<div class="progress">
+							<div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<div class="jumbotron">
 			<h2 class="display-4"><?php _e( '1. Connect', 'iup' ); ?></h2>
