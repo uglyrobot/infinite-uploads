@@ -61,6 +61,8 @@ class Infinite_Uploads {
 
 		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
 
+		add_filter( 'pre_wp_unique_filename_file_list', [ $this, 'get_files_for_unique_filename_file_list' ], 10, 3 );
+
 		// Add filters to "wrap" the wp_privacy_personal_data_export_file function call as we need to
 		// switch out the personal_data directory to a local temp folder, and then upload after it's
 		// complete, as Core tries to write directly to the ZipArchive which won't work with the
@@ -279,6 +281,21 @@ class Infinite_Uploads {
 
 			return 'other';
 		}
+	}
+
+	/**
+	 * Override the files used for wp_unique_filename() comparisons
+	 *
+	 * @param array|null $files
+	 * @param string     $dir
+	 *
+	 * @return array
+	 */
+	public function get_files_for_unique_filename_file_list( ?array $files, string $dir, string $filename ): array {
+		$name = pathinfo( $filename, PATHINFO_FILENAME );
+		// The iu:// streamwrapper support listing by partial prefixes with wildcards.
+		// For example, scandir( iu://bucket/2019/06/my-image* )
+		return scandir( trailingslashit( $dir ) . $name . '*' );
 	}
 
 	public function filter_upload_dir( $dirs ) {

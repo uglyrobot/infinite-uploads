@@ -510,7 +510,18 @@ class Infinite_Uploads_Stream_Wrapper {
 
 		if ( $params['Key'] ) {
 			$params['Key'] = rtrim( $params['Key'], $delimiter ) . $delimiter;
-			$op['Prefix']  = $params['Key'];
+			// Support paths ending in "*" to allow listing of arbitrary prefixes.
+			if ( substr( $params['Key'], - 1, 1 ) === '*' ) {
+				$params['Key'] = rtrim( $params['Key'], '*' );
+				// Set the opened bucket prefix to be the directory. This is because $this->openedBucketPrefix
+				// will be removed from the resulting keys, and we want to return all files in the directory
+				// of the wildcard.
+				$this->openedBucketPrefix = substr( $params['Key'], 0, ( strrpos( $params['Key'], '/' ) ?: 0 ) + 1 );
+			} else {
+				$params['Key']            = rtrim( $params['Key'], $delimiter ) . $delimiter;
+				$this->openedBucketPrefix = $params['Key'];
+			}
+			$op['Prefix'] = $params['Key'];
 		}
 
 		$this->openedBucketPrefix = $params['Key'];
