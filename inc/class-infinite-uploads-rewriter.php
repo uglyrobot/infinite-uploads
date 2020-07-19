@@ -39,7 +39,7 @@ class Infinite_Uploads_Rewriter {
 	 */
 
 	public function handle_rewrite_hook() {
-		ob_start( array( &$this, 'rewrite' ) );
+		ob_start( [ &$this, 'rewrite' ] );
 	}
 
 

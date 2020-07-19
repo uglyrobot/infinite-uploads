@@ -91,7 +91,7 @@ class Infinite_Uploads_Filelist {
 	 */
 	protected function get_files() {
 
-		$paths = ( empty( $this->paths_left ) ) ? array( $this->root_path ) : $this->paths_left;
+		$paths = ( empty( $this->paths_left ) ) ? [ $this->root_path ] : $this->paths_left;
 
 		while ( ! empty( $paths ) ) {
 			$path = array_pop( $paths );
@@ -115,7 +115,7 @@ class Infinite_Uploads_Filelist {
 				: glob( trailingslashit( $path ) . '[!.,!..]*' );
 
 			foreach ( $contents as $item ) {
-				$file = array();
+				$file = [];
 
 				if ( is_link( $item ) || $this->is_excluded( $item ) ) {
 					continue;
@@ -167,7 +167,7 @@ class Infinite_Uploads_Filelist {
 	 * @return mixed File info or false for failure.
 	 */
 	protected function get_file_info( $item ) {
-		$file          = array();
+		$file          = [];
 		$file['mtime'] = filemtime( $item );
 		//$file['md5']   = md5_file( $item );
 		$file['size'] = filesize( $item );
@@ -216,7 +216,7 @@ class Infinite_Uploads_Filelist {
 		global $wpdb;
 
 		if ( count( $this->file_list ) ) {
-			$values = array();
+			$values = [];
 			foreach ( $this->file_list as $file ) {
 				$values[] = $wpdb->prepare( "(%s,%d,%d,%s)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 			}

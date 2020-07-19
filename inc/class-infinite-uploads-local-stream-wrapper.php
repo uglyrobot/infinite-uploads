@@ -197,7 +197,7 @@ class Infinite_Uploads_Local_Stream_Wrapper {
 	 * @see http://php.net/manual/streamwrapper.stream-lock.php
 	 */
 	public function stream_lock( $operation ) {
-		if ( in_array( $operation, array( LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB ) ) ) {
+		if ( in_array( $operation, [ LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB ] ) ) {
 			return flock( $this->handle, $operation );
 		}
 

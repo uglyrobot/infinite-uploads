@@ -1,4 +1,5 @@
 jQuery(document).ready(function ($) {
+  $('[data-toggle="tooltip"]').tooltip();
 
   var buildFilelist = function (remaining_dirs) {
 

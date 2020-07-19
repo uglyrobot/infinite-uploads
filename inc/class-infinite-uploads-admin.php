@@ -9,19 +9,19 @@ use Aws\Exception\S3Exception;
 class Infinite_Uploads_Admin {
 
 	private static $instance;
-	private $iup_instance;
 	public $ajax_timelimit = 20;
+	private $iup_instance;
 
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 
-		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 
-		add_action( 'wp_ajax_infinite-uploads-filelist', array( &$this, 'ajax_filelist' ) );
-		add_action( 'wp_ajax_infinite-uploads-remote-filelist', array( &$this, 'ajax_remote_filelist' ) );
-		add_action( 'wp_ajax_infinite-uploads-sync', array( &$this, 'ajax_sync' ) );
-		add_action( 'wp_ajax_infinite-uploads-delete', array( &$this, 'ajax_delete' ) );
-		add_action( 'wp_ajax_infinite-uploads-toggle', array( &$this, 'ajax_toggle' ) );
+		add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
+		add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
+		add_action( 'wp_ajax_infinite-uploads-sync', [ &$this, 'ajax_sync' ] );
+		add_action( 'wp_ajax_infinite-uploads-delete', [ &$this, 'ajax_delete' ] );
+		add_action( 'wp_ajax_infinite-uploads-toggle', [ &$this, 'ajax_toggle' ] );
 	}
 
 	/**
@@ -84,10 +84,10 @@ class Infinite_Uploads_Admin {
 			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
 		}
 
-		$args = array(
+		$args = [
 			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
 			'Prefix' => $prefix,
-		);
+		];
 
 		if ( ! empty( $_POST['next_token'] ) ) {
 			$args['ContinuationToken'] = $_POST['next_token'];
@@ -113,7 +113,7 @@ class Infinite_Uploads_Admin {
 						$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
 						$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
 						if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $local_key ] );
 						}
 						if ( ! $file ) {
 							$cloud_only_files[] = [
@@ -128,7 +128,7 @@ class Infinite_Uploads_Admin {
 
 				//flush new files to db
 				if ( count( $cloud_only_files ) ) {
-					$values = array();
+					$values = [];
 					foreach ( $cloud_only_files as $file ) {
 						$values[] = $wpdb->prepare( "(%s,%d,%d,%s,1,1)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 					}
@@ -210,7 +210,7 @@ class Infinite_Uploads_Admin {
 								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
 									$uploaded ++;
 									$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
-									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
 
 									return $result;
 								} )
@@ -257,7 +257,7 @@ class Infinite_Uploads_Admin {
 			$to_delete = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0 LIMIT 500" );
 			foreach ( $to_delete as $file ) {
 				@unlink( $path['basedir'] . $file );
-				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 1 ), array( 'file' => $file ) );
+				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 1 ], [ 'file' => $file ] );
 				$deleted ++;
 			}
 
@@ -303,7 +303,7 @@ class Infinite_Uploads_Admin {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {
 								$downloaded ++;
 								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 0 ), array( 'file' => $file ) );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
 
 								return $result;
 							} )
@@ -358,23 +358,23 @@ class Infinite_Uploads_Admin {
 			__( 'Infinite Uploads', 'infinite-uploads' ),
 			'manage_options',
 			'infinite_uploads',
-			array(
+			[
 				$this,
 				'settings_page',
-			)
+			]
 		);
 
-		add_action( 'admin_print_scripts-' . $page, array( &$this, 'admin_scripts' ) );
-		add_action( 'admin_print_styles-' . $page, array( &$this, 'admin_styles' ) );
+		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
+		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
 	}
 
 	/**
 	 *
 	 */
 	function admin_scripts() {
-		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), array( 'jquery' ), INFINITE_UPLOADS_VERSION );
-		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), array(), INFINITE_UPLOADS_VERSION );
-		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), array(), INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 
 		$types = $this->iup_instance->get_local_filetypes( true );
 		wp_localize_script( 'iup-js', 'local_types', $types );
@@ -412,21 +412,87 @@ class Infinite_Uploads_Admin {
 				background: inherit;
 				box-sizing: inherit;
 			}
-		</style>
-		<h2 class="display-5">
-			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="30" width="30"/><?php _e( 'Infinite Uploads', 'iup' ); ?></h2>
 
-		<div class="jumbotron">
-			<div class="card-header"><?php _e( 'Local File Overview', 'iup' ); ?></div>
-			<p class="lead"><?php _e( 'Create your free Infinite Uploads cloud account and connect this site.', 'iup' ); ?></p>
-			<hr class="my-4">
-			<p><?php _e( 'Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.', 'iup' ); ?></p>
-			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><?php _e( 'Create Account or Login', 'iup' ); ?></a>
+			.card-header {
+				background-color: #ffffff;
+			}
+
+			.card-body.cloud {
+				background: bottom url("<?php echo esc_url( plugins_url( '/assets/img/wave-bg.svg', __FILE__ ) ); ?>") no-repeat;
+				background-size: 100% auto;
+			}
+
+			.btn-primary {
+				background-color: rgba(38, 169, 224, 1);
+				border-radius: 24px;
+				border-width: 0;
+			}
+
+			.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+				background-color: rgba(38, 169, 224, 0.8);
+				border-width: 0;
+			}
+
+			.btn-info {
+				background-color: #EE7C1E;
+				border-radius: 24px;
+				border-width: 0;
+			}
+
+			.btn-info:hover, .btn-info:active, .btn-info:focus {
+				background-color: rgba(238, 124, 30, 0.8);
+				border-width: 0;
+			}
+
+			.btn .dashicons {
+				font-size: 1.8rem;
+				line-height: 1;
+				margin-right: 1rem;
+			}
+
+			.progress {
+				height: 30px;
+				border-radius: 15px;
+				padding: 5px;
+			}
+
+			.progress .progress-bar {
+				background-color: rgba(38, 169, 224, 1);
+				border-radius: 10px;
+			}
+		</style>
+
+		<h1>
+			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
+			<span class="badge badge-success"><?php _e( 'Enabled', 'iup' ); ?></span>
+			<span class="badge badge-secondary"><?php _e( 'Disabled', 'iup' ); ?></span>
+		</h1>
+
+		<div class="card">
+			<div class="card-body cloud">
+				<div class="row justify-content-center mb-5 mt-3">
+					<div class="col text-center">
+						<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+						<h4><?php _e( 'Infinite Uploads Setup', 'iup' ); ?></h4>
+						<p class="lead"><?php _e( "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library for smart recommendations choosing the best plan for your site, create or connect your account, and voilà – you're ready to push to the cloud.", 'iup' ); ?></p>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col-2 text-center">
+						<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#scan-modal"><?php _e( 'Run Scan', 'iup' ); ?></button>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-3">
+					<div class="col-2 text-center">
+						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-1.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="card">
-			<div class="card-header"><?php _e( 'Local File Overview', 'iup' ); ?></div>
-			<div class="card-body">
+			<div class="card-header h5"><?php _e( 'Local File Overview', 'iup' ); ?></div>
+			<div class="card-body cloud">
 				<div class="row align-items-center justify-content-center">
 					<div class="col">
 						<h5>Total Bytes/Files</h5>
@@ -446,34 +512,25 @@ class Infinite_Uploads_Admin {
 						<canvas id="iup-local-pie"></canvas>
 					</div>
 				</div>
-				<div class="row justify-content-center mb-2">
+				<div class="row justify-content-center mb-3">
 					<div class="col text-center">
 						<h4><?php _e( 'Ready to Connect!', 'iup' ); ?></h4>
 						<p class="lead"><?php _e( 'Get smart plan recommendations, create or connect to existing account, and sync to the cloud.', 'iup' ); ?></p>
 					</div>
 				</div>
-				<div class="row justify-content-center mb-2">
+				<div class="row justify-content-center mb-5">
 					<div class="col-2 text-center">
-						<button type="button" class="btn btn-primary btn-lg btn-block" id=""><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></button>
+						<a class="btn btn-primary btn-lg btn-block" id="" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></a>
 					</div>
 				</div>
-				<div class="row justify-content-center">
+				<div class="row justify-content-center mb-3">
 					<div class="col-2 text-center">
-						<div class="progress">
-							<div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-						</div>
+						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-3.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="jumbotron">
-			<h2 class="display-4"><?php _e( '1. Connect', 'iup' ); ?></h2>
-			<p class="lead"><?php _e( 'Create your free Infinite Uploads cloud account and connect this site.', 'iup' ); ?></p>
-			<hr class="my-4">
-			<p><?php _e( 'Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth.', 'iup' ); ?></p>
-			<a class="btn btn-primary btn-lg" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><?php _e( 'Create Account or Login', 'iup' ); ?></a>
-		</div>
 
 		<div class="jumbotron">
 			<h2 class="display-4"><?php _e( '2. Sync', 'iup' ); ?></h2>
@@ -550,41 +607,198 @@ class Infinite_Uploads_Admin {
 			</div>
 		<?php } ?>
 
-		<div class="container">
-			<h2><?php _e( 'Settings', 'iup' ); ?></h2>
-			<form>
-				<div class="form-group custom-control custom-switch">
-					<input type="checkbox" class="custom-control-input" id="customSwitch1">
-					<label class="custom-control-label" for="customSwitch1"><?php _e( 'Keep a local copy of new uploads', 'iup' ); ?></label>
-					<small
-						class="form-text text-muted"><?php _e( 'The default is to move all new uploads to the cloud to free up local storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this setting.', 'iup' ); ?></small>
+		<div class="card">
+			<div class="card-header h5"><?php _e( 'Account & Settings', 'iup' ); ?></div>
+			<div class="card-body p-5">
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'Infinite Uploads Plan', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Recalculated every 24hrs', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
+							<div class="col text-right"><?php _e( 'Need more?', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Switch to a new plan.', 'iup' ); ?></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '1.2 GB', '10 GB', 'Starter' ); ?></p></div>
+						</div>
+					</div>
 				</div>
-				<div class="form-group custom-control custom-switch">
-					<input type="checkbox" class="custom-control-input" id="customSwitch2">
-					<label class="custom-control-label" for="customSwitch2"><?php _e( 'Keep a local copy of new uploads', 'iup' ); ?></label>
-					<small class="form-text text-muted"><?php _e( 'The default is to move all new uploads to the cloud to free up storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this.', 'iup' ); ?></small>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'CDN Bandwidth', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Infinite Uploads includes allotted bandwidth for CDN delivery of your files.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Recalculated every 24hrs', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '2.2 GB', '10 GB', 'Starter' ); ?></p></div>
+						</div>
+					</div>
 				</div>
-				<button type="submit" class="btn btn-primary"><?php _e( 'Save', 'iup' ); ?></button>
-			</form>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'CDN URL', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Your uploads are served from this CDN url via 45 edge locations around the world.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Current CDN URL', 'iup' ); ?></div>
+							<div class="col text-right"><?php _e( 'Use your own domain!', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Upgrade to a business plan.', 'iup' ); ?></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php echo esc_html( '67865.infiniteuploads.com' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'Storage Region', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'The location of our servers storing your uploads.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Region', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Region can only be selected when first connecting your site.', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php _e( 'United States', 'iup' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'Import & Disconnect', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row text-center mb-3">
+							<div class="col"><?php _e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'iup' ); ?></div>
+						</div>
+						<div class="row justify-content-center">
+							<div class="col-4 text-center">
+								<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'iup' ); ?></button>
+								<p><?php printf( __( '%s / %s files to Download', 'iup' ), '1.21 GB', '1,213' ); ?></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 
-		<!-- Modal -->
-		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
+		<!-- Scan Modal -->
+		<div class="modal fade" id="scan-modal" tabindex="-1" role="dialog" aria-labelledby="scan-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel"><?php _e( 'Modal title', 'iup' ); ?></h5>
+						<h5 class="modal-title" id="scan-modal-label"><?php _e( 'Quick Connect', 'iup' ); ?></h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
 					<div class="modal-body">
-						...
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-5 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Scan in progress', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col-2 text-center">
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-3">
+								<div class="col-2 text-center">
+									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal"><?php _e( 'Close', 'iup' ); ?></button>
-						<button type="button" class="btn btn-primary"><?php _e( 'Save changes', 'iup' ); ?></button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Upload Modal -->
+		<div class="modal fade" id="upload-modal" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="upload-modal-label"><?php _e( 'Upload to Cloud', 'iup' ); ?></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-5 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Sync in progress', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col-2 text-center">
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-3">
+								<div class="col-2 text-center">
+									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Download Modal -->
+		<div class="modal fade" id="download-modal" tabindex="-1" role="dialog" aria-labelledby="download-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="download-modal-label"><?php _e( 'Download & Disconnect', 'iup' ); ?></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-5 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Sync in progress', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col-2 text-center">
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-3">
+								<div class="col-2 text-center">
+									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

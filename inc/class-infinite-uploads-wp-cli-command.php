@@ -105,10 +105,10 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		try {
-			$objects = $s3->getIterator( 'ListObjects', array(
+			$objects = $s3->getIterator( 'ListObjects', [
 				'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
 				'Prefix' => $prefix,
-			) );
+			] );
 			foreach ( $objects as $object ) {
 				WP_CLI::line( str_replace( $prefix, '', $object['Key'] ) . ' ' . size_format( $object['Size'] ) . ' ' . $object['LastModified']->__toString() );
 			}
@@ -272,7 +272,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $args_assoc, $progress_bar, $command, $wpdb, $unsynced, &$uploaded ) {
 								$uploaded ++;
 								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $file ) );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
 									WP_CLI::success( sprintf( __( '%s - Synced %s of %s files.', 'iup' ), $file, number_format_i18n( $uploaded ), number_format_i18n( $unsynced ) ) );
@@ -329,10 +329,10 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
 		}
 
-		$args = array(
+		$args = [
 			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
 			'Prefix' => $prefix,
-		);
+		];
 
 		//set flag
 		$progress                    = get_site_option( 'iup_files_scanned' );
@@ -348,7 +348,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 						$local_key = str_replace( untrailingslashit( $prefix ), '', $object['Key'] );
 						$file      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}infinite_uploads_files WHERE file = %s", $local_key ) );
 						if ( $file && ! $file->synced && $file->size == $object['Size'] ) {
-							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'synced' => 1 ), array( 'file' => $local_key ) );
+							$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $local_key ] );
 						}
 						if ( ! $file ) {
 							$cloud_only_files[] = [
@@ -362,7 +362,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				}
 				//flush new files to db
 				if ( count( $cloud_only_files ) ) {
-					$values = array();
+					$values = [];
 					foreach ( $cloud_only_files as $file ) {
 						$values[] = $wpdb->prepare( "(%s,%d,%d,%s,1,1)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 					}
@@ -413,7 +413,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 		foreach ( $to_delete as $file ) {
 			if ( @unlink( $path['basedir'] . $file ) ) {
-				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 1 ), array( 'file' => $file ) );
+				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 1 ], [ 'file' => $file ] );
 				$deleted ++;
 				if ( $args_assoc['verbose'] ) {
 					WP_CLI::success( sprintf( __( '%s - Deleted %s of %s files.', 'iup' ), $file, number_format_i18n( $deleted ), number_format_i18n( count( $to_delete ) ) ) );
@@ -487,7 +487,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $args_assoc, $progress_bar, $command, $wpdb, $unsynced, &$downloaded ) {
 								$downloaded ++;
 								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", array( 'deleted' => 0 ), array( 'file' => $file ) );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
 									WP_CLI::success( sprintf( __( '%s - Downloaded %s of %s files.', 'iup' ), $file, number_format_i18n( $downloaded ), number_format_i18n( $unsynced ) ) );
@@ -553,12 +553,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				strtok( INFINITE_UPLOADS_BUCKET, '/' ),
 				$prefix,
 				$regex,
-				array(
+				[
 					'before_delete',
 					function () {
 						WP_CLI::line( sprintf( 'Deleting file' ) );
 					},
-				)
+				]
 			);
 
 		} catch ( Exception $e ) {

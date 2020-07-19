@@ -52,14 +52,14 @@ class Infinite_Uploads {
 
 		$this->register_stream_wrapper();
 
-		add_filter( 'upload_dir', array( $this, 'filter_upload_dir' ) );
-		add_filter( 'wp_image_editors', array( $this, 'filter_editors' ), 9 );
-		add_action( 'delete_attachment', array( $this, 'delete_attachment_files' ) );
-		add_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10, 2 );
-		add_filter( 'wp_resource_hints', array( $this, 'wp_filter_resource_hints' ), 10, 2 );
+		add_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
+		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
+		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
+		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
+		add_filter( 'wp_resource_hints', [ $this, 'wp_filter_resource_hints' ], 10, 2 );
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
-		add_action( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
+		add_action( 'wp_handle_sideload_prefilter', [ $this, 'filter_sideload_move_temp_file_to_s3' ] );
 
 		add_filter( 'pre_wp_unique_filename_file_list', [ $this, 'get_files_for_unique_filename_file_list' ], 10, 3 );
 
@@ -67,9 +67,9 @@ class Infinite_Uploads {
 		// switch out the personal_data directory to a local temp folder, and then upload after it's
 		// complete, as Core tries to write directly to the ZipArchive which won't work with the
 		// IU streamWrapper.
-		add_action( 'wp_privacy_personal_data_export_file', array( $this, 'before_export_personal_data', 9 ) );
-		add_action( 'wp_privacy_personal_data_export_file', array( $this, 'after_export_personal_data', 11 ) );
-		add_action( 'wp_privacy_personal_data_export_file_created', array( $this, 'move_temp_personal_data_to_s3', 1000 ) );
+		add_action( 'wp_privacy_personal_data_export_file', [ $this, 'before_export_personal_data', 9 ] );
+		add_action( 'wp_privacy_personal_data_export_file', [ $this, 'after_export_personal_data', 11 ] );
+		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 			new Infinite_Uploads_Rewriter( INFINITE_UPLOADS_BUCKET_URL );
@@ -104,7 +104,7 @@ class Infinite_Uploads {
 			return $this->s3;
 		}
 
-		$params = array( 'version' => 'latest' );
+		$params = [ 'version' => 'latest' ];
 
 		if ( $this->key && $this->secret ) {
 			$params['credentials']['key']    = $this->key;
@@ -139,9 +139,9 @@ class Infinite_Uploads {
 	public function tear_down() {
 
 		stream_wrapper_unregister( 'iu' );
-		remove_filter( 'upload_dir', array( $this, 'filter_upload_dir' ) );
-		remove_filter( 'wp_image_editors', array( $this, 'filter_editors' ), 9 );
-		remove_filter( 'wp_handle_sideload_prefilter', array( $this, 'filter_sideload_move_temp_file_to_s3' ) );
+		remove_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
+		remove_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
+		remove_filter( 'wp_handle_sideload_prefilter', [ $this, 'filter_sideload_move_temp_file_to_s3' ] );
 	}
 
 	public function get_original_upload_dir() {
@@ -187,15 +187,15 @@ class Infinite_Uploads {
 		global $wpdb;
 
 		$types  = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0 GROUP BY type ORDER BY size DESC" );
-		$labels = array(
-			'image'    => [ 'color' => 'cyan', 'label' => __( 'Images', 'iup' ) ],
-			'audio'    => [ 'color' => 'green', 'label' => __( 'Audio', 'iup' ) ],
-			'video'    => [ 'color' => 'purple', 'label' => __( 'Video', 'iup' ) ],
-			'document' => [ 'color' => 'orange', 'label' => __( 'Documents', 'iup' ) ],
-			'archive'  => [ 'color' => 'pink', 'label' => __( 'Archives', 'iup' ) ],
-			'code'     => [ 'color' => 'blue', 'label' => __( 'Code', 'iup' ) ],
-			'other'    => [ 'color' => 'gray', 'label' => __( 'Other', 'iup' ) ],
-		);
+		$labels = [
+			'image'    => [ 'color' => '#26A9E0', 'label' => __( 'Images', 'iup' ) ],
+			'audio'    => [ 'color' => '#00A167', 'label' => __( 'Audio', 'iup' ) ],
+			'video'    => [ 'color' => '#C035E2', 'label' => __( 'Video', 'iup' ) ],
+			'document' => [ 'color' => '#EE7C1E', 'label' => __( 'Documents', 'iup' ) ],
+			'archive'  => [ 'color' => '#EC008C', 'label' => __( 'Archives', 'iup' ) ],
+			'code'     => [ 'color' => '#EFED27', 'label' => __( 'Code', 'iup' ) ],
+			'other'    => [ 'color' => '#F1F1F1', 'label' => __( 'Other', 'iup' ) ],
+		];
 
 		$data = [];
 		foreach ( $types as $type ) {
@@ -224,11 +224,11 @@ class Infinite_Uploads {
 	}
 
 	public function get_file_type( $filename ) {
-		$extensions = array(
-			'image'    => array( 'jpg', 'jpeg', 'jpe', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'svgz', 'webp' ),
-			'audio'    => array( 'aac', 'ac3', 'aif', 'aiff', 'flac', 'm3a', 'm4a', 'm4b', 'mka', 'mp1', 'mp2', 'mp3', 'ogg', 'oga', 'ram', 'wav', 'wma' ),
-			'video'    => array( '3g2', '3gp', '3gpp', 'asf', 'avi', 'divx', 'dv', 'flv', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'mpv', 'ogm', 'ogv', 'qt', 'rm', 'vob', 'wmv', 'webm' ),
-			'document' => array(
+		$extensions = [
+			'image'    => [ 'jpg', 'jpeg', 'jpe', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'svgz', 'webp' ],
+			'audio'    => [ 'aac', 'ac3', 'aif', 'aiff', 'flac', 'm3a', 'm4a', 'm4b', 'mka', 'mp1', 'mp2', 'mp3', 'ogg', 'oga', 'ram', 'wav', 'wma' ],
+			'video'    => [ '3g2', '3gp', '3gpp', 'asf', 'avi', 'divx', 'dv', 'flv', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'mpv', 'ogm', 'ogv', 'qt', 'rm', 'vob', 'wmv', 'webm' ],
+			'document' => [
 				'log',
 				'asc',
 				'csv',
@@ -265,10 +265,10 @@ class Infinite_Uploads {
 				'xlsx',
 				'xlsm',
 				'xlsb',
-			),
-			'archive'  => array( 'bz2', 'cab', 'dmg', 'gz', 'rar', 'sea', 'sit', 'sqx', 'tar', 'tgz', 'zip', '7z', 'data', 'bin', 'bak' ),
-			'code'     => array( 'css', 'htm', 'html', 'php', 'js', 'md' ),
-		);
+			],
+			'archive'  => [ 'bz2', 'cab', 'dmg', 'gz', 'rar', 'sea', 'sit', 'sqx', 'tar', 'tgz', 'zip', '7z', 'data', 'bin', 'bak' ],
+			'code'     => [ 'css', 'htm', 'html', 'php', 'js', 'md' ],
+		];
 
 		$ext = preg_replace( '/^.+?\.([^.]+)$/', '$1', $filename );
 		if ( ! empty( $ext ) ) {
@@ -412,10 +412,10 @@ class Infinite_Uploads {
 	 * @return array|bool
 	 */
 	public function wp_filter_read_image_metadata( $meta, $file ) {
-		remove_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10 );
+		remove_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10 );
 		$temp_file = $this->copy_image_from_s3( $file );
 		$meta      = wp_read_image_metadata( $temp_file );
-		add_filter( 'wp_read_image_metadata', array( $this, 'wp_filter_read_image_metadata' ), 10, 2 );
+		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
 		unlink( $temp_file );
 
 		return $meta;
@@ -458,14 +458,14 @@ class Infinite_Uploads {
 	 * Setup the filters for wp_privacy_exports_dir to use a temp folder location.
 	 */
 	function before_export_personal_data() {
-		add_filter( 'wp_privacy_exports_dir', array( $this, 'set_wp_privacy_exports_dir' ) );
+		add_filter( 'wp_privacy_exports_dir', [ $this, 'set_wp_privacy_exports_dir' ] );
 	}
 
 	/**
 	 * Remove the filters for wp_privacy_exports_dir as we only want it added in some cases.
 	 */
 	function after_export_personal_data() {
-		remove_filter( 'wp_privacy_exports_dir', array( $this, 'set_wp_privacy_exports_dir' ) );
+		remove_filter( 'wp_privacy_exports_dir', [ $this, 'set_wp_privacy_exports_dir' ] );
 	}
 
 	/**
