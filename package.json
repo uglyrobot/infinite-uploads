@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "gulp": "^4.0.2",
-    "gulp-wp-pot": "^2.4.3"
+    "gulp-wp-pot": "^2.4.3",
+    "gulp-zip": "^5.0.2"
   },
   "scripts": {
     "test": "phpunit"

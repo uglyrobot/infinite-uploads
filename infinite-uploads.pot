@@ -13,138 +13,416 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: inc/class-infinite-uploads-admin.php:217
-msgid "Infinite Uploads"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:220
-msgid "1. Connect"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:221
-msgid "Create your free Infinite Uploads cloud account and connect this site."
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:223
-msgid "Infinite Uploads is free to get started, and includes 2GB of free cloud storage with unlimited CDN bandwidth."
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:224
-msgid "Create Account or Login"
+#: inc/class-infinite-uploads-admin.php:230
+msgid "Error uploading file. Queued for retry."
 msgstr ""
 
 #: inc/class-infinite-uploads-admin.php:228
-msgid "2. Sync"
+msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:229
-msgid "Copy all your existing uploads the the cloud."
+#: inc/class-infinite-uploads-admin.php:322
+msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:231
-msgid "Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed."
+#: inc/class-infinite-uploads-admin.php:320
+msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:232
-msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
+#: inc/class-infinite-uploads-admin.php:497
+msgid "Disabled"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:238
-msgid "Error!"
+#: inc/class-infinite-uploads-admin.php:498
+msgid "Enabled"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:246
-msgid "Local"
+#: inc/class-infinite-uploads-admin.php:506
+msgid "Infinite Uploads Setup"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:247
-msgid "Local Files"
+#: inc/class-infinite-uploads-admin.php:507
+msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library for smart recommendations choosing the best plan for your site, create or connect your account, and voilà – you're ready to push to the cloud."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:250
-msgid "Synced"
+#: inc/class-infinite-uploads-admin.php:512
+msgid "Run Scan"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:253
-msgid "Remaining"
+#: inc/class-infinite-uploads-admin.php:524
+msgid "Local File Overview"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:254
-msgid "Remaining Files"
+#: inc/class-infinite-uploads-admin.php:528, inc/class-infinite-uploads-admin.php:569
+msgid "Total Bytes / Files"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:265
-msgid "files"
+#: inc/class-infinite-uploads-admin.php:547
+msgid "Ready to Connect!"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:272, inc/class-infinite-uploads-admin.php:275, inc/class-infinite-uploads-admin.php:278
+#: inc/class-infinite-uploads-admin.php:548
+msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:553
+msgid "Connect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:565
+msgid "Ready to Sync"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:589
+msgid "You have %s of premium storage available!"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:590
+msgid "Move your media library to the Infinite Uploads cloud."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:595
+msgid "Sync Now"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:609
+msgid "Cloud Storage Overview"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:613
+msgid "This Site's Cloud Bytes / Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:613, inc/class-infinite-uploads-admin.php:651, inc/class-infinite-uploads-admin.php:667
+msgid "Recalculated every 24 hours"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:627
+msgid "%s / %s %s Plan"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:633
+msgid "Visit the Infinite Uploads site to view, manage, or change your plan."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:634
+msgid "Account Management"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:642
+msgid "Account & Settings"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:646
+msgid "Infinite Uploads Plan"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:647
+msgid "Your current Infinite Uploads plan and storage."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:651, inc/class-infinite-uploads-admin.php:667
+msgid "Used / Available"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:652
+msgid "Need more?"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:652
+msgid "Switch to a new plan."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:656, inc/class-infinite-uploads-admin.php:671
+msgid "%s / %s %s"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:662
+msgid "CDN Bandwidth"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:663
+msgid "Infinite Uploads includes allotted bandwidth for CDN delivery of your files."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:677
+msgid "CDN URL"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:678
+msgid "Your uploads are served from this CDN url via 45 edge locations around the world."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:682
+msgid "Current CDN URL"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:683
+msgid "Use your own domain!"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:683
+msgid "Upgrade to a business plan."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:693
+msgid "Storage Region"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:694
+msgid "The location of our servers storing your uploads."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:698
+msgid "Region"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:698
+msgid "Region can only be selected when first connecting your site."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:702
+msgid "United States"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:708
+msgid "Import & Disconnect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:709
+msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:713
+msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:717
+msgid "Disconnect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:718
+msgid "%s / %s files to Download"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:732
+msgid "Scanning Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:742
+msgid "Scanning Local Filesystem"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:743, inc/class-infinite-uploads-admin.php:818
+msgid "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:748, inc/class-infinite-uploads-admin.php:878, inc/class-infinite-uploads-admin.php:881, inc/class-infinite-uploads-admin.php:884
 msgid "Loading..."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:273
+#: inc/class-infinite-uploads-admin.php:749
+msgid "Found %s / %s Files..."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:769
+msgid "Upload to Cloud"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:779
+msgid "Sync in Progress"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:780
+msgid "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:781, inc/class-infinite-uploads-admin.php:840
+msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:807
+msgid "Download & Disconnect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:817
+msgid "Downloading Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:836
+msgid "OLD SYNC DESIGN"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:837
+msgid "Copy all your existing uploads the the cloud."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:839
+msgid "Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:850
+msgid "Local"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:851
+msgid "Local Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:854
+msgid "Synced"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:857
+msgid "Remaining"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:858
+msgid "Remaining Files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:870
+msgid "files"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:879
 msgid "Scanning local filesystem"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:276
+#: inc/class-infinite-uploads-admin.php:882
 msgid "Comparing to the cloud"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:279
+#: inc/class-infinite-uploads-admin.php:885
 msgid "Copying to the cloud"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:282
+#: inc/class-infinite-uploads-admin.php:888
 msgid "Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:285
+#: inc/class-infinite-uploads-admin.php:891
 msgid "Sync to Cloud"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:286
+#: inc/class-infinite-uploads-admin.php:892
 msgid "Continue Sync"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:292
+#: inc/class-infinite-uploads-admin.php:899
 msgid "3. Enable"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:293
+#: inc/class-infinite-uploads-admin.php:900
 msgid "Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:297
+#: inc/class-infinite-uploads-admin.php:904
 msgid "Enable Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:303
-msgid "Settings"
+#: inc/class-infinite-uploads-admin.php:906
+msgid "Enabling..."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:307, inc/class-infinite-uploads-admin.php:312
-msgid "Keep a local copy of new uploads"
+#: inc/class-infinite-uploads-wp-cli-command.php:218, inc/class-infinite-uploads-wp-cli-command.php:403
+msgid "%s files (%s) remaining to be synced."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:308
-msgid "The default is to move all new uploads to the cloud to free up local storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this setting."
+#: inc/class-infinite-uploads-wp-cli-command.php:226
+msgid "Copying to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:313
-msgid "The default is to move all new uploads to the cloud to free up storage and make your site stateless. If you are just trying out Infinite Uploads or using it more for backup purposes you may want to enable this."
+#: inc/class-infinite-uploads-wp-cli-command.php:278
+msgid "%s - Synced %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:315
-msgid "Save"
+#: inc/class-infinite-uploads-wp-cli-command.php:294
+msgid "%s error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:325
-msgid "Modal title"
+#: inc/class-infinite-uploads-wp-cli-command.php:306
+msgid "Sync complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:334
-msgid "Close"
+#: inc/class-infinite-uploads-wp-cli-command.php:318
+msgid "Scanning local filesystem..."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:335
-msgid "Save changes"
+#: inc/class-infinite-uploads-wp-cli-command.php:323
+msgid "%s files (%s) found in uploads."
 msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:325
+msgid "Comparing to the cloud..."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:411
+msgid "Deleting local copies of synced files..."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:424
+msgid "Could not delete %s."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:419
+msgid "%s - Deleted %s of %s files."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:431
+msgid "Delete complete!"
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:451
+msgid "%s files (%s) remaining to be downloaded."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:458
+msgid "Downloading from the cloud..."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:493
+msgid "%s - Downloaded %s of %s files."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:509
+msgid "%s error downloading %s. Queued for retry."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:521
+msgid "Download complete!"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:191
+msgid "Images"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:192
+msgid "Audio"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:193
+msgid "Video"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:194
+msgid "Documents"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:195
+msgid "Archives"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:196
+msgid "Code"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:197
+msgid "Other"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:217
+msgid "%s file totalling %s"
+msgid_plural "%s files totalling %s"
+msgstr[0] ""
+msgstr[1] ""
