@@ -400,9 +400,13 @@ class Infinite_Uploads_Admin {
 
 		$stats = $this->iup_instance->get_sync_stats();
 		$types = $this->iup_instance->get_local_filetypes();
-		echo '<div id="container" class="wrap">';
+		echo '<div id="container" class="wrap iup-background">';
 		?>
 		<style type="text/css">
+			body {
+				background-color: rgb(241, 241, 241);
+			}
+
 			.card {
 				margin-top: inherit;
 				padding: inherit;
@@ -411,6 +415,7 @@ class Infinite_Uploads_Admin {
 				box-shadow: inherit;
 				background: inherit;
 				box-sizing: inherit;
+				background-color: #ffffff;
 			}
 
 			.card-header {
@@ -460,16 +465,41 @@ class Infinite_Uploads_Admin {
 				background-color: rgba(38, 169, 224, 1);
 				border-radius: 10px;
 			}
+
+			.progress.download .progress-bar {
+				background-color: #EE7C1E;
+			}
+
+			.tooltip {
+				max-width: 150px;
+			}
+
+			.tooltip .tooltip-inner {
+				background-color: #F1F1F1;
+				color: #2A2A2A;
+			}
+
+			.bs-tooltip-top .arrow {
+				margin-left: 0;
+			}
+
+			.bs-tooltip-top .arrow:before {
+				border-top-color: #F1F1F1;
+			}
+
+			.bs-tooltip-bottom .arrow:before {
+				border-bottom-color: #F1F1F1;
+			}
 		</style>
 
 		<h1>
 			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
-			<span class="badge badge-success"><?php _e( 'Enabled', 'iup' ); ?></span>
-			<span class="badge badge-secondary"><?php _e( 'Disabled', 'iup' ); ?></span>
+			<span class="badge badge-secondary float-right"><?php _e( 'Disabled', 'iup' ); ?></span>
+			<span class="badge badge-success float-right mr-2"><?php _e( 'Enabled', 'iup' ); ?></span>
 		</h1>
 
 		<div class="card">
-			<div class="card-body cloud">
+			<div class="card-body cloud p-5">
 				<div class="row justify-content-center mb-5 mt-3">
 					<div class="col text-center">
 						<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
@@ -482,9 +512,9 @@ class Infinite_Uploads_Admin {
 						<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#scan-modal"><?php _e( 'Run Scan', 'iup' ); ?></button>
 					</div>
 				</div>
-				<div class="row justify-content-center mb-3">
+				<div class="row justify-content-center mb-1">
 					<div class="col-2 text-center">
-						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-1.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-0.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 					</div>
 				</div>
 			</div>
@@ -492,18 +522,18 @@ class Infinite_Uploads_Admin {
 
 		<div class="card">
 			<div class="card-header h5"><?php _e( 'Local File Overview', 'iup' ); ?></div>
-			<div class="card-body cloud">
+			<div class="card-body cloud p-5">
 				<div class="row align-items-center justify-content-center">
 					<div class="col">
-						<h5>Total Bytes/Files</h5>
-						<h1 class="display-1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></h1>
+						<p class="lead mb-0"><?php _e( "Total Bytes / Files", 'iup' ); ?></p>
+						<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 						<div class="container">
 							<?php foreach ( $types as $type ) { ?>
 								<div class="row mt-2">
 									<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
 									<div class="col-3 lead"><?php echo $type['label']; ?></div>
-									<div class="col-3"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
+									<div class="col-3 text-justify"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
 								</div>
 							<?php } ?>
 						</div>
@@ -523,7 +553,51 @@ class Infinite_Uploads_Admin {
 						<a class="btn btn-primary btn-lg btn-block" id="" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></a>
 					</div>
 				</div>
-				<div class="row justify-content-center mb-3">
+				<div class="row justify-content-center mb-1">
+					<div class="col-2 text-center">
+						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-header h5"><?php _e( 'Ready to Sync', 'iup' ); ?></div>
+			<div class="card-body cloud p-5">
+				<div class="row align-items-center justify-content-center mb-5">
+					<div class="col">
+						<p class="lead mb-0"><?php _e( "Total Bytes / Files", 'iup' ); ?></p>
+						<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
+
+						<div class="container">
+							<?php foreach ( $types as $type ) { ?>
+								<div class="row mt-2">
+									<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
+									<div class="col-3 lead"><?php echo $type['label']; ?></div>
+									<div class="col-3"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
+								</div>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="col-1 text-center">
+						<img src="<?php echo esc_url( plugins_url( '/assets/img/arrow.svg', __FILE__ ) ); ?>" alt="Right sync arrow" height="31" width="56"/>
+					</div>
+					<div class="col">
+						<div class="row justify-content-center mb-3">
+							<div class="col text-center">
+								<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+								<p class="lead"><?php printf( __( 'You have %s of premium storage available!', 'iup' ), '10 GB' ); ?></p>
+								<p class="lead"><?php _e( 'Move your media library to the Infinite Uploads cloud.', 'iup' ); ?></p>
+							</div>
+						</div>
+						<div class="row justify-content-center">
+							<div class="col-4 text-center">
+								<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'iup' ); ?></button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-1">
 					<div class="col-2 text-center">
 						<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-3.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 					</div>
@@ -531,9 +605,235 @@ class Infinite_Uploads_Admin {
 			</div>
 		</div>
 
+		<div class="card">
+			<div class="card-header h5"><?php _e( 'Cloud Storage Overview', 'iup' ); ?></div>
+			<div class="card-body cloud p-5">
+				<div class="row align-items-center justify-content-center mb-5">
+					<div class="col">
+						<p class="lead mb-0"><?php _e( "This Site's Cloud Bytes / Files", 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></p>
+						<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
+
+						<div class="container">
+							<?php foreach ( $types as $type ) { ?>
+								<div class="row mt-2">
+									<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
+									<div class="col-3 lead"><?php echo $type['label']; ?></div>
+									<div class="col-3"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
+								</div>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="col text-center">
+						<p class="h5"><?php printf( __( '%s / %s %s Plan', 'iup' ), '1.2 GB', '10 GB', 'Starter' ); ?></p>
+						<canvas id="iup-cloud-pie"></canvas>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-1">
+					<div class="col-4 text-center">
+						<p><?php _e( 'Visit the Infinite Uploads site to view, manage, or change your plan.', 'iup' ); ?></p>
+						<a class="btn btn-info btn-lg" id="" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><?php _e( 'Account Management', 'iup' ); ?></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="card">
+			<div class="card-header h5"><?php _e( 'Account & Settings', 'iup' ); ?></div>
+			<div class="card-body p-5">
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'Infinite Uploads Plan', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></div>
+							<div class="col text-right"><?php _e( 'Need more?', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Switch to a new plan.', 'iup' ); ?></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '1.2 GB', '10 GB', 'Starter' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'CDN Bandwidth', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Infinite Uploads includes allotted bandwidth for CDN delivery of your files.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '2.2 GB', '10 GB', 'Starter' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'CDN URL', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Your uploads are served from this CDN url via 45 edge locations around the world.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Current CDN URL', 'iup' ); ?></div>
+							<div class="col text-right"><?php _e( 'Use your own domain!', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Upgrade to a business plan.', 'iup' ); ?></a></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php echo esc_html( '67865.infiniteuploads.com' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center mb-5">
+					<div class="col">
+						<h5><?php _e( 'Storage Region', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'The location of our servers storing your uploads.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row">
+							<div class="col"><?php _e( 'Region', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Region can only be selected when first connecting your site.', 'iup' ); ?>"></span></div>
+						</div>
+						<div class="row">
+							<div class="col badge badge-pill badge-light text-left p-3">
+								<p class="h5 ml-2 mb-0"><?php _e( 'United States', 'iup' ); ?></p></div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="col">
+						<h5><?php _e( 'Import & Disconnect', 'iup' ); ?></h5>
+						<p class="lead"><?php _e( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com.', 'iup' ); ?></p>
+					</div>
+					<div class="col">
+						<div class="row text-center mb-3">
+							<div class="col"><?php _e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'iup' ); ?></div>
+						</div>
+						<div class="row justify-content-center">
+							<div class="col-4 text-center">
+								<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'iup' ); ?></button>
+								<p><?php printf( __( '%s / %s files to Download', 'iup' ), '1.21 GB', '1,213' ); ?></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Scan Modal -->
+		<div class="modal fade" id="scan-modal" tabindex="-1" role="dialog" aria-labelledby="scan-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="scan-modal-label"><?php _e( 'Scanning Files', 'iup' ); ?></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-4 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/scan.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Scanning Local Filesystem', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col text-center text-muted">
+									<div class="spinner-border mr-1" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
+									<span class="h3"><?php printf( __( 'Found %s / %s Files...', 'iup' ), '1.2 GB', '1,234' ); ?></span>
+
+								</div>
+							</div>
+							<div class="row justify-content-center mb-3">
+								<div class="col-2 text-center">
+									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-1.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Upload Modal -->
+		<div class="modal fade" id="upload-modal" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="upload-modal-label"><?php _e( 'Upload to Cloud', 'iup' ); ?></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-5 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Sync in Progress', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later.", 'iup' ); ?></p>
+									<p><?php _e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'iup' ); ?> <code>wp infinite-uploads sync</code></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col text-center">
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-3">
+								<div class="col-2 text-center">
+									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-4.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Download Modal -->
+		<div class="modal fade" id="download-modal" tabindex="-1" role="dialog" aria-labelledby="download-modal-label" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="download-modal-label"><?php _e( 'Download & Disconnect', 'iup' ); ?></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row justify-content-center mb-5 mt-3">
+								<div class="col text-center">
+									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/download-from-cloud.svg', __FILE__ ) ); ?>" alt="Download from Cloud" height="76" width="76"/>
+									<h4><?php _e( 'Downloading Files', 'iup' ); ?></h4>
+									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+								</div>
+							</div>
+							<div class="row justify-content-center mb-5">
+								<div class="col text-center">
+									<div class="progress download">
+										<div class="progress-bar" role="progressbar" style="width: 66%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">66%</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<div class="jumbotron">
-			<h2 class="display-4"><?php _e( '2. Sync', 'iup' ); ?></h2>
+			<h2 class="display-4"><?php _e( 'OLD SYNC DESIGN', 'iup' ); ?></h2>
 			<p class="lead"><?php _e( 'Copy all your existing uploads the the cloud.', 'iup' ); ?></p>
 			<hr class="my-4">
 			<p><?php _e( 'Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed.', 'iup' ); ?></p>
@@ -607,202 +907,6 @@ class Infinite_Uploads_Admin {
 			</div>
 		<?php } ?>
 
-		<div class="card">
-			<div class="card-header h5"><?php _e( 'Account & Settings', 'iup' ); ?></div>
-			<div class="card-body p-5">
-				<div class="row justify-content-center mb-5">
-					<div class="col">
-						<h5><?php _e( 'Infinite Uploads Plan', 'iup' ); ?></h5>
-						<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
-					</div>
-					<div class="col">
-						<div class="row">
-							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Recalculated every 24hrs', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
-							<div class="col text-right"><?php _e( 'Need more?', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Switch to a new plan.', 'iup' ); ?></a></div>
-						</div>
-						<div class="row">
-							<div class="col badge badge-pill badge-light text-left p-3">
-								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '1.2 GB', '10 GB', 'Starter' ); ?></p></div>
-						</div>
-					</div>
-				</div>
-				<div class="row justify-content-center mb-5">
-					<div class="col">
-						<h5><?php _e( 'CDN Bandwidth', 'iup' ); ?></h5>
-						<p class="lead"><?php _e( 'Infinite Uploads includes allotted bandwidth for CDN delivery of your files.', 'iup' ); ?></p>
-					</div>
-					<div class="col">
-						<div class="row">
-							<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Recalculated every 24hrs', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
-						</div>
-						<div class="row">
-							<div class="col badge badge-pill badge-light text-left p-3">
-								<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s %s', 'iup' ), '2.2 GB', '10 GB', 'Starter' ); ?></p></div>
-						</div>
-					</div>
-				</div>
-				<div class="row justify-content-center mb-5">
-					<div class="col">
-						<h5><?php _e( 'CDN URL', 'iup' ); ?></h5>
-						<p class="lead"><?php _e( 'Your uploads are served from this CDN url via 45 edge locations around the world.', 'iup' ); ?></p>
-					</div>
-					<div class="col">
-						<div class="row">
-							<div class="col"><?php _e( 'Current CDN URL', 'iup' ); ?></div>
-							<div class="col text-right"><?php _e( 'Use your own domain!', 'iup' ); ?> <a href="#" class="text-warning"><?php _e( 'Upgrade to a business plan.', 'iup' ); ?></a></div>
-						</div>
-						<div class="row">
-							<div class="col badge badge-pill badge-light text-left p-3">
-								<p class="h5 ml-2 mb-0"><?php echo esc_html( '67865.infiniteuploads.com' ); ?></p></div>
-						</div>
-					</div>
-				</div>
-				<div class="row justify-content-center mb-5">
-					<div class="col">
-						<h5><?php _e( 'Storage Region', 'iup' ); ?></h5>
-						<p class="lead"><?php _e( 'The location of our servers storing your uploads.', 'iup' ); ?></p>
-					</div>
-					<div class="col">
-						<div class="row">
-							<div class="col"><?php _e( 'Region', 'iup' ); ?> <a class="text-muted" data-toggle="tooltip" data-placement="top" title="<?php esc_attr_e( 'Region can only be selected when first connecting your site.', 'iup' ); ?>"><span class="dashicons dashicons-info"></span></a></div>
-						</div>
-						<div class="row">
-							<div class="col badge badge-pill badge-light text-left p-3">
-								<p class="h5 ml-2 mb-0"><?php _e( 'United States', 'iup' ); ?></p></div>
-						</div>
-					</div>
-				</div>
-				<div class="row justify-content-center mb-5">
-					<div class="col">
-						<h5><?php _e( 'Import & Disconnect', 'iup' ); ?></h5>
-						<p class="lead"><?php _e( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com.', 'iup' ); ?></p>
-					</div>
-					<div class="col">
-						<div class="row text-center mb-3">
-							<div class="col"><?php _e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'iup' ); ?></div>
-						</div>
-						<div class="row justify-content-center">
-							<div class="col-4 text-center">
-								<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'iup' ); ?></button>
-								<p><?php printf( __( '%s / %s files to Download', 'iup' ), '1.21 GB', '1,213' ); ?></p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-		<!-- Scan Modal -->
-		<div class="modal fade" id="scan-modal" tabindex="-1" role="dialog" aria-labelledby="scan-modal-label" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="scan-modal-label"><?php _e( 'Quick Connect', 'iup' ); ?></h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="container-fluid">
-							<div class="row justify-content-center mb-5 mt-3">
-								<div class="col text-center">
-									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
-									<h4><?php _e( 'Scan in progress', 'iup' ); ?></h4>
-									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-5">
-								<div class="col-2 text-center">
-									<div class="progress">
-										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-									</div>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-3">
-								<div class="col-2 text-center">
-									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Upload Modal -->
-		<div class="modal fade" id="upload-modal" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="upload-modal-label"><?php _e( 'Upload to Cloud', 'iup' ); ?></h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="container-fluid">
-							<div class="row justify-content-center mb-5 mt-3">
-								<div class="col text-center">
-									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
-									<h4><?php _e( 'Sync in progress', 'iup' ); ?></h4>
-									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-5">
-								<div class="col-2 text-center">
-									<div class="progress">
-										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-									</div>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-3">
-								<div class="col-2 text-center">
-									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Download Modal -->
-		<div class="modal fade" id="download-modal" tabindex="-1" role="dialog" aria-labelledby="download-modal-label" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="download-modal-label"><?php _e( 'Download & Disconnect', 'iup' ); ?></h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="container-fluid">
-							<div class="row justify-content-center mb-5 mt-3">
-								<div class="col text-center">
-									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', __FILE__ ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
-									<h4><?php _e( 'Sync in progress', 'iup' ); ?></h4>
-									<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-5">
-								<div class="col-2 text-center">
-									<div class="progress">
-										<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-									</div>
-								</div>
-							</div>
-							<div class="row justify-content-center mb-3">
-								<div class="col-2 text-center">
-									<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-2.svg', __FILE__ ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 		<?php
 		echo '</div>';
 	}

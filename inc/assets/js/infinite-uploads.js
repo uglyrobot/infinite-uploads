@@ -186,7 +186,7 @@ jQuery(document).ready(function ($) {
     return label;
   };
   //Charts
-  var config = {
+  var config_local = {
     type: 'pie',
     data: local_types,
     options: {
@@ -195,13 +195,48 @@ jQuery(document).ready(function ($) {
       tooltips: {
         callbacks: {
           label: sizelabel
-        }
+        },
+        backgroundColor: '#F1F1F1',
+        bodyFontColor: '#2A2A2A',
+      },
+      title: {
+        display: true,
+        position: 'bottom',
+        fontSize: 18,
+        fontStyle: 'normal',
+        text: '8.3 GB / 1,234 Files'
+      }
+    }
+  };
+
+  var config_cloud = {
+    type: 'pie',
+    data: local_types,
+    options: {
+      responsive: true,
+      legend: false,
+      tooltips: {
+        callbacks: {
+          label: sizelabel
+        },
+        backgroundColor: '#F1F1F1',
+        bodyFontColor: '#2A2A2A',
+      },
+      title: {
+        display: true,
+        position: 'bottom',
+        fontSize: 18,
+        fontStyle: 'normal',
+        text: '8.3 GB / 1,234 Files'
       }
     }
   };
 
   window.onload = function () {
     var ctx = document.getElementById('iup-local-pie').getContext('2d');
-    window.myPie = new Chart(ctx, config);
+    window.myPieLocal = new Chart(ctx, config_local);
+
+    var ctx = document.getElementById('iup-cloud-pie').getContext('2d');
+    window.myPieCloud = new Chart(ctx, config_cloud);
   };
 });
