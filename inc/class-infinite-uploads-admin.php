@@ -386,6 +386,7 @@ class Infinite_Uploads_Admin {
 	function admin_styles() {
 
 		wp_enqueue_style( 'iup-bootstrap', plugins_url( 'assets/bootstrap/css/bootstrap.min.css', __FILE__ ), false, INFINITE_UPLOADS_VERSION );
+		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-bootstrap' ], INFINITE_UPLOADS_VERSION );
 
 		//hide all admin notices from another source on these pages
 		//remove_all_actions( 'admin_notices' );
@@ -402,95 +403,6 @@ class Infinite_Uploads_Admin {
 		$types = $this->iup_instance->get_local_filetypes();
 		echo '<div id="container" class="wrap iup-background">';
 		?>
-		<style type="text/css">
-			body {
-				background-color: rgb(241, 241, 241);
-			}
-
-			.card {
-				margin-top: inherit;
-				padding: inherit;
-				min-width: inherit;
-				max-width: inherit;
-				box-shadow: inherit;
-				background: inherit;
-				box-sizing: inherit;
-				background-color: #ffffff;
-			}
-
-			.card-header {
-				background-color: #ffffff;
-			}
-
-			.card-body.cloud {
-				background: bottom url("<?php echo esc_url( plugins_url( '/assets/img/wave-bg.svg', __FILE__ ) ); ?>") no-repeat;
-				background-size: 100% auto;
-			}
-
-			.btn-primary {
-				background-color: rgba(38, 169, 224, 1);
-				border-radius: 24px;
-				border-width: 0;
-			}
-
-			.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-				background-color: rgba(38, 169, 224, 0.8);
-				border-width: 0;
-			}
-
-			.btn-info {
-				background-color: #EE7C1E;
-				border-radius: 24px;
-				border-width: 0;
-			}
-
-			.btn-info:hover, .btn-info:active, .btn-info:focus {
-				background-color: rgba(238, 124, 30, 0.8);
-				border-width: 0;
-			}
-
-			.btn .dashicons {
-				font-size: 1.8rem;
-				line-height: 1;
-				margin-right: 1rem;
-			}
-
-			.progress {
-				height: 30px;
-				border-radius: 15px;
-				padding: 5px;
-			}
-
-			.progress .progress-bar {
-				background-color: rgba(38, 169, 224, 1);
-				border-radius: 10px;
-			}
-
-			.progress.download .progress-bar {
-				background-color: #EE7C1E;
-			}
-
-			.tooltip {
-				max-width: 150px;
-			}
-
-			.tooltip .tooltip-inner {
-				background-color: #F1F1F1;
-				color: #2A2A2A;
-			}
-
-			.bs-tooltip-top .arrow {
-				margin-left: 0;
-			}
-
-			.bs-tooltip-top .arrow:before {
-				border-top-color: #F1F1F1;
-			}
-
-			.bs-tooltip-bottom .arrow:before {
-				border-bottom-color: #F1F1F1;
-			}
-		</style>
 
 		<h1>
 			<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
