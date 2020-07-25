@@ -1,47 +1,32 @@
 jQuery(document).ready(function ($) {
   $('[data-toggle="tooltip"]').tooltip();
 
-  var buildFilelist = function (remaining_dirs) {
+  var stopLoop = false;
 
-    //progress indication
-    $('.iup-scan-progress').show();
-    $('.iup-scan-progress .spinner-border').addClass('text-hide');
-    $('.iup-scan-progress .iup-local .spinner-border').removeClass('text-hide');
-    $('.iup-scan-progress h3').addClass('text-muted');
-    $('.iup-scan-progress .iup-local h3').removeClass('text-muted');
+  var buildFilelist = function (remaining_dirs) {
+    if (stopLoop) {
+      return false;
+    }
 
     var data = {"remaining_dirs": remaining_dirs};
     $.post(ajaxurl + '?action=infinite-uploads-filelist', data, function (json) {
       if (json.success) {
-        if (json.data.is_data) {
-          $('#iup-progress-gauges').show();
-        }
-        $('.iup-progress-pcnt').text(json.data.pcnt_complete);
-        $('.iup-progress-size').text(json.data.remaining_size);
-        $('.iup-progress-files').text(json.data.remaining_files);
-        $('.iup-progress-total-size').text(json.data.local_size);
-        $('.iup-progress-total-files').text(json.data.local_files);
-        $('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-        $('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
+        $('.iup-scan-storage').text(json.data.local_size);
+        $('.iup-scan-files').text(json.data.local_files);
         if (!json.data.is_done) {
           buildFilelist(json.data.remaining_dirs);
         } else {
-          fetchRemoteFilelist('');
+          location.reload();
+          return true;
         }
 
       } else {
         $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
-
-        $('.iup-scan-progress').hide();
-        $('#iup-sync').show();
       }
     }, 'json').fail(function () {
       $('#iup-error').text("Unknown Error");
       $('#iup-error').show();
-
-      $('.iup-scan-progress').hide();
-      $('#iup-sync').show();
     });
   };
 
@@ -141,6 +126,13 @@ jQuery(document).ready(function ($) {
       });
   };
 
+  $('#scan-modal').on('shown.bs.modal', function () {
+    buildFilelist([]);
+  }).on('hidden.bs.modal', function () {
+    stopLoop = true;
+  })
+
+
   //Syncing
   $('#iup-sync').on('click', function () {
     $('#iup-sync, #iup-continue-sync, #iup-error').hide();
@@ -204,7 +196,7 @@ jQuery(document).ready(function ($) {
         position: 'bottom',
         fontSize: 18,
         fontStyle: 'normal',
-        text: '8.3 GB / 1,234 Files'
+        text: local_types.total
       }
     }
   };
@@ -227,7 +219,7 @@ jQuery(document).ready(function ($) {
         position: 'bottom',
         fontSize: 18,
         fontStyle: 'normal',
-        text: '8.3 GB / 1,234 Files'
+        text: local_types.total
       }
     }
   };

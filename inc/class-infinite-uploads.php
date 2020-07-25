@@ -161,11 +161,12 @@ class Infinite_Uploads {
 		$synced  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
 		$deleted = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
 
-		$progress    = get_site_option( 'iup_files_scanned' );
-		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+		$progress = (array) get_site_option( 'iup_files_scanned' );
+
+		/*$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 		foreach ( $progress as $key => $timestamp ) {
 			$progress[ $key ] = $timestamp ? date_i18n( $date_format, $progress[ $key ] ) : $timestamp;
-		}
+		}*/
 
 		return array_merge( $progress, [
 			'is_data'         => (bool) $total->files,
@@ -216,6 +217,10 @@ class Infinite_Uploads {
 				$chart['datasets'][0]['backgroundColor'][] = $item['color'];
 				$chart['labels'][]                         = $item['label'] . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item['files'], 'iup' ), number_format_i18n( $item['files'] ), size_format( $item['size'], 1 ) );
 			}
+
+			$total_size     = array_sum( wp_list_pluck( $data, 'size' ) );
+			$total_files    = array_sum( wp_list_pluck( $data, 'files' ) );
+			$chart['total'] = sprintf( _n( '%s / %s File', '%s / %s Files', $total_files, 'iup' ), size_format( $total_size, 2 ), number_format_i18n( $total_files ) );
 
 			return $chart;
 		}
