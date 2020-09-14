@@ -139,7 +139,7 @@ function infinite_uploads_outdated_wp_version_notice() {
  * @return bool
  */
 function infinite_uploads_enabled() {
-	return get_site_option( 'iup_enabled' );
+	return get_site_option( '' );
 }
 
 /**

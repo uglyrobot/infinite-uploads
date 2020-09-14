@@ -145,9 +145,8 @@ class Infinite_Uploads {
 	}
 
 	public function get_original_upload_dir() {
-
 		if ( empty( $this->original_upload_dir ) ) {
-			wp_upload_dir();
+			return wp_upload_dir();
 		}
 
 		return $this->original_upload_dir;

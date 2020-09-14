@@ -33,7 +33,16 @@
 		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col-2 text-center">
-				<a class="btn btn-primary btn-lg btn-block" id="" href="https://infiniteuploads.com/?register=<?php echo admin_url( 'options-general.php?page=infinite_uploads' ); ?>" role="button"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></a>
+				<form method="post" action="https://one.wordpress.test/smart-pricing/">
+					<input type="hidden" name="action" value="iup_connect">
+					<input type="hidden" name="site_id" value="">
+					<input type="hidden" name="domain" value="<?php echo esc_url( network_site_url() ); ?>">
+					<input type="hidden" name="redirect_url" value="<?php echo esc_url( admin_url( 'options-general.php?page=infinite_uploads' ) ); ?>">
+					<input type="hidden" name="bytes" value="<?php echo $to_sync->size; ?>">
+					<input type="hidden" name="files" value="<?php echo $to_sync->files; ?>">
+					<button class="btn btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></button>
+
+				</form>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-1">

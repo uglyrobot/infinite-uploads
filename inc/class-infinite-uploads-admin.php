@@ -11,9 +11,11 @@ class Infinite_Uploads_Admin {
 	private static $instance;
 	public $ajax_timelimit = 20;
 	private $iup_instance;
+	private $api;
 
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
+		$this->api          = Infinite_Uploads_Api::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 
@@ -367,7 +369,7 @@ class Infinite_Uploads_Admin {
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
 	}
-
+	/**/
 	/**
 	 *
 	 */
@@ -398,13 +400,19 @@ class Infinite_Uploads_Admin {
 	 * Settings page display callback.
 	 */
 	function settings_page() {
+		global $wpdb;
+
+		if ( isset( $_GET['temp_token'] ) ) {
+			$result = $this->api->authorize( $_GET['temp_token'] );
+		}
 
 		if ( isset( $_GET['clear'] ) ) {
 			delete_site_option( 'iup_files_scanned' );
 		}
 
-		$stats = $this->iup_instance->get_sync_stats();
-		$types = $this->iup_instance->get_local_filetypes();
+		$stats    = $this->iup_instance->get_sync_stats();
+		$types    = $this->iup_instance->get_local_filetypes();
+		$api_data = $this->api->get_site_data();
 
 		//var_dump($stats);
 		?>
@@ -415,82 +423,28 @@ class Infinite_Uploads_Admin {
 			</h1>
 
 			<?php
-			if ( ! empty( $stats['files_finished'] ) && $stats['files_finished'] >= ( time() - DAY_IN_SECONDS ) ) {
-				require_once( dirname( __FILE__ ) . '/templates/connect.php' );
+			if ( $this->api->has_token() ) {
+				if ( ! empty( $stats['sync_finished'] ) ) {
+					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
+				} else {
+					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
+					require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
+				}
+
+				require_once( dirname( __FILE__ ) . '/templates/settings.php' );
+
+				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
+
 			} else {
-				require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
+				if ( ! empty( $stats['files_finished'] ) && $stats['files_finished'] >= ( time() - DAY_IN_SECONDS ) ) {
+					$to_sync = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
+					require_once( dirname( __FILE__ ) . '/templates/connect.php' );
+				} else {
+					require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
+				}
+				require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			}
-			require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
-
-			//require_once( dirname( __FILE__ ) . '/templates/sync.php' );
-			//require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
-
-			//require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
-
-			//require_once( dirname( __FILE__ ) . '/templates/settings.php' );
-
-			//require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
-
 			?>
-			<div class="jumbotron" style="display:none;">
-				<h2 class="display-4"><?php _e( 'OLD SYNC DESIGN', 'iup' ); ?></h2>
-				<p class="lead"><?php _e( 'Copy all your existing uploads the the cloud.', 'iup' ); ?></p>
-				<hr class="my-4">
-				<p><?php _e( 'Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed.', 'iup' ); ?></p>
-				<p><?php _e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'iup' ); ?> <code>wp infinite-uploads sync</code></p>
-				<?php
-				?>
-				<div class="alert alert-danger fade show overflow-auto" role="alert" id="iup-error" style="display: none;max-height: 100px">
-				</div>
-				<div class="container-fluid">
-					<div class="row mt-4 ml-1" id="iup-progress-gauges" <?php echo $stats['is_data'] ? '' : 'style="display: none;"'; ?>>
-						<ul class="list-group list-group-horizontal">
-							<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-size"><?php echo esc_html( $stats['local_size'] ); ?></span><small class="text-muted"> <?php _e( 'Local', 'iup' ); ?></small></h3></li>
-							<li class="list-group-item list-group-item-primary"><h3 class="m-0"><span class="iup-progress-total-files"><?php echo esc_html( $stats['local_files'] ); ?></span><small class="text-muted"> <?php _e( 'Local Files', 'iup' ); ?></small></h3></li>
-						</ul>
-						<ul class="list-group list-group-horizontal iup-progress-gauges-cloud ml-4" <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>>
-							<li class="list-group-item list-group-item-success"><h3 class="m-0"><span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%<small class="text-muted"> <?php _e( 'Synced', 'iup' ); ?></small></h3></li>
-						</ul>
-						<ul class="list-group list-group-horizontal iup-progress-gauges-cloud ml-4" <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>>
-							<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span><small class="text-muted"> <?php _e( 'Remaining', 'iup' ); ?></small></h3></li>
-							<li class="list-group-item list-group-item-info"><h3 class="m-0"><span class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span><small class="text-muted"> <?php _e( 'Remaining Files', 'iup' ); ?></small></h3></li>
-						</ul>
-					</div>
-
-					<div class="progress mt-4" id="iup-sync-progress-bar" style="height: 30px;<?php echo $stats['compare_started'] ? '' : 'display: none;'; ?>">
-						<div class="progress-bar bg-info iup-cloud" role="progressbar" style="width: <?php echo esc_attr( $stats['pcnt_complete'] ); ?>%" aria-valuenow="<?php echo esc_attr( $stats['pcnt_complete'] ); ?>" aria-valuemin="0" aria-valuemax="100">
-							<div>
-								<span class="iup-progress-pcnt"><?php echo esc_html( $stats['pcnt_complete'] ); ?></span>%
-							</div>
-						</div>
-						<div class="progress-bar bg-warning iup-local" role="progressbar" style="width: <?php echo 100 - $stats['pcnt_complete']; ?>%" aria-valuenow="<?php echo 100 - $stats['pcnt_complete']; ?>" aria-valuemin="0" aria-valuemax="100">
-							<div <?php echo $stats['compare_started'] ? '' : 'style="display: none;"'; ?>><span class="iup-progress-size"><?php echo esc_html( $stats['remaining_size'] ); ?></span> (<span
-									class="iup-progress-files"><?php echo esc_html( $stats['remaining_files'] ); ?></span> <?php _e( 'files', 'iup' ); ?>)
-							</div>
-						</div>
-					</div>
-
-					<div class="row mt-4 iup-scan-progress" style="display:none;">
-						<ul class="col-md">
-							<li class="iup-local">
-								<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
-								<h3 class="text-muted"><?php _e( 'Scanning local filesystem', 'iup' ); ?></h3></li>
-							<li class="iup-cloud">
-								<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
-								<h3 class="text-muted"><?php _e( 'Comparing to the cloud', 'iup' ); ?></h3></li>
-							<li class="iup-sync">
-								<div class="spinner-border float-left mr-3 text-hide" role="status"><span class="sr-only"><?php _e( 'Loading...', 'iup' ); ?></span></div>
-								<h3 class="text-muted"><?php _e( 'Copying to the cloud', 'iup' ); ?></h3></li>
-						</ul>
-					</div>
-					<p class="iup-scan-progress text-muted" style="display:none;"><?php _e( 'Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later.', 'iup' ); ?></p>
-
-					<div class="row mt-4">
-						<button type="button" class="btn btn-primary" id="iup-sync"><?php _e( 'Sync to Cloud', 'iup' ); ?></button>
-						<button type="button" class="btn btn-primary" id="iup-continue-sync" style="display: n1one;"><?php _e( 'Continue Sync', 'iup' ); ?></button>
-					</div>
-				</div>
-			</div>
 
 			<?php if ( ! infinite_uploads_enabled() ) { ?>
 				<div class="jumbotron">

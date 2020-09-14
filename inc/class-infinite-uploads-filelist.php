@@ -15,8 +15,10 @@ class Infinite_Uploads_Filelist {
 	public $file_list = [];
 	public $exclusions = [
 		'/et-cache/',
+		'/et_temp/',
 		'/imports/',
 		'/cache/',
+		'/wp-defender/',
 		'/elementor/css/',
 	];
 	protected $root_path;
