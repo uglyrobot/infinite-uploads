@@ -12,12 +12,14 @@ class Infinite_Uploads_Admin {
 	public $ajax_timelimit = 20;
 	private $iup_instance;
 	private $api;
+	private $auth_error;
 
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
-		$this->api          = Infinite_Uploads_Api::get_instance();
+		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
 
 		add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
 		add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
@@ -352,6 +354,39 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
+	 * Get the settings url with optional url args.
+	 *
+	 * @param array $args Optional. Same as for add_query_arg()
+	 *
+	 * @return string
+	 */
+	function settings_url( $args = [] ) {
+		if ( is_multisite() ) {
+			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
+		} else {
+			$base = admin_url( 'options-general.php?page=infinite_uploads' );
+		}
+
+		return add_query_arg( $args, $base );
+	}
+
+	/**
+	 * Identical to WP core size_format() function except it returns "0 GB" instead of false on failure.
+	 *
+	 * @param int|string $bytes    Number of bytes. Note max integer size for integers.
+	 * @param int        $decimals Optional. Precision of number of decimal places. Default 0.
+	 *
+	 * @return string Number string on success.
+	 */
+	function size_format_zero( $bytes, $decimals = 0 ) {
+		if ( $bytes > 0 ) {
+			return size_format( $bytes, $decimals );
+		} else {
+			return '0 GB';
+		}
+	}
+
+	/**
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
@@ -397,22 +432,47 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
+	 * Checks for temp_token in url and processes auth if present.
+	 */
+	function intercept_auth() {
+		if ( ! empty( $_GET['temp_token'] ) ) {
+			$result = $this->api->authorize( $_GET['temp_token'] );
+			if ( ! $result ) {
+				$this->auth_error = $this->api->api_error;
+			} else {
+				$result = $this->api->get_site_data( true );
+				if ( ! $result ) {
+					$this->auth_error = $this->api->api_error;
+				} else {
+					wp_safe_redirect( $this->settings_url() );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Settings page display callback.
 	 */
 	function settings_page() {
 		global $wpdb;
 
-		if ( isset( $_GET['temp_token'] ) ) {
-			$result = $this->api->authorize( $_GET['temp_token'] );
+		$region_labels = [
+			'US' => __( 'United States', 'iup' ),
+			'EU' => __( 'Europe', 'iup' ),
+		];
+
+		if ( $this->auth_error ) {
+			?>
+			<div class="error"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
 		}
 
 		if ( isset( $_GET['clear'] ) ) {
 			delete_site_option( 'iup_files_scanned' );
 		}
 
-		$stats    = $this->iup_instance->get_sync_stats();
-		$types    = $this->iup_instance->get_local_filetypes();
-		$api_data = $this->api->get_site_data();
+		$stats       = $this->iup_instance->get_sync_stats();
+		$local_types = $this->iup_instance->get_local_filetypes();
+		$api_data    = $this->api->get_site_data();
 
 		//var_dump($stats);
 		?>
@@ -442,8 +502,8 @@ class Infinite_Uploads_Admin {
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
 				}
-				require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			}
+			require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			?>
 
 			<?php if ( ! infinite_uploads_enabled() ) { ?>

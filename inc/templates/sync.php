@@ -7,7 +7,7 @@
 				<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 				<div class="container">
-					<?php foreach ( $types as $type ) { ?>
+					<?php foreach ( $local_types as $type ) { ?>
 						<div class="row mt-2">
 							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
 							<div class="col-3 lead"><?php echo $type['label']; ?></div>
@@ -28,7 +28,7 @@
 				<div class="row justify-content-center mb-3">
 					<div class="col text-center">
 						<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
-						<p class="lead"><?php printf( __( 'You have %s of premium storage available!', 'iup' ), '10 GB' ); ?></p>
+						<p class="lead"><?php printf( __( 'You have %s of premium storage available!', 'iup' ), $this->size_format_zero( ( $api_data->plan->storage_limit * GB_IN_BYTES ) - $api_data->stats->cloud->storage, 2 ) ); ?></p>
 						<p class="lead"><?php _e( 'Move your media library to the Infinite Uploads cloud.', 'iup' ); ?></p>
 					</div>
 				</div>

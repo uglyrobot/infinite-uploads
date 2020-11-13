@@ -7,7 +7,7 @@
 /**
  * The main API class.
  */
-class Infinite_Uploads_Api {
+class Infinite_Uploads_Api_Handler {
 	private static $instance;
 
 	/**
@@ -58,7 +58,7 @@ class Infinite_Uploads_Api {
 	 * @internal
 	 */
 	public function __construct() {
-		if ( INFINITE_UPLOADS_CUSTOM_API_SERVER ) {
+		if ( defined( 'INFINITE_UPLOADS_CUSTOM_API_SERVER' ) ) {
 			$this->server_root = trailingslashit( INFINITE_UPLOADS_CUSTOM_API_SERVER );
 		}
 		$this->server_url = $this->server_root . $this->rest_api;
@@ -82,12 +82,12 @@ class Infinite_Uploads_Api {
 
 	/**
 	 *
-	 * @return Infinite_Uploads_Api
+	 * @return Infinite_Uploads_Api_Handler
 	 */
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
-			self::$instance = new Infinite_Uploads_Api();
+			self::$instance = new Infinite_Uploads_Api_Handler();
 		}
 
 		return self::$instance;
@@ -253,7 +253,7 @@ class Infinite_Uploads_Api {
 
 			$msg = sprintf(
 				$log,
-				INFINITE_UPLOADS_Dashboard::$version,
+				INFINITE_UPLOADS_VERSION,
 				$method,
 				$link,
 				wp_remote_retrieve_response_code( $response ),
@@ -266,26 +266,29 @@ class Infinite_Uploads_Api {
 		//if there is an auth problem
 		if ( $this->has_token() && in_array( wp_remote_retrieve_response_code( $response ), [ 401, 402, 403, 404 ] ) ) {
 			$this->set_token( '' );
-		} elseif ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+		}
+
+		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
 			$this->parse_api_error( $response );
+
+			return false;
 		}
 
-		try {
-			$body = json_decode( wp_remote_retrieve_body( $response ), JSON_THROW_ON_ERROR );
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( json_last_error() ) {
+			$this->parse_api_error( json_last_error_msg() );
 
-			return $body;
-		} catch ( Exception $e ) {
-			$this->parse_api_error( $e->getMessage() );
+			return false;
 		}
 
-		return false;
+		return $body;
 	}
 
 	/**
 	 * Parses an HTTP response object (or other value) to determine an error
 	 * reason. The error reason is added to the PHP error log.
 	 *
-	 * @param misc $response String, WP_Error object, HTTP response array.
+	 * @param string|WP_Error|array $response String, WP_Error object, HTTP response array.
 	 */
 	protected function parse_api_error( $response ) {
 		$error_code = wp_remote_retrieve_response_code( $response );
@@ -361,7 +364,7 @@ class Infinite_Uploads_Api {
 		error_log(
 			sprintf(
 				'[INFINITE_UPLOADS API Error] %s | %s (%s [%s]) %s',
-				INFINITE_UPLOADS_Dashboard::$version,
+				INFINITE_UPLOADS_VERSION,
 				$this->api_error,
 				$url,
 				$error_code,
@@ -381,6 +384,7 @@ class Infinite_Uploads_Api {
 	 */
 	public function authorize( $temp_token ) {
 		$result = $this->call( 'token', [ 'temp_token' => $temp_token ], 'POST' );
+		var_dump( $result );
 		if ( $result ) {
 			$this->set_token( $result->api_token );
 			$this->set_site_id( $result->site_id );
@@ -401,21 +405,25 @@ class Infinite_Uploads_Api {
 	 */
 	public function get_site_data( $force_refresh = false ) {
 
+		if ( ! $this->has_token() || ! $this->get_site_id() ) {
+			return false;
+		}
+
 		if ( ! $force_refresh ) {
 			$data = get_site_option( 'infinite_uploads_api_data' );
 			if ( $data ) {
 				$data = json_decode( $data );
-
+				var_dump( $data );
 				if ( $data->refreshed >= ( time() - HOUR_IN_SECONDS * 12 ) ) {
 					return $data;
 				}
 			}
 		}
 
+
 		$result = $this->call( "site/" . $this->get_site_id(), [], 'GET' );
 		if ( $result ) {
 			$result->refreshed = time();
-
 			//json_encode to prevent object injections
 			update_site_option( 'infinite_uploads_api_data', json_encode( $result ) );
 

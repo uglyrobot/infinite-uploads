@@ -7,7 +7,7 @@
 				<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 				<div class="container">
-					<?php foreach ( $types as $type ) { ?>
+					<?php foreach ( $local_types as $type ) { ?>
 						<div class="row mt-2">
 							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
 							<div class="col-3 lead"><?php echo $type['label']; ?></div>
@@ -35,9 +35,9 @@
 			<div class="col-2 text-center">
 				<form method="post" action="https://one.wordpress.test/smart-pricing/">
 					<input type="hidden" name="action" value="iup_connect">
-					<input type="hidden" name="site_id" value="">
+					<input type="hidden" name="site_id" value="<?php echo esc_attr( $this->api->get_site_id() ); ?>">
 					<input type="hidden" name="domain" value="<?php echo esc_url( network_site_url() ); ?>">
-					<input type="hidden" name="redirect_url" value="<?php echo esc_url( admin_url( 'options-general.php?page=infinite_uploads' ) ); ?>">
+					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $this->settings_url() ); ?>">
 					<input type="hidden" name="bytes" value="<?php echo $to_sync->size; ?>">
 					<input type="hidden" name="files" value="<?php echo $to_sync->files; ?>">
 					<button class="btn btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'iup' ); ?></button>
