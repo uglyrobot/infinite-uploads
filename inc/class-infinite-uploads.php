@@ -5,18 +5,13 @@ class Infinite_Uploads {
 	private static $instance;
 	public $original_upload_dir;
 	public $original_file;
-	private $bucket;
-	private $bucket_url;
+	public $bucket;
+	public $bucket_url;
 	private $key;
 	private $secret;
 
-	public function __construct( $bucket, $key, $secret, $bucket_url = null, $region = null ) {
+	public function __construct() {
 
-		$this->bucket     = $bucket;
-		$this->key        = $key;
-		$this->secret     = $secret;
-		$this->bucket_url = $bucket_url;
-		$this->region     = $region;
 	}
 
 	/**
@@ -26,13 +21,7 @@ class Infinite_Uploads {
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
-			self::$instance = new Infinite_Uploads(
-				INFINITE_UPLOADS_BUCKET,
-				defined( 'INFINITE_UPLOADS_KEY' ) ? INFINITE_UPLOADS_KEY : null,
-				defined( 'INFINITE_UPLOADS_SECRET' ) ? INFINITE_UPLOADS_SECRET : null,
-				defined( 'INFINITE_UPLOADS_BUCKET_URL' ) ? INFINITE_UPLOADS_BUCKET_URL : null,
-				INFINITE_UPLOADS_REGION
-			);
+			self::$instance = new Infinite_Uploads();
 		}
 
 		return self::$instance;
@@ -45,6 +34,25 @@ class Infinite_Uploads {
 
 		$this->admin = Infinite_Uploads_Admin::get_instance();
 		$this->api   = Infinite_Uploads_Api_Handler::get_instance();
+
+		$api_data = $this->api->get_site_data();
+		if ( isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
+			$this->bucket     = $api_data->site->upload_bucket;
+			$this->key        = $api_data->site->upload_key;
+			$this->secret     = $api_data->site->upload_secret;
+			$this->bucket_url = $api_data->site->cdn_url;
+			$this->region     = $api_data->site->upload_region;
+
+			add_filter( 'infinite_uploads_s3_client_params', function ( $params ) use ( $api_data ) {
+				$params['endpoint']                = $api_data->site->upload_endpoint;
+				$params['use_path_style_endpoint'] = true;
+				//$params['debug'] = [
+				//	'logfn'        => 'error_log',
+				//	'stream_size'  => 0,
+				//];
+				return $params;
+			} );
+		}
 
 		// don't register all this until we've enabled rewriting.
 		if ( ! infinite_uploads_enabled() ) {
@@ -73,7 +81,7 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
-			new Infinite_Uploads_Rewriter( INFINITE_UPLOADS_BUCKET_URL );
+			new Infinite_Uploads_Rewriter( $this->bucket_url );
 		}
 	}
 

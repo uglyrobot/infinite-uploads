@@ -84,12 +84,12 @@ class Infinite_Uploads_Admin {
 
 		$prefix = '';
 
-		if ( strpos( INFINITE_UPLOADS_BUCKET, '/' ) ) {
-			$prefix = trailingslashit( str_replace( strtok( INFINITE_UPLOADS_BUCKET, '/' ) . '/', '', INFINITE_UPLOADS_BUCKET ) );
+		if ( strpos( $this->iup_instance->bucket, '/' ) ) {
+			$prefix = trailingslashit( str_replace( strtok( $this->iup_instance->bucket, '/' ) . '/', '', $this->iup_instance->bucket ) );
 		}
 
 		$args = [
-			'Bucket' => strtok( INFINITE_UPLOADS_BUCKET, '/' ),
+			'Bucket' => strtok( $this->iup_instance->bucket, '/' ),
 			'Prefix' => $prefix,
 		];
 
@@ -213,7 +213,7 @@ class Infinite_Uploads_Admin {
 							$command->getHandlerList()->appendSign(
 								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
 									$uploaded ++;
-									$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
+									$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
 									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
 
 									return $result;
@@ -224,11 +224,11 @@ class Infinite_Uploads_Admin {
 				},
 			];
 			try {
-				$manager = new Transfer( $s3, $from, 's3://' . INFINITE_UPLOADS_BUCKET . '/', $transfer_args );
+				$manager = new Transfer( $s3, $from, 's3://' . $this->iup_instance->bucket . '/', $transfer_args );
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file     = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
+					$file     = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
 					$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'iup' ), $file );
 				} else {
 					$errors[] = __( 'Error uploading file. Queued for retry.', 'iup' );
@@ -292,7 +292,7 @@ class Infinite_Uploads_Admin {
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = 's3://' . INFINITE_UPLOADS_BUCKET . $file;
+				$to_sync_full[] = 's3://' . $this->iup_instance->bucket . $file;
 			}
 
 			$obj  = new ArrayObject( $to_sync_full );
@@ -300,13 +300,13 @@ class Infinite_Uploads_Admin {
 
 			$transfer_args = [
 				'concurrency' => 5,
-				'base_dir'    => 's3://' . INFINITE_UPLOADS_BUCKET,
+				'base_dir'    => 's3://' . $this->iup_instance->bucket,
 				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$downloaded ) {//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
 						$command->getHandlerList()->appendSign(
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {
 								$downloaded ++;
-								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], INFINITE_UPLOADS_BUCKET ) + strlen( INFINITE_UPLOADS_BUCKET ) ) ) );
+								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
 								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
 
 								return $result;
@@ -320,7 +320,7 @@ class Infinite_Uploads_Admin {
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file     = str_replace( trailingslashit( INFINITE_UPLOADS_BUCKET ), '', $e->getRequest()->getRequestTarget() );
+					$file     = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
 					$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file );
 				} else {
 					$errors[] = __( 'Error downloading file. Queued for retry.', 'iup' );
@@ -440,12 +440,7 @@ class Infinite_Uploads_Admin {
 			if ( ! $result ) {
 				$this->auth_error = $this->api->api_error;
 			} else {
-				$result = $this->api->get_site_data( true );
-				if ( ! $result ) {
-					$this->auth_error = $this->api->api_error;
-				} else {
-					wp_safe_redirect( $this->settings_url() );
-				}
+				wp_safe_redirect( $this->settings_url() );
 			}
 		}
 	}
@@ -473,9 +468,10 @@ class Infinite_Uploads_Admin {
 		$stats       = $this->iup_instance->get_sync_stats();
 		$local_types = $this->iup_instance->get_local_filetypes();
 		$api_data    = $this->api->get_site_data();
-
+		//var_dump($api_data);
 		//var_dump($stats);
 		?>
+		<div id="iup-error" class="error" style="display: none;"><p></p></div>
 		<div id="container" class="wrap iup-background">
 
 			<h1>
@@ -483,11 +479,13 @@ class Infinite_Uploads_Admin {
 			</h1>
 
 			<?php
-			if ( $this->api->has_token() ) {
+			if ( $this->api->has_token() && $api_data ) {
 				if ( ! empty( $stats['sync_finished'] ) ) {
 					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
+					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
+					require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
 				}
 
@@ -502,8 +500,8 @@ class Infinite_Uploads_Admin {
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
 				}
+				require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			}
-			require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			?>
 
 			<?php if ( ! infinite_uploads_enabled() ) { ?>

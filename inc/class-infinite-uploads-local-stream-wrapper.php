@@ -277,8 +277,8 @@ class Infinite_Uploads_Local_Stream_Wrapper {
 		$result = fflush( $this->handle );
 
 		$params = [
-			'Bucket' => INFINITE_UPLOADS_BUCKET,
-			'Key' => trim( str_replace( INFINITE_UPLOADS_BUCKET, '', $this->getTarget() ), '/' ),
+			'Bucket' => Infinite_Uploads::get_instance()->bucket,
+			'Key'    => trim( str_replace( Infinite_Uploads::get_instance()->bucket, '', $this->getTarget() ), '/' ),
 		];
 
 		/**

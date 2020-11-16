@@ -63,8 +63,8 @@ class Infinite_Uploads_Api_Handler {
 		}
 		$this->server_url = $this->server_root . $this->rest_api;
 
-		$this->api_token   = get_site_option( 'infinite_uploads_apitoken' );
-		$this->api_site_id = get_site_option( 'infinite_uploads_site_id' );
+		$this->api_token   = get_site_option( 'iup_apitoken' );
+		$this->api_site_id = get_site_option( 'iup_site_id' );
 
 		// Schedule automatic data update on the main site of the network.
 		if ( is_main_site() ) {
@@ -118,7 +118,7 @@ class Infinite_Uploads_Api_Handler {
 	 */
 	public function set_token( $token ) {
 		$this->api_token = $token;
-		update_site_option( 'infinite_uploads_apitoken', $token );
+		update_site_option( 'iup_apitoken', $token );
 	}
 
 	/**
@@ -137,7 +137,7 @@ class Infinite_Uploads_Api_Handler {
 	 */
 	public function set_site_id( $site_id ) {
 		$this->api_site_id = $site_id;
-		update_site_option( 'infinite_uploads_site_id', $site_id );
+		update_site_option( 'iup_site_id', $site_id );
 	}
 
 	/**
@@ -207,7 +207,7 @@ class Infinite_Uploads_Api_Handler {
 		$options = wp_parse_args(
 			$options,
 			[
-				'timeout'    => 30,
+				'timeout'    => 25,
 				'user-agent' => 'Infinite Uploads/' . INFINITE_UPLOADS_VERSION . ' (+' . network_site_url() . ')',
 				'headers'    => [
 					'Content-Type' => 'application/json',
@@ -384,13 +384,11 @@ class Infinite_Uploads_Api_Handler {
 	 */
 	public function authorize( $temp_token ) {
 		$result = $this->call( 'token', [ 'temp_token' => $temp_token ], 'POST' );
-		var_dump( $result );
 		if ( $result ) {
 			$this->set_token( $result->api_token );
 			$this->set_site_id( $result->site_id );
-			$this->get_site_data( true );
 
-			return true;
+			return $this->get_site_data( true );
 		}
 
 		return false;
@@ -410,10 +408,10 @@ class Infinite_Uploads_Api_Handler {
 		}
 
 		if ( ! $force_refresh ) {
-			$data = get_site_option( 'infinite_uploads_api_data' );
+			$data = get_site_option( 'iup_api_data' );
 			if ( $data ) {
 				$data = json_decode( $data );
-				var_dump( $data );
+				//return $data; //TODO REMOVE DEBUG CODE
 				if ( $data->refreshed >= ( time() - HOUR_IN_SECONDS * 12 ) ) {
 					return $data;
 				}
@@ -425,7 +423,7 @@ class Infinite_Uploads_Api_Handler {
 		if ( $result ) {
 			$result->refreshed = time();
 			//json_encode to prevent object injections
-			update_site_option( 'infinite_uploads_api_data', json_encode( $result ) );
+			update_site_option( 'iup_api_data', json_encode( $result ) );
 
 			return $result;
 		}
