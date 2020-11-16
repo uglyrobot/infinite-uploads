@@ -20,7 +20,12 @@
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center">
 							<div class="progress">
-								<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+								<div id="iup-sync-progress-bar" class="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style="width: <?php echo $stats['pcnt_complete']; ?>%;" aria-valuenow="<?php echo $stats['pcnt_complete']; ?>" aria-valuemin="0"
+								     aria-valuemax="100"><?php echo $stats['pcnt_complete']; ?>%
+								</div>
+							</div>
+							<div class="col text-center text-muted">
+								<span class="h6"><?php printf( __( '<span id="iup-progress-size">%s</span> / <span id="iup-progress-files">%s</span> Files Remaining...', 'iup' ), $stats['remaining_size'], $stats['remaining_files'] ); ?></span>
 							</div>
 						</div>
 					</div>

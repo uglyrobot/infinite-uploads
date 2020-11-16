@@ -5,14 +5,15 @@ jQuery(document).ready(function ($) {
 
   var buildFilelist = function (remaining_dirs) {
     if (stopLoop) {
+      stopLoop = false;
       return false;
     }
 
     var data = {"remaining_dirs": remaining_dirs};
     $.post(ajaxurl + '?action=infinite-uploads-filelist', data, function (json) {
       if (json.success) {
-        $('.iup-scan-storage').text(json.data.local_size);
-        $('.iup-scan-files').text(json.data.local_files);
+        $('#iup-scan-storage').text(json.data.local_size);
+        $('#iup-scan-files').text(json.data.local_files);
         if (!json.data.is_done) {
           buildFilelist(json.data.remaining_dirs);
         } else {
@@ -21,130 +22,124 @@ jQuery(document).ready(function ($) {
         }
 
       } else {
-        $('#iup-error').text(json.data.substr(0, 200));
+        $('#scan-modal').modal('hide');
+        $('#iup-error p').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json').fail(function () {
-      $('#iup-error').text("Unknown Error");
+      $('#scan-modal').modal('hide');
+      $('#iup-error p').text("Unknown Error");
       $('#iup-error').show();
     });
   };
 
   var fetchRemoteFilelist = function (next_token) {
-
-    //progress indication
-    $('.iup-scan-progress').show();
-    $('.iup-scan-progress .spinner-border').addClass('text-hide');
-    $('.iup-scan-progress .iup-cloud .spinner-border').removeClass('text-hide');
-    $('.iup-scan-progress h3').addClass('text-muted');
-    $('.iup-scan-progress .iup-cloud h3').removeClass('text-muted');
+    if (stopLoop) {
+      stopLoop = false;
+      return false;
+    }
 
     var data = {"next_token": next_token};
     $.post(ajaxurl + '?action=infinite-uploads-remote-filelist', data, function (json) {
       if (json.success) {
-        $('.iup-progress-gauges-cloud, .iup-sync-progress-bar .iup-local div').show();
-        $('.iup-progress-pcnt').text(json.data.pcnt_complete);
-        $('.iup-progress-size').text(json.data.remaining_size);
-        $('.iup-progress-files').text(json.data.remaining_files);
-        $('#iup-sync-progress-bar').show();
-        $('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-        $('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
+        $('#iup-scan-remote-storage').text(json.data.cloud_size);
+        $('#iup-scan-remote-files').text(json.data.cloud_files);
         if (!json.data.is_done) {
           fetchRemoteFilelist(json.data.next_token);
         } else {
-          syncFilelist();
+          //update values in next modal
+          $('#iup-progress-size').text(json.data.remaining_size);
+          $('#iup-progress-files').text(json.data.remaining_files);
+          $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
+
+          $('#iup-sync-button').attr('data-target', '#upload-modal');
+          $('#scan-remote-modal').modal('hide');
+          $('#upload-modal').modal('show');
         }
 
       } else {
-        $('#iup-error').text(json.data.substr(0, 200));
+        $('#scan-remote-modal').modal('hide');
+        $('#iup-error p').text(json.data.substr(0, 200));
         $('#iup-error').show();
-
-        $('.iup-scan-progress').hide();
-        $('#iup-sync').show();
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error').text("Unknown Error");
+        $('#scan-remote-modal').modal('hide');
+        $('#iup-error p').text("Unknown Error");
         $('#iup-error').show();
-
-        $('.iup-scan-progress').hide();
-        $('#iup-sync').show();
       });
   };
 
   var syncFilelist = function () {
-
-    //progress indication
-    $('.iup-scan-progress').show();
-    $('.iup-scan-progress .spinner-border').addClass('text-hide');
-    $('.iup-scan-progress .iup-sync .spinner-border').removeClass('text-hide');
-    $('.iup-scan-progress h3').addClass('text-muted');
-    $('.iup-scan-progress .iup-sync h3').removeClass('text-muted');
-    $('#iup-sync-progress-bar .progress-bar').addClass('progress-bar-animated progress-bar-striped');
+    if (stopLoop) {
+      stopLoop = false;
+      return false;
+    }
 
     $.post(ajaxurl + '?action=infinite-uploads-sync', {}, function (json) {
       if (json.success) {
-        $('.iup-progress-pcnt').text(json.data.pcnt_complete);
-        $('.iup-progress-size').text(json.data.remaining_size);
-        $('.iup-progress-files').text(json.data.remaining_files);
-        $('#iup-sync-progress-bar .iup-cloud').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete);
-        $('#iup-sync-progress-bar .iup-local').css('width', 100 - json.data.pcnt_complete + "%").attr('aria-valuenow', 100 - json.data.pcnt_complete);
+        //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+        $('#iup-progress-size').text(json.data.remaining_size);
+        $('#iup-progress-files').text(json.data.remaining_files);
+        $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
         if (!json.data.is_done) {
           syncFilelist();
         } else {
-          $('#iup-continue-sync').show();
-          $('.iup-scan-progress').hide();
-          $('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
+          location.reload();
+          return true;
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
-          $('#iup-error').html('<ul>');
+          $('#iup-error p').html('<ul>');
           $.each(json.data.errors, function (i, value) {
-            $('#iup-error').append('<li>' + value + '</li>');
+            $('#iup-error p').append('<li>' + value + '</li>');
           });
-          $('#iup-error').append('</ul>');
+          $('#iup-error p').append('</ul>');
           $('#iup-error').show();
         } else {
           $('#iup-error').hide();
         }
 
       } else {
-        $('#iup-error').text(json.data.substr(0, 200));
+        $('#upload-modal').modal('hide');
+        $('#iup-error p').text(json.data.substr(0, 200));
         $('#iup-error').show();
-
-        $('#iup-continue-sync').show();
-        $('.iup-scan-progress').hide();
-        $('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error').text("Unknown Error");
+        $('#upload-modal').modal('hide');
+        $('#iup-error p').text("Unknown Error");
         $('#iup-error').show();
-
-        $('#iup-continue-sync').show();
-        $('.iup-scan-progress').hide();
-        $('#iup-sync-progress-bar .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
       });
   };
 
-  $('#scan-modal').on('shown.bs.modal', function () {
+  //Scan
+  $('#scan-modal').on('show.bs.modal', function () {
+    $('#iup-error').hide();
+    stopLoop = false;
     buildFilelist([]);
-  }).on('hidden.bs.modal', function () {
+  }).on('hide.bs.modal', function () {
+    stopLoop = true;
+  })
+
+  //Compare to live
+  $('#scan-remote-modal').on('show.bs.modal', function () {
+    $('#iup-error').hide();
+    stopLoop = false;
+    fetchRemoteFilelist(null);
+  }).on('hide.bs.modal', function () {
+    stopLoop = true;
+  })
+
+  //Sync
+  $('#upload-modal').on('show.bs.modal', function () {
+    $('#iup-error').hide();
+    stopLoop = false;
+    syncFilelist([]);
+  }).on('hide.bs.modal', function () {
     stopLoop = true;
   })
 
 
-  //Syncing
-  $('#iup-sync').on('click', function () {
-    $('#iup-sync, #iup-continue-sync, #iup-error').hide();
-
-    buildFilelist([]);
-  });
-  //Resync in case of error
-  $('#iup-continue-sync').on('click', function () {
-    $('#iup-sync, #iup-continue-sync, #iup-error').hide();
-
-    syncFilelist();
-  });
   //Enable infinite uploads
   $('#iup-enable').on('click', function () {
     $('#iup-enable-spinner').removeClass('text-hide');
@@ -225,10 +220,16 @@ jQuery(document).ready(function ($) {
   };
 
   window.onload = function () {
-    var ctx = document.getElementById('iup-local-pie').getContext('2d');
-    window.myPieLocal = new Chart(ctx, config_local);
+    var pie1 = document.getElementById('iup-local-pie');
+    if (pie1) {
+      var ctx = pie1.getContext('2d');
+      window.myPieLocal = new Chart(ctx, config_local);
+    }
 
-    var ctx = document.getElementById('iup-cloud-pie').getContext('2d');
-    window.myPieCloud = new Chart(ctx, config_cloud);
+    var pie2 = document.getElementById('iup-cloud-pie');
+    if (pie2) {
+      var ctx = pie2.getContext('2d');
+      window.myPieCloud = new Chart(ctx, config_cloud);
+    }
   };
 });

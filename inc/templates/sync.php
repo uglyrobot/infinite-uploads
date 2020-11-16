@@ -34,7 +34,11 @@
 				</div>
 				<div class="row justify-content-center">
 					<div class="col-4 text-center">
-						<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'iup' ); ?></button>
+						<?php if ( ! empty( $stats['compare_finished'] ) ) { ?>
+							<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'iup' ); ?></button>
+						<?php } else { ?>
+							<button class="btn btn-primary btn-lg btn-block" id="iup-sync-button" data-toggle="modal" data-target="#scan-remote-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'iup' ); ?></button>
+						<?php } ?>
 					</div>
 				</div>
 			</div>
