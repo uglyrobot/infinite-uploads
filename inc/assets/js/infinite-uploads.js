@@ -112,6 +112,85 @@ jQuery(document).ready(function ($) {
       });
   };
 
+  var deleteFiles = function () {
+    if (stopLoop) {
+      stopLoop = false;
+      return false;
+    }
+
+    $.post(ajaxurl + '?action=infinite-uploads-delete', {}, function (json) {
+      if (json.success) {
+        //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+        $('#iup-delete-size').text(json.data.deletable_size);
+        $('#iup-delete-files').text(json.data.deletable_files);
+        if (!json.data.is_done) {
+          deleteFiles();
+        } else {
+          location.reload();
+          return true;
+        }
+        if (Array.isArray(json.data.errors) && json.data.errors.length) {
+          $('#iup-error p').html('<ul>');
+          $.each(json.data.errors, function (i, value) {
+            $('#iup-error p').append('<li>' + value + '</li>');
+          });
+          $('#iup-error p').append('</ul>');
+          $('#iup-error').show();
+        } else {
+          $('#iup-error').hide();
+        }
+
+      } else {
+        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').show();
+      }
+    }, 'json')
+      .fail(function () {
+        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').show();
+      });
+  };
+
+  var downloadFiles = function () {
+    if (stopLoop) {
+      stopLoop = false;
+      return false;
+    }
+
+    $.post(ajaxurl + '?action=infinite-uploads-download', {}, function (json) {
+      if (json.success) {
+        //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
+        $('#iup-download-size').text(json.data.deleted_size);
+        $('#iup-download-files').text(json.data.deleted_files);
+        $('#iup-download-progress-bar').css('width', json.data.pcnt_downloaded + "%").attr('aria-valuenow', json.data.pcnt_downloaded).text(json.data.pcnt_downloaded + "%");
+        if (!json.data.is_done) {
+          downloadFiles();
+        } else {
+          location.reload();
+          return true;
+        }
+        if (Array.isArray(json.data.errors) && json.data.errors.length) {
+          $('#iup-error p').html('<ul>');
+          $.each(json.data.errors, function (i, value) {
+            $('#iup-error p').append('<li>' + value + '</li>');
+          });
+          $('#iup-error p').append('</ul>');
+          $('#iup-error').show();
+        } else {
+          $('#iup-error').hide();
+        }
+
+      } else {
+        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').show();
+      }
+    }, 'json')
+      .fail(function () {
+        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').show();
+      });
+  };
+
   //Scan
   $('#scan-modal').on('show.bs.modal', function () {
     $('#iup-error').hide();
@@ -134,11 +213,36 @@ jQuery(document).ready(function ($) {
   $('#upload-modal').on('show.bs.modal', function () {
     $('#iup-error').hide();
     stopLoop = false;
-    syncFilelist([]);
+    syncFilelist();
   }).on('hide.bs.modal', function () {
     stopLoop = true;
   })
 
+  //Download
+  $('#download-modal').on('show.bs.modal', function () {
+    $('#iup-error').hide();
+    stopLoop = false;
+    downloadFiles();
+  }).on('hide.bs.modal', function () {
+    stopLoop = true;
+  })
+
+  //Delete
+  $('#delete-modal').on('show.bs.modal', function () {
+    $('#iup-error').hide();
+    stopLoop = false;
+    $('#iup-delete-local-button').show();
+    $('#iup-delete-local-spinner').hide();
+  }).on('hide.bs.modal', function () {
+    stopLoop = true;
+  })
+
+  //Delete local files
+  $('#iup-delete-local-button').on('click', function () {
+    $(this).hide();
+    $('#iup-delete-local-spinner').show();
+    deleteFiles();
+  });
 
   //Enable infinite uploads
   $('#iup-enable').on('click', function () {

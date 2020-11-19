@@ -25,7 +25,7 @@
 								</div>
 							</div>
 							<div class="col text-center text-muted">
-								<span class="h6"><?php printf( __( '<span id="iup-progress-size">%s</span> / <span id="iup-progress-files">%s</span> Files Remaining...', 'iup' ), $stats['remaining_size'], $stats['remaining_files'] ); ?></span>
+								<span class="h6"><?php printf( __( '<span id="iup-progress-size">%s</span> / <span id="iup-progress-files">%s</span> Files Remaining', 'iup' ), $stats['remaining_size'], $stats['remaining_files'] ); ?></span>
 							</div>
 						</div>
 					</div>

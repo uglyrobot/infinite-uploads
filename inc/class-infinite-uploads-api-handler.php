@@ -74,7 +74,7 @@ class Infinite_Uploads_Api_Handler {
 
 			add_action(
 				'infinite_uploads_sync',
-				array( $this, 'sync' )
+				array( $this, 'get_site_data' )
 			);
 
 		}
@@ -411,7 +411,8 @@ class Infinite_Uploads_Api_Handler {
 			$data = get_site_option( 'iup_api_data' );
 			if ( $data ) {
 				$data = json_decode( $data );
-				//return $data; //TODO REMOVE DEBUG CODE
+
+				return $data; //TODO REMOVE DEBUG CODE
 				if ( $data->refreshed >= ( time() - HOUR_IN_SECONDS * 12 ) ) {
 					return $data;
 				}

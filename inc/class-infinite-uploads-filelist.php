@@ -20,6 +20,7 @@ class Infinite_Uploads_Filelist {
 		'/cache/',
 		'/wp-defender/',
 		'/elementor/css/',
+		'.DS_Store',
 	];
 	protected $root_path;
 	protected $timeout;

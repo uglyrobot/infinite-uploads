@@ -64,6 +64,25 @@
 				</div>
 			</div>
 		</div>
+		<?php if ( (bool) $stats['deletable_files'] ) { ?>
+			<div class="row justify-content-center iup-settings-row-delete">
+				<div class="col">
+					<h5><?php _e( 'Free Up Local Storage', 'iup' ); ?></h5>
+					<p class="lead"><?php _e( 'There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space.', 'iup' ); ?></p>
+				</div>
+				<div class="col">
+					<div class="row text-center mb-3">
+						<div class="col"><?php _e( 'This saves space and improves server performance.', 'iup' ); ?></div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-4 text-center">
+							<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#delete-modal"><?php _e( 'Delete', 'iup' ); ?></button>
+							<p><strong><?php printf( __( '%s / %s deletable files', 'iup' ), $stats['deletable_size'], $stats['deletable_files'] ); ?></strong></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php } ?>
 		<div class="row justify-content-center">
 			<div class="col">
 				<h5><?php _e( 'Import & Disconnect', 'iup' ); ?></h5>

@@ -25,6 +25,7 @@ class Infinite_Uploads_Admin {
 		add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
 		add_action( 'wp_ajax_infinite-uploads-sync', [ &$this, 'ajax_sync' ] );
 		add_action( 'wp_ajax_infinite-uploads-delete', [ &$this, 'ajax_delete' ] );
+		add_action( 'wp_ajax_infinite-uploads-download', [ &$this, 'ajax_download' ] );
 		add_action( 'wp_ajax_infinite-uploads-toggle', [ &$this, 'ajax_toggle' ] );
 	}
 
@@ -213,7 +214,7 @@ class Infinite_Uploads_Admin {
 							$command->getHandlerList()->appendSign(
 								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
 									$uploaded ++;
-									$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
+									$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
 									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
 
 									return $result;
@@ -292,7 +293,7 @@ class Infinite_Uploads_Admin {
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = 's3://' . $this->iup_instance->bucket . $file;
+				$to_sync_full[] = 's3://' . untrailingslashit( $this->iup_instance->bucket ) . $file;
 			}
 
 			$obj  = new ArrayObject( $to_sync_full );
@@ -306,7 +307,7 @@ class Infinite_Uploads_Admin {
 						$command->getHandlerList()->appendSign(
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {
 								$downloaded ++;
-								$file = urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
+								$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
 								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
 
 								return $result;
@@ -481,6 +482,9 @@ class Infinite_Uploads_Admin {
 			<?php
 			if ( $this->api->has_token() && $api_data ) {
 				if ( ! empty( $stats['sync_finished'] ) ) {
+					if () {
+						$local_types = $this->iup_instance->get_local_filetypes( false, true );
+					}
 					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
@@ -491,6 +495,7 @@ class Infinite_Uploads_Admin {
 
 				require_once( dirname( __FILE__ ) . '/templates/settings.php' );
 
+				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
 
 			} else {

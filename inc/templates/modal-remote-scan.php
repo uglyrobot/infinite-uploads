@@ -20,7 +20,7 @@
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center text-muted">
-							<span class="h3"><?php printf( __( '<span id="iup-scan-remote-storage">%s</span> / <span id="iup-scan-remote-files">%s</span> Files Synced...', 'iup' ), $stats['cloud_size'], $stats['cloud_files'] ); ?></span>
+							<span class="h3"><?php printf( __( '<span id="iup-scan-remote-storage">%s</span> / <span id="iup-scan-remote-files">%s</span> Files Synced', 'iup' ), $stats['cloud_size'], $stats['cloud_files'] ); ?></span>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">

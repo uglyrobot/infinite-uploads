@@ -13,13 +13,19 @@
 						<div class="col text-center">
 							<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/download-from-cloud.svg', dirname( __FILE__ ) ) ); ?>" alt="Download from Cloud" height="76" width="76"/>
 							<h4><?php _e( 'Downloading Files', 'iup' ); ?></h4>
-							<p class="lead"><?php _e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'iup' ); ?></p>
+							<p class="lead"><?php _e( "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the download is being processed. If you close the tab the download will be interrupted and you will have to continue where you left off later.", 'iup' ); ?></p>
+							<p><?php _e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'iup' ); ?> <code>wp infinite-uploads download</code></p>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center">
 							<div class="progress download">
-								<div class="progress-bar" role="progressbar" style="width: 66%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">66%</div>
+								<div id="iup-download-progress-bar" class="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style="width: <?php echo $stats['pcnt_downloaded']; ?>%;" aria-valuenow="<?php echo $stats['pcnt_downloaded']; ?>" aria-valuemin="0"
+								     aria-valuemax="100"><?php echo $stats['pcnt_downloaded']; ?>%
+								</div>
+							</div>
+							<div class="col text-center text-muted">
+								<span class="h6"><?php printf( __( '<span id="iup-download-size">%s</span> / <span id="iup-download-files">%s</span> Files Remaining', 'iup' ), $stats['deleted_size'], $stats['deleted_files'] ); ?></span>
 							</div>
 						</div>
 					</div>

@@ -164,10 +164,11 @@ class Infinite_Uploads {
 	public function get_sync_stats() {
 		global $wpdb;
 
-		$total   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
-		$local   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
-		$synced  = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
-		$deleted = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
+		$total     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
+		$local     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
+		$synced    = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+		$deletable = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0" );
+		$deleted   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
 
 		$progress = (array) get_site_option( 'iup_files_scanned' );
 
@@ -184,18 +185,25 @@ class Infinite_Uploads {
 			'local_size'      => size_format( (int) $local->size, 2 ),
 			'cloud_files'     => number_format_i18n( (int) $synced->files ),
 			'cloud_size'      => size_format( (int) $synced->size, 2 ),
+			'deletable_files' => number_format_i18n( (int) $deletable->files ),
+			'deletable_size'  => size_format( (int) $deletable->size, 2 ),
 			'deleted_files'   => number_format_i18n( (int) $deleted->files ),
 			'deleted_size'    => size_format( (int) $deleted->size, 2 ),
 			'remaining_files' => number_format_i18n( max( $total->files - $synced->files, 0 ) ),
 			'remaining_size'  => size_format( max( $total->size - $synced->size, 0 ), 2 ),
 			'pcnt_complete'   => ( $local->files ? round( ( $synced->files / $total->files ) * 100, 2 ) : 0 ),
+			'pcnt_downloaded' => ( $synced->files ? round( 100 - ( ( $deleted->files / $synced->files ) * 100 ), 2 ) : 0 ),
 		] );
 	}
 
-	public function get_local_filetypes( $is_chart = false ) {
+	public function get_local_filetypes( $is_chart = false, $cloud_estimate = false ) {
 		global $wpdb;
 
-		$types  = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0 GROUP BY type ORDER BY size DESC" );
+		if ( $cloud_estimate ) {
+			$types = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 GROUP BY type ORDER BY size DESC" );
+		} else {
+			$types = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0 GROUP BY type ORDER BY size DESC" );
+		}
 
 		$data = [];
 		foreach ( $types as $type ) {

@@ -17,14 +17,14 @@
 				</div>
 			</div>
 			<div class="col text-center">
-				<p class="h5"><?php printf( __( '%s / %s Plan', 'iup' ), $this->size_format_zero( $api_data->stats->cloud->storage, 2 ), esc_html( $api_data->plan->label ) ); ?></p>
+				<p class="h5"><?php printf( __( '%s / %s', 'iup' ), $this->size_format_zero( $api_data->stats->cloud->storage, 2 ), esc_html( $api_data->plan->label ) ); ?></p>
 				<canvas id="iup-cloud-pie"></canvas>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-1">
 			<div class="col-4 text-center">
 				<p><?php _e( 'Visit the Infinite Uploads site to view, manage, or change your plan.', 'iup' ); ?></p>
-				<a class="btn btn-info btn-lg" id="" href="https://infiniteuploads.com/?register=<?php echo url_encode( $this->settings_url() ); ?>" role="button"><?php _e( 'Account Management', 'iup' ); ?></a>
+				<a class="btn btn-info btn-lg" id="" href="https://infiniteuploads.com/?register=<?php echo urlencode( $this->settings_url() ); ?>" role="button"><?php _e( 'Account Management', 'iup' ); ?></a>
 			</div>
 		</div>
 	</div>
