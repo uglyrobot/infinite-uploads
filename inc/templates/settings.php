@@ -1,6 +1,21 @@
 <div class="card">
-	<div class="card-header h5"><?php _e( 'Account & Settings', 'iup' ); ?></div>
+	<div class="card-header h5"><?php _e( 'Account & Settings', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Includes usage data for all connected sites', 'iup' ); ?>"></span></div>
 	<div class="card-body p-5">
+		<div class="row justify-content-center mb-5">
+			<div class="col">
+				<h5><?php _e( 'Cloud Enabled', 'iup' ); ?></h5>
+				<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
+			</div>
+			<div class="col">
+				<div class="row">
+					<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></div>
+					<div class="custom-control custom-switch form-control-lg btn-info">
+						<input type="checkbox" class="custom-control-input" id="customSwitch1">
+						<label class="custom-control-label" for="customSwitch1"></label>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col">
 				<h5><?php _e( 'Infinite Uploads Plan', 'iup' ); ?></h5>
@@ -13,7 +28,7 @@
 				</div>
 				<div class="row">
 					<div class="col badge badge-pill badge-light text-left p-3">
-						<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s', 'iup' ), $this->size_format_zero( $api_data->stats->cloud->storage, 2 ), esc_html( $api_data->plan->label ) ); ?></p></div>
+						<p class="h5 ml-2 mb-0"><?php printf( __( '%s / %s', 'iup' ), $this->size_format_zero( $cloud_total_size, 2 ), esc_html( $api_data->plan->label ) ); ?></p></div>
 				</div>
 			</div>
 		</div>
@@ -70,7 +85,7 @@
 					<h5><?php _e( 'Free Up Local Storage', 'iup' ); ?></h5>
 					<p class="lead"><?php _e( 'There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space.', 'iup' ); ?></p>
 				</div>
-				<div class="col">
+				<div class="col mt-4">
 					<div class="row text-center mb-3">
 						<div class="col"><?php _e( 'This saves space and improves server performance.', 'iup' ); ?></div>
 					</div>
@@ -88,7 +103,7 @@
 				<h5><?php _e( 'Import & Disconnect', 'iup' ); ?></h5>
 				<p class="lead"><?php _e( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com.', 'iup' ); ?></p>
 			</div>
-			<div class="col">
+			<div class="col mt-4">
 				<div class="row text-center mb-3">
 					<div class="col"><?php _e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'iup' ); ?></div>
 				</div>

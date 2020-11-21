@@ -4,20 +4,20 @@
 		<div class="row align-items-center justify-content-center mb-5">
 			<div class="col">
 				<p class="lead mb-0"><?php _e( "This Site's Cloud Bytes / Files", 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></p>
-				<span class="h1"><?php echo $this->size_format_zero( $api_data->stats->site->storage, 2 ); ?><small class="text-muted"> / <?php echo number_format_i18n( $api_data->stats->site->files ); ?></small></span>
+				<span class="h1"><?php echo $this->size_format_zero( $cloud_size, 2 ); ?><small class="text-muted"> / <?php echo number_format_i18n( $cloud_files ); ?></small></span>
 
 				<div class="container">
-					<?php foreach ( $api_data->stats->types as $type ) { ?>
+					<?php foreach ( $this->iup_instance->get_filetypes( false, $api_data->stats->cloud->types ) as $type ) { ?>
 						<div class="row mt-2">
-							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $this->iup_instance->get_file_type_format( $type->type, 'color' ); ?>">&nbsp;</span></div>
-							<div class="col-3 lead"><?php echo $this->iup_instance->get_file_type_format( $type->type, 'label' ); ?></div>
+							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type->color; ?>">&nbsp;</span></div>
+							<div class="col-3 lead"><?php echo $type->label; ?></div>
 							<div class="col-3"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
 						</div>
 					<?php } ?>
 				</div>
 			</div>
 			<div class="col text-center">
-				<p class="h5"><?php printf( __( '%s / %s', 'iup' ), $this->size_format_zero( $api_data->stats->cloud->storage, 2 ), esc_html( $api_data->plan->label ) ); ?></p>
+				<p class="h5"><?php printf( __( '%s / %s', 'iup' ), $this->size_format_zero( $cloud_total_size, 2 ), esc_html( $api_data->plan->label ) ); ?></p>
 				<canvas id="iup-cloud-pie"></canvas>
 			</div>
 		</div>

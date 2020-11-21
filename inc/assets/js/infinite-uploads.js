@@ -302,7 +302,7 @@ jQuery(document).ready(function ($) {
 
   var config_cloud = {
     type: 'pie',
-    data: local_types,
+    data: cloud_types,
     options: {
       responsive: true,
       legend: false,
@@ -318,7 +318,7 @@ jQuery(document).ready(function ($) {
         position: 'bottom',
         fontSize: 18,
         fontStyle: 'normal',
-        text: local_types.total
+        text: cloud_types.total
       }
     }
   };

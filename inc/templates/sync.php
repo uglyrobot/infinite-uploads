@@ -7,11 +7,11 @@
 				<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 				<div class="container">
-					<?php foreach ( $local_types as $type ) { ?>
+					<?php foreach ( $this->iup_instance->get_filetypes( false ) as $type ) { ?>
 						<div class="row mt-2">
-							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type['color']; ?>">&nbsp;</span></div>
-							<div class="col-3 lead"><?php echo $type['label']; ?></div>
-							<div class="col-3"><strong><?php echo size_format( $type['size'], 2 ); ?> / <?php echo number_format_i18n( $type['files'] ); ?></strong></div>
+							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type->color; ?>">&nbsp;</span></div>
+							<div class="col-3 lead"><?php echo $type->label; ?></div>
+							<div class="col-3"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
 						</div>
 					<?php } ?>
 					<div class="row mt-2">

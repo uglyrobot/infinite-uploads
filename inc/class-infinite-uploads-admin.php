@@ -414,8 +414,14 @@ class Infinite_Uploads_Admin {
 		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 
-		$types = $this->iup_instance->get_local_filetypes( true );
+		$types = $this->iup_instance->get_filetypes( true );
 		wp_localize_script( 'iup-js', 'local_types', $types );
+
+		$api_data = $this->api->get_site_data();
+		if ( $this->api->has_token() && $api_data ) {
+			$cloud_types = $this->iup_instance->get_filetypes( true, $api_data->stats->cloud->types );
+			wp_localize_script( 'iup-js', 'cloud_types', $cloud_types );
+		}
 	}
 
 	/**
@@ -467,7 +473,6 @@ class Infinite_Uploads_Admin {
 		}
 
 		$stats       = $this->iup_instance->get_sync_stats();
-		$local_types = $this->iup_instance->get_local_filetypes();
 		$api_data    = $this->api->get_site_data();
 		//var_dump($api_data);
 		//var_dump($stats);
@@ -482,8 +487,15 @@ class Infinite_Uploads_Admin {
 			<?php
 			if ( $this->api->has_token() && $api_data ) {
 				if ( ! empty( $stats['sync_finished'] ) ) {
-					if () {
-						$local_types = $this->iup_instance->get_local_filetypes( false, true );
+					if ( ! $api_data->stats->site->files ) {
+						$synced           = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+						$cloud_size       = $synced->size;
+						$cloud_files      = $synced->files;
+						$cloud_total_size = $api_data->stats->cloud->storage + $synced->size;
+					} else {
+						$cloud_size       = $api_data->stats->site->storage;
+						$cloud_files      = $api_data->stats->site->files;
+						$cloud_total_size = $api_data->stats->cloud->storage;
 					}
 					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
 				} else {

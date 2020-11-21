@@ -196,18 +196,22 @@ class Infinite_Uploads {
 		] );
 	}
 
-	public function get_local_filetypes( $is_chart = false, $cloud_estimate = false ) {
+	public function get_filetypes( $is_chart = false, $cloud_types = false ) {
 		global $wpdb;
 
-		if ( $cloud_estimate ) {
-			$types = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 GROUP BY type ORDER BY size DESC" );
+		if ( false !== $cloud_types ) {
+			if ( empty( $cloud_types ) ) { //estimate if sync was fresh
+				$types = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 GROUP BY type ORDER BY size DESC" );
+			} else {
+				$types = $cloud_types;
+			}
 		} else {
 			$types = $wpdb->get_results( "SELECT type, count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0 GROUP BY type ORDER BY size DESC" );
 		}
 
 		$data = [];
 		foreach ( $types as $type ) {
-			$data[ $type->type ] = [
+			$data[ $type->type ] = (object) [
 				'color' => $this->get_file_type_format( $type->type, 'color' ),
 				'label' => $this->get_file_type_format( $type->type, 'label' ),
 				'size'  => $type->size,
@@ -218,9 +222,9 @@ class Infinite_Uploads {
 		$chart = [];
 		if ( $is_chart ) {
 			foreach ( $data as $item ) {
-				$chart['datasets'][0]['data'][]            = $item['size'];
-				$chart['datasets'][0]['backgroundColor'][] = $item['color'];
-				$chart['labels'][]                         = $item['label'] . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item['files'], 'iup' ), number_format_i18n( $item['files'] ), size_format( $item['size'], 1 ) );
+				$chart['datasets'][0]['data'][]            = $item->size;
+				$chart['datasets'][0]['backgroundColor'][] = $item->color;
+				$chart['labels'][]                         = $item->label . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item->files, 'iup' ), number_format_i18n( $item->files ), size_format( $item->size, 1 ) );
 			}
 
 			$total_size     = array_sum( wp_list_pluck( $data, 'size' ) );
