@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Infinite Uploads
-Description: Store uploads in the cloud with unlimited storage
+Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
 Author: UglyRobot
 Version: 0.1-alpha-3
 Author URI: https://uglyrobot.com
-Text Domain: iup
+Text Domain: infinite-uploads
 
 Inspired by and borrowed heavily from S3 Uploads plugin from Human Made https://github.com/humanmade/S3-Uploads.
 */
@@ -61,13 +61,14 @@ function infinite_uploads_install() {
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		}
 
-		dbDelta( $sql );
-
+		//prevent race condition during upgrade by setting option before running potentially long query
 		if ( is_multisite() ) {
 			update_site_option( 'iup_installed', INFINITE_UPLOADS_VERSION );
 		} else {
 			update_option( 'iup_installed', INFINITE_UPLOADS_VERSION, true );
 		}
+
+		dbDelta( $sql );
 	}
 }
 
@@ -78,19 +79,16 @@ function infinite_uploads_install() {
  */
 function infinite_uploads_check_requirements() {
 	global $wp_version;
+	$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
 
 	if ( version_compare( PHP_VERSION, '5.5.0', '<' ) ) {
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			add_action( 'admin_notices', 'infinite_uploads_outdated_php_version_notice' );
-		}
+		add_action( $hook, 'infinite_uploads_outdated_php_version_notice' );
 
 		return false;
 	}
 
 	if ( version_compare( $wp_version, '5.3.0', '<' ) ) {
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			add_action( 'admin_notices', 'infinite_uploads_outdated_wp_version_notice' );
-		}
+		add_action( $hook, 'infinite_uploads_outdated_wp_version_notice' );
 
 		return false;
 	}
@@ -104,10 +102,11 @@ function infinite_uploads_check_requirements() {
  * This has to be a named function for compatibility with PHP 5.2.
  */
 function infinite_uploads_outdated_php_version_notice() {
-	printf(
-		'<div class="error"><p>The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s.</p></div>',
-		PHP_VERSION
-	);
+	?>
+	<div class="notice notice-warning is-dismissible"><p>
+			<?php printf( __( 'The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s.', 'infinite-uploads' ), PHP_VERSION ); ?>
+		</p></div>
+	<?php
 }
 
 /**
@@ -117,11 +116,11 @@ function infinite_uploads_outdated_php_version_notice() {
  */
 function infinite_uploads_outdated_wp_version_notice() {
 	global $wp_version;
-
-	printf(
-		'<div class="error"><p>The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s.</p></div>',
-		$wp_version
-	);
+	?>
+	<div class="notice notice-warning is-dismissible"><p>
+			<?php printf( __( 'The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s.', 'infinite-uploads' ), $wp_version ); ?>
+		</p></div>
+	<?php
 }
 
 /**

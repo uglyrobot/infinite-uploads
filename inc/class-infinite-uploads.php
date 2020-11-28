@@ -9,6 +9,7 @@ class Infinite_Uploads {
 	public $bucket_url;
 	private $key;
 	private $secret;
+	private $admin;
 
 	public function __construct() {
 
@@ -57,7 +58,8 @@ class Infinite_Uploads {
 
 		// don't register all this until we've enabled rewriting.
 		if ( ! infinite_uploads_enabled() ) {
-			return;
+			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
+			add_action( $hook, [ $this, 'setup_notice' ] );
 		}
 
 		$this->register_stream_wrapper();
@@ -84,6 +86,18 @@ class Infinite_Uploads {
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 			new Infinite_Uploads_Rewriter( $this->bucket_url );
 		}
+	}
+
+	public function setup_notice() {
+		?>
+		<div class="notice notice-info">
+			<p style="font-size: 15px;line-height: 2.3;">
+				<strong><?php _e( 'Infinite Uploads is Ready!', 'infinite-uploads' ); ?></strong> <?php _e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' ); ?>
+				<a class="button button-primary" href="<?php echo $this->admin->settings_url(); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
+			</p>
+
+		</div>
+		<?php
 	}
 
 	/**
@@ -225,12 +239,12 @@ class Infinite_Uploads {
 			foreach ( $data as $item ) {
 				$chart['datasets'][0]['data'][]            = $item->size;
 				$chart['datasets'][0]['backgroundColor'][] = $item->color;
-				$chart['labels'][]                         = $item->label . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item->files, 'iup' ), number_format_i18n( $item->files ), size_format( $item->size, 1 ) );
+				$chart['labels'][]                         = $item->label . ": " . sprintf( _n( '%s file totalling %s', '%s files totalling %s', $item->files, 'infinite-uploads' ), number_format_i18n( $item->files ), size_format( $item->size, 1 ) );
 			}
 
 			$total_size     = array_sum( wp_list_pluck( $data, 'size' ) );
 			$total_files    = array_sum( wp_list_pluck( $data, 'files' ) );
-			$chart['total'] = sprintf( _n( '%s / %s File', '%s / %s Files', $total_files, 'iup' ), size_format( $total_size, 2 ), number_format_i18n( $total_files ) );
+			$chart['total'] = sprintf( _n( '%s / %s File', '%s / %s Files', $total_files, 'infinite-uploads' ), size_format( $total_size, 2 ), number_format_i18n( $total_files ) );
 
 			return $chart;
 		}
@@ -240,13 +254,13 @@ class Infinite_Uploads {
 
 	public function get_file_type_format( $type, $key ) {
 		$labels = [
-			'image'    => [ 'color' => '#26A9E0', 'label' => __( 'Images', 'iup' ) ],
-			'audio'    => [ 'color' => '#00A167', 'label' => __( 'Audio', 'iup' ) ],
-			'video'    => [ 'color' => '#C035E2', 'label' => __( 'Video', 'iup' ) ],
-			'document' => [ 'color' => '#EE7C1E', 'label' => __( 'Documents', 'iup' ) ],
-			'archive'  => [ 'color' => '#EC008C', 'label' => __( 'Archives', 'iup' ) ],
-			'code'     => [ 'color' => '#EFED27', 'label' => __( 'Code', 'iup' ) ],
-			'other'    => [ 'color' => '#F1F1F1', 'label' => __( 'Other', 'iup' ) ],
+			'image'    => [ 'color' => '#26A9E0', 'label' => __( 'Images', 'infinite-uploads' ) ],
+			'audio'    => [ 'color' => '#00A167', 'label' => __( 'Audio', 'infinite-uploads' ) ],
+			'video'    => [ 'color' => '#C035E2', 'label' => __( 'Video', 'infinite-uploads' ) ],
+			'document' => [ 'color' => '#EE7C1E', 'label' => __( 'Documents', 'infinite-uploads' ) ],
+			'archive'  => [ 'color' => '#EC008C', 'label' => __( 'Archives', 'infinite-uploads' ) ],
+			'code'     => [ 'color' => '#EFED27', 'label' => __( 'Code', 'infinite-uploads' ) ],
+			'other'    => [ 'color' => '#F1F1F1', 'label' => __( 'Other', 'infinite-uploads' ) ],
 		];
 
 		if ( isset( $labels[ $type ] ) ) {

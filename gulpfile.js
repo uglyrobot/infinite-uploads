@@ -5,7 +5,7 @@ const zip = require('gulp-zip');
 gulp.task('pot', function () {
   return gulp.src(['**/*.php', '!node_modules/**', '!vendor/**'])
     .pipe(wpPot({
-      domain: 'iup',
+      domain: 'infinite-uploads',
       package: 'Infinite Uploads'
     }))
     .pipe(gulp.dest('infinite-uploads.pot'));

@@ -204,7 +204,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();
 			$stats = $instance->get_sync_stats();
-			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'infinite-uploads' ), $stats['remaining_files'], $stats['remaining_size'] ) );
 		}
 
 		//begin transfer
@@ -212,7 +212,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$unsynced     = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
 		$progress_bar = null;
 		if ( ! $args_assoc['verbose'] ) {
-			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Copying to the cloud...', 'iup' ), $synced + $unsynced );
+			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Copying to the cloud...', 'infinite-uploads' ), $synced + $unsynced );
 			for ( $i = 0; $i < $synced; $i ++ ) {
 				$progress_bar->tick();
 			}
@@ -264,7 +264,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1, 'errors' => 0 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
-									WP_CLI::success( sprintf( __( '%s - Synced %s of %s files.', 'iup' ), $file, number_format_i18n( $uploaded ), number_format_i18n( $unsynced ) ) );
+									WP_CLI::success( sprintf( __( '%s - Synced %s of %s files.', 'infinite-uploads' ), $file, number_format_i18n( $uploaded ), number_format_i18n( $unsynced ) ) );
 								} else {
 									$progress_bar->tick();
 								}
@@ -284,14 +284,14 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
-						WP_CLI::warning( sprintf( __( 'Error uploading %s. Retries exceeded.', 'iup' ), $file ) );
+						WP_CLI::warning( sprintf( __( 'Error uploading %s. Retries exceeded.', 'infinite-uploads' ), $file ) );
 					} else {
-						WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+						WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'infinite-uploads' ), $e->getAwsErrorCode(), $file ) );
 					}
 					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 
 				} else {
-					WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+					WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'infinite-uploads' ), $e->getAwsErrorCode(), $file ) );
 				}
 			}
 
@@ -307,9 +307,9 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 				$error_count = $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors >= 3" );
 				if ( $error_count ) {
-					WP_CLI::warning( sprintf( __( 'Unable to upload %s files.', 'iup' ), number_format_i18n( $error_count ) ) );
+					WP_CLI::warning( sprintf( __( 'Unable to upload %s files.', 'infinite-uploads' ), number_format_i18n( $error_count ) ) );
 				}
-				WP_CLI::success( __( 'Sync complete!', 'iup' ) );
+				WP_CLI::success( __( 'Sync complete!', 'infinite-uploads' ) );
 			}
 
 		}
@@ -321,14 +321,14 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$s3       = $instance->s3();
 		$path     = $instance->get_original_upload_dir();
 
-		WP_CLI::line( __( 'Scanning local filesystem...', 'iup' ) );
+		WP_CLI::line( __( 'Scanning local filesystem...', 'infinite-uploads' ) );
 		$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
 		$filelist->start();
 
 		$stats = $instance->get_sync_stats();
-		WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'iup' ), $stats['local_files'], $stats['local_size'] ) );
+		WP_CLI::line( sprintf( __( '%s files (%s) found in uploads.', 'infinite-uploads' ), $stats['local_files'], $stats['local_size'] ) );
 
-		WP_CLI::line( __( 'Comparing to the cloud...', 'iup' ) );
+		WP_CLI::line( __( 'Comparing to the cloud...', 'infinite-uploads' ) );
 		$prefix = '';
 
 		if ( strpos( Infinite_Uploads::get_instance()->bucket, '/' ) ) {
@@ -406,7 +406,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();
 			$stats = $instance->get_sync_stats();
-			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'iup' ), $stats['remaining_files'], $stats['remaining_size'] ) );
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be synced.', 'infinite-uploads' ), $stats['remaining_files'], $stats['remaining_size'] ) );
 		}
 
 		//begin deleting
@@ -414,7 +414,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$to_delete    = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0" );
 		$progress_bar = null;
 		if ( ! $args_assoc['verbose'] ) {
-			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Deleting local copies of synced files...', 'iup' ), count( $to_delete ) );
+			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Deleting local copies of synced files...', 'infinite-uploads' ), count( $to_delete ) );
 		}
 
 		foreach ( $to_delete as $file ) {
@@ -422,19 +422,19 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 1 ], [ 'file' => $file ] );
 				$deleted ++;
 				if ( $args_assoc['verbose'] ) {
-					WP_CLI::success( sprintf( __( '%s - Deleted %s of %s files.', 'iup' ), $file, number_format_i18n( $deleted ), number_format_i18n( count( $to_delete ) ) ) );
+					WP_CLI::success( sprintf( __( '%s - Deleted %s of %s files.', 'infinite-uploads' ), $file, number_format_i18n( $deleted ), number_format_i18n( count( $to_delete ) ) ) );
 				} else {
 					$progress_bar->tick();
 				}
 			} else {
-				WP_CLI::warning( sprintf( __( 'Could not delete %s.', 'iup' ), $file ) );
+				WP_CLI::warning( sprintf( __( 'Could not delete %s.', 'infinite-uploads' ), $file ) );
 			}
 		}
 
 		if ( ! $args_assoc['verbose'] ) {
 			$progress_bar->finish();
 		}
-		WP_CLI::success( __( 'Delete complete!', 'iup' ) );
+		WP_CLI::success( __( 'Delete complete!', 'infinite-uploads' ) );
 	}
 
 	/**
@@ -454,7 +454,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();
 			$unsynced = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
-			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be downloaded.', 'iup' ), $unsynced->files, size_format( $unsynced->size, 2 ) ) );
+			WP_CLI::line( sprintf( __( '%s files (%s) remaining to be downloaded.', 'infinite-uploads' ), $unsynced->files, size_format( $unsynced->size, 2 ) ) );
 		}
 
 		//begin transfer
@@ -463,7 +463,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 		$progress_bar = null;
 		if ( ! $args_assoc['verbose'] ) {
-			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Downloading from the cloud...', 'iup' ), $unsynced->files );
+			$progress_bar = \WP_CLI\Utils\make_progress_bar( __( 'Downloading from the cloud...', 'infinite-uploads' ), $unsynced->files );
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -498,7 +498,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0, 'errors' => 0 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
-									WP_CLI::success( sprintf( __( '%s - Downloaded %s of %s files.', 'iup' ), $file, number_format_i18n( $downloaded ), number_format_i18n( $unsynced->files ) ) );
+									WP_CLI::success( sprintf( __( '%s - Downloaded %s of %s files.', 'infinite-uploads' ), $file, number_format_i18n( $downloaded ), number_format_i18n( $unsynced->files ) ) );
 								} else {
 									$progress_bar->tick();
 								}
@@ -518,13 +518,13 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
-						WP_CLI::warning( sprintf( __( 'Error downloading %s. Retries exceeded.', 'iup' ), $file ) );
+						WP_CLI::warning( sprintf( __( 'Error downloading %s. Retries exceeded.', 'infinite-uploads' ), $file ) );
 					} else {
-						WP_CLI::warning( sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file ) );
+						WP_CLI::warning( sprintf( __( 'Error downloading %s. Queued for retry.', 'infinite-uploads' ), $file ) );
 					}
 					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
-					WP_CLI::warning( sprintf( __( '%s error downloading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+					WP_CLI::warning( sprintf( __( '%s error downloading %s. Queued for retry.', 'infinite-uploads' ), $e->getAwsErrorCode(), $file ) );
 				}
 			}
 
@@ -539,9 +539,9 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				}
 				$error_count = $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors >= 3" );
 				if ( $error_count ) {
-					WP_CLI::warning( sprintf( __( 'Unable to download %s files.', 'iup' ), number_format_i18n( $error_count ) ) );
+					WP_CLI::warning( sprintf( __( 'Unable to download %s files.', 'infinite-uploads' ), number_format_i18n( $error_count ) ) );
 				}
-				WP_CLI::success( __( 'Download complete!', 'iup' ) );
+				WP_CLI::success( __( 'Download complete!', 'infinite-uploads' ) );
 			}
 
 		}

@@ -233,13 +233,13 @@ class Infinite_Uploads_Admin {
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
-						$errors[] = sprintf( __( 'Error uploading %s. Retries exceeded.', 'iup' ), $file );
+						$errors[] = sprintf( __( 'Error uploading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
-						$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'iup' ), $file );
+						$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
 					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
-					$errors[] = __( 'Error uploading file. Queued for retry.', 'iup' );
+					$errors[] = __( 'Error uploading file. Queued for retry.', 'infinite-uploads' );
 				}
 			}
 
@@ -332,13 +332,13 @@ class Infinite_Uploads_Admin {
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
-						$errors[] = sprintf( __( 'Error downloading %s. Retries exceeded.', 'iup' ), $file );
+						$errors[] = sprintf( __( 'Error downloading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
-						$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file );
+						$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
 					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
-					$errors[] = __( 'Error downloading file. Queued for retry.', 'iup' );
+					$errors[] = __( 'Error downloading file. Queued for retry.', 'infinite-uploads' );
 				}
 			}
 
@@ -473,8 +473,8 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		$region_labels = [
-			'US' => __( 'United States', 'iup' ),
-			'EU' => __( 'Europe', 'iup' ),
+			'US' => __( 'United States', 'infinite-uploads' ),
+			'EU' => __( 'Europe', 'infinite-uploads' ),
 		];
 
 		if ( $this->auth_error ) {

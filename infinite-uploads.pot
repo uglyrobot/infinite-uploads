@@ -13,213 +13,177 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: inc/class-infinite-uploads-admin.php:230
+#: infinite-uploads.php:106
+msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
+msgstr ""
+
+#: infinite-uploads.php:120
+msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:242
 msgid "Error uploading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:228
+#: inc/class-infinite-uploads-admin.php:238
 msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:322
+#: inc/class-infinite-uploads-admin.php:236, inc/class-infinite-uploads-wp-cli-command.php:287
+msgid "Error uploading %s. Retries exceeded."
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:341
 msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:320
+#: inc/class-infinite-uploads-admin.php:337, inc/class-infinite-uploads-wp-cli-command.php:523
 msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:436
-msgid "OLD SYNC DESIGN"
+#: inc/class-infinite-uploads-admin.php:335, inc/class-infinite-uploads-wp-cli-command.php:521
+msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:437
-msgid "Copy all your existing uploads the the cloud."
+#: inc/class-infinite-uploads-admin.php:409, inc/class-infinite-uploads-admin.php:410
+msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:439
-msgid "Before we can begin serving all your files from the Infinite Uploads global CDN, we need to copy your uploads directory to our cloud storage. Please be patient as this can take quite a while depending on the size of your uploads directory and server speed."
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:440, inc/templates/modal-upload.php:17
-msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:448
-msgid "Local"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:449
-msgid "Local Files"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:452
-msgid "Synced"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:455
-msgid "Remaining"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:456
-msgid "Remaining Files"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:468
-msgid "files"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:476, inc/class-infinite-uploads-admin.php:479, inc/class-infinite-uploads-admin.php:482
-msgid "Loading..."
+#: inc/class-infinite-uploads-admin.php:476
+msgid "United States"
 msgstr ""
 
 #: inc/class-infinite-uploads-admin.php:477
-msgid "Scanning local filesystem"
+msgid "Europe"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:480
-msgid "Comparing to the cloud"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:483
-msgid "Copying to the cloud"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:486
-msgid "Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:489
-msgid "Sync to Cloud"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:490
-msgid "Continue Sync"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:497
-msgid "3. Enable"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:498
-msgid "Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN."
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:502
-msgid "Enable Infinite Uploads"
-msgstr ""
-
-#: inc/class-infinite-uploads-admin.php:504
-msgid "Enabling..."
-msgstr ""
-
-#: inc/class-infinite-uploads-wp-cli-command.php:218, inc/class-infinite-uploads-wp-cli-command.php:403
+#: inc/class-infinite-uploads-wp-cli-command.php:207, inc/class-infinite-uploads-wp-cli-command.php:409
 msgid "%s files (%s) remaining to be synced."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:226
+#: inc/class-infinite-uploads-wp-cli-command.php:215
 msgid "Copying to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:278
+#: inc/class-infinite-uploads-wp-cli-command.php:267
 msgid "%s - Synced %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:294
+#: inc/class-infinite-uploads-wp-cli-command.php:294, inc/class-infinite-uploads-wp-cli-command.php:289
 msgid "%s error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:306
+#: inc/class-infinite-uploads-wp-cli-command.php:310
+msgid "Unable to upload %s files."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:312
 msgid "Sync complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:318
+#: inc/class-infinite-uploads-wp-cli-command.php:324
 msgid "Scanning local filesystem..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:323
+#: inc/class-infinite-uploads-wp-cli-command.php:329
 msgid "%s files (%s) found in uploads."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:325
+#: inc/class-infinite-uploads-wp-cli-command.php:331
 msgid "Comparing to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:411
+#: inc/class-infinite-uploads-wp-cli-command.php:417
 msgid "Deleting local copies of synced files..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:424
+#: inc/class-infinite-uploads-wp-cli-command.php:430
 msgid "Could not delete %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:419
+#: inc/class-infinite-uploads-wp-cli-command.php:425
 msgid "%s - Deleted %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:431
+#: inc/class-infinite-uploads-wp-cli-command.php:437
 msgid "Delete complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:451
+#: inc/class-infinite-uploads-wp-cli-command.php:457
 msgid "%s files (%s) remaining to be downloaded."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:458
+#: inc/class-infinite-uploads-wp-cli-command.php:466
 msgid "Downloading from the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:493
+#: inc/class-infinite-uploads-wp-cli-command.php:501
 msgid "%s - Downloaded %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:509
+#: inc/class-infinite-uploads-wp-cli-command.php:527
 msgid "%s error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:521
+#: inc/class-infinite-uploads-wp-cli-command.php:542
+msgid "Unable to download %s files."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:544
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:191
-msgid "Images"
+#: inc/class-infinite-uploads.php:95
+msgid "Infinite Uploads is Ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:192
-msgid "Audio"
+#: inc/class-infinite-uploads.php:95
+msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:193
-msgid "Video"
+#: inc/class-infinite-uploads.php:96, inc/templates/connect.php:43
+msgid "Connect"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:194
-msgid "Documents"
-msgstr ""
-
-#: inc/class-infinite-uploads.php:195
-msgid "Archives"
-msgstr ""
-
-#: inc/class-infinite-uploads.php:196
-msgid "Code"
-msgstr ""
-
-#: inc/class-infinite-uploads.php:197
-msgid "Other"
-msgstr ""
-
-#: inc/class-infinite-uploads.php:217
+#: inc/class-infinite-uploads.php:242
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:222
+#: inc/class-infinite-uploads.php:247
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
+
+#: inc/class-infinite-uploads.php:257
+msgid "Images"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:258
+msgid "Audio"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:259
+msgid "Video"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:260
+msgid "Documents"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:261
+msgid "Archives"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:262
+msgid "Code"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:263
+msgid "Other"
+msgstr ""
 
 #: inc/templates/cloud-overview.php:2
 msgid "Cloud Storage Overview"
@@ -233,8 +197,8 @@ msgstr ""
 msgid "Recalculated every 24 hours"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:20
-msgid "%s / %s %s Plan"
+#: inc/templates/cloud-overview.php:20, inc/templates/settings.php:16, inc/templates/settings.php:31
+msgid "%s / %s"
 msgstr ""
 
 #: inc/templates/cloud-overview.php:26
@@ -257,24 +221,44 @@ msgstr ""
 msgid "Scanned %s ago"
 msgstr ""
 
-#: inc/templates/connect.php:18, inc/templates/sync.php:18
+#: inc/templates/connect.php:19, inc/templates/sync.php:19
 msgid "Run a new scan to detect and sync recently uploaded files."
 msgstr ""
 
-#: inc/templates/connect.php:18, inc/templates/sync.php:18
+#: inc/templates/connect.php:19, inc/templates/sync.php:19
 msgid "Refresh"
 msgstr ""
 
-#: inc/templates/connect.php:28
+#: inc/templates/connect.php:30
 msgid "Ready to Connect!"
 msgstr ""
 
-#: inc/templates/connect.php:29
+#: inc/templates/connect.php:31
 msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
 msgstr ""
 
-#: inc/templates/connect.php:34
-msgid "Connect"
+#: inc/templates/modal-delete.php:5, inc/templates/settings.php:70
+msgid "Free Up Local Storage"
+msgstr ""
+
+#: inc/templates/modal-delete.php:14
+msgid "Delete Local Files"
+msgstr ""
+
+#: inc/templates/modal-delete.php:15
+msgid "This will delete the duplicate copies of your files stored in your local media library. This saves space and improves server performance but will require downloading these files back to the uploads directory before disconnecting to prevent broken media on your site."
+msgstr ""
+
+#: inc/templates/modal-delete.php:16
+msgid "If your host provides access to WP CLI, you can also execute the command:"
+msgstr ""
+
+#: inc/templates/modal-delete.php:24
+msgid "<span id=\"iup-delete-size\">%s</span> / <span id=\"iup-delete-files\">%s</span> Deletable Files"
+msgstr ""
+
+#: inc/templates/modal-delete.php:29
+msgid "Start Delete"
 msgstr ""
 
 #: inc/templates/modal-download.php:5
@@ -285,19 +269,47 @@ msgstr ""
 msgid "Downloading Files"
 msgstr ""
 
-#: inc/templates/modal-download.php:16, inc/templates/modal-scan.php:19
-msgid "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan."
+#: inc/templates/modal-download.php:16
+msgid "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the download is being processed. If you close the tab the download will be interrupted and you will have to continue where you left off later."
+msgstr ""
+
+#: inc/templates/modal-download.php:17, inc/templates/modal-upload.php:17
+msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
+msgstr ""
+
+#: inc/templates/modal-download.php:34
+msgid "<span id=\"iup-download-size\">%s</span> / <span id=\"iup-download-files\">%s</span> Files Remaining"
+msgstr ""
+
+#: inc/templates/modal-remote-scan.php:5
+msgid "Scanning Cloud"
+msgstr ""
+
+#: inc/templates/modal-remote-scan.php:17
+msgid "Comparing to Cloud"
+msgstr ""
+
+#: inc/templates/modal-remote-scan.php:18
+msgid "Checking for files already uploaded to the cloud. Please leave this tab open while we complete your scan."
+msgstr ""
+
+#: inc/templates/modal-remote-scan.php:23
+msgid "<span id=\"iup-scan-remote-storage\">%s</span> / <span id=\"iup-scan-remote-files\">%s</span> Files Synced"
 msgstr ""
 
 #: inc/templates/modal-scan.php:5
 msgid "Scanning Files"
 msgstr ""
 
-#: inc/templates/modal-scan.php:18
+#: inc/templates/modal-scan.php:17
 msgid "Scanning Local Filesystem"
 msgstr ""
 
-#: inc/templates/modal-scan.php:24
+#: inc/templates/modal-scan.php:18
+msgid "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan."
+msgstr ""
+
+#: inc/templates/modal-scan.php:23
 msgid "Found <span id=\"iup-scan-storage\">0 MB</span> / <span id=\"iup-scan-files\">0</span> Files..."
 msgstr ""
 
@@ -313,8 +325,16 @@ msgstr ""
 msgid "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
+#: inc/templates/modal-upload.php:34
+msgid "<span id=\"iup-progress-size\">%s</span> / <span id=\"iup-progress-files\">%s</span> Files Remaining"
+msgstr ""
+
 #: inc/templates/settings.php:2
 msgid "Account & Settings"
+msgstr ""
+
+#: inc/templates/settings.php:2
+msgid "Includes usage data for all connected sites"
 msgstr ""
 
 #: inc/templates/settings.php:6
@@ -337,10 +357,6 @@ msgstr ""
 msgid "Switch to a new plan."
 msgstr ""
 
-#: inc/templates/settings.php:16, inc/templates/settings.php:31
-msgid "%s / %s %s"
-msgstr ""
-
 #: inc/templates/settings.php:22
 msgid "CDN Bandwidth"
 msgstr ""
@@ -349,63 +365,75 @@ msgstr ""
 msgid "Infinite Uploads includes allotted bandwidth for CDN delivery of your files."
 msgstr ""
 
-#: inc/templates/settings.php:37
+#: inc/templates/settings.php:38
 msgid "CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:38
+#: inc/templates/settings.php:39
 msgid "Your uploads are served from this CDN url via 45 edge locations around the world."
 msgstr ""
 
-#: inc/templates/settings.php:42
+#: inc/templates/settings.php:43
 msgid "Current CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:43
+#: inc/templates/settings.php:44
 msgid "Use your own domain!"
 msgstr ""
 
-#: inc/templates/settings.php:43
+#: inc/templates/settings.php:44
 msgid "Upgrade to a business plan."
 msgstr ""
 
-#: inc/templates/settings.php:53
+#: inc/templates/settings.php:54
 msgid "Storage Region"
 msgstr ""
 
-#: inc/templates/settings.php:54
+#: inc/templates/settings.php:55
 msgid "The location of our servers storing your uploads."
 msgstr ""
 
-#: inc/templates/settings.php:58
+#: inc/templates/settings.php:59
 msgid "Region"
 msgstr ""
 
-#: inc/templates/settings.php:58
+#: inc/templates/settings.php:59
 msgid "Region can only be selected when first connecting your site."
 msgstr ""
 
-#: inc/templates/settings.php:62
-msgid "United States"
+#: inc/templates/settings.php:71
+msgid "There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space."
 msgstr ""
 
-#: inc/templates/settings.php:68
+#: inc/templates/settings.php:75
+msgid "This saves space and improves server performance."
+msgstr ""
+
+#: inc/templates/settings.php:79
+msgid "Delete"
+msgstr ""
+
+#: inc/templates/settings.php:80
+msgid "%s / %s deletable files"
+msgstr ""
+
+#: inc/templates/settings.php:88
 msgid "Import & Disconnect"
 msgstr ""
 
-#: inc/templates/settings.php:69
+#: inc/templates/settings.php:89
 msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com."
 msgstr ""
 
-#: inc/templates/settings.php:73
+#: inc/templates/settings.php:93
 msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/settings.php:77
+#: inc/templates/settings.php:97
 msgid "Disconnect"
 msgstr ""
 
-#: inc/templates/settings.php:78
+#: inc/templates/settings.php:98
 msgid "%s / %s files to Download"
 msgstr ""
 
@@ -413,15 +441,15 @@ msgstr ""
 msgid "Ready to Sync"
 msgstr ""
 
-#: inc/templates/sync.php:29
+#: inc/templates/sync.php:31
 msgid "You have %s of premium storage available!"
 msgstr ""
 
-#: inc/templates/sync.php:30
+#: inc/templates/sync.php:32
 msgid "Move your media library to the Infinite Uploads cloud."
 msgstr ""
 
-#: inc/templates/sync.php:35
+#: inc/templates/sync.php:40, inc/templates/sync.php:38
 msgid "Sync Now"
 msgstr ""
 
