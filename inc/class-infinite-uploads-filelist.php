@@ -119,7 +119,6 @@ class Infinite_Uploads_Filelist {
 
 			foreach ( $contents as $item ) {
 				$file = [];
-
 				if ( is_link( $item ) || $this->is_excluded( $item ) ) {
 					continue;
 				} elseif ( is_file( $item ) ) {
@@ -206,7 +205,6 @@ class Infinite_Uploads_Filelist {
 	protected function add_file( $file ) {
 		$this->file_list[] = $file;
 		$this->file_count ++;
-
 		if ( count( $this->file_list ) >= $this->insert_rows ) {
 			$this->flush_to_db();
 		}
@@ -221,12 +219,12 @@ class Infinite_Uploads_Filelist {
 		if ( count( $this->file_list ) ) {
 			$values = [];
 			foreach ( $this->file_list as $file ) {
-				$values[] = $wpdb->prepare( "(%s,%d,%d,%s)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
+				$values[] = $wpdb->prepare( "(%s,%d,%d,%s,0)", $file['name'], $file['size'], $file['mtime'], $file['type'] );
 			}
 
-			$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type) VALUES ";
+			$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type, errors) VALUES ";
 			$query .= implode( ",\n", $values );
-			$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type)";
+			$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), errors = 0";
 			if ( $wpdb->query( $query ) ) {
 				$this->file_list = [];
 			}

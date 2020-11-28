@@ -19,12 +19,18 @@
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center">
+							<div id="iup-sync-errors" class="alert alert-warning text-left" role="alert">
+								<ul class="mb-0 mb-lc-0"></ul>
+							</div>
 							<div class="progress">
 								<div id="iup-sync-progress-bar" class="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style="width: <?php echo $stats['pcnt_complete']; ?>%;" aria-valuenow="<?php echo $stats['pcnt_complete']; ?>" aria-valuemin="0"
 								     aria-valuemax="100"><?php echo $stats['pcnt_complete']; ?>%
 								</div>
 							</div>
 							<div class="col text-center text-muted">
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="sr-only">Uploading...</span>
+								</div>
 								<span class="h6"><?php printf( __( '<span id="iup-progress-size">%s</span> / <span id="iup-progress-files">%s</span> Files Remaining', 'iup' ), $stats['remaining_size'], $stats['remaining_files'] ); ?></span>
 							</div>
 						</div>

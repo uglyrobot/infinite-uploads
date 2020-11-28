@@ -19,12 +19,18 @@
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center">
+							<div id="iup-download-errors" class="alert alert-warning text-left" role="alert">
+								<ul class="mb-0 mb-lc-0"></ul>
+							</div>
 							<div class="progress download">
 								<div id="iup-download-progress-bar" class="progress-bar progress-bar-animated progress-bar-striped" role="progressbar" style="width: <?php echo $stats['pcnt_downloaded']; ?>%;" aria-valuenow="<?php echo $stats['pcnt_downloaded']; ?>" aria-valuemin="0"
 								     aria-valuemax="100"><?php echo $stats['pcnt_downloaded']; ?>%
 								</div>
 							</div>
 							<div class="col text-center text-muted">
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="sr-only">Downloading...</span>
+								</div>
 								<span class="h6"><?php printf( __( '<span id="iup-download-size">%s</span> / <span id="iup-download-files">%s</span> Files Remaining', 'iup' ), $stats['deleted_size'], $stats['deleted_files'] ); ?></span>
 							</div>
 						</div>

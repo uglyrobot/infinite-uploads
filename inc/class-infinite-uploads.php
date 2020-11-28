@@ -37,7 +37,8 @@ class Infinite_Uploads {
 
 		$api_data = $this->api->get_site_data();
 		if ( isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
-			$this->bucket     = $api_data->site->upload_bucket;
+			$this->bucket = $api_data->site->upload_bucket;
+			//$this->bucket     = 'TESTING';
 			$this->key        = $api_data->site->upload_key;
 			$this->secret     = $api_data->site->upload_secret;
 			$this->bucket_url = $api_data->site->cdn_url;

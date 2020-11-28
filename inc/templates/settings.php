@@ -3,21 +3,6 @@
 	<div class="card-body p-5">
 		<div class="row justify-content-center mb-5">
 			<div class="col">
-				<h5><?php _e( 'Cloud Enabled', 'iup' ); ?></h5>
-				<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
-			</div>
-			<div class="col">
-				<div class="row">
-					<div class="col"><?php _e( 'Used / Available', 'iup' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'iup' ); ?>"></span></div>
-					<div class="custom-control custom-switch form-control-lg btn-info">
-						<input type="checkbox" class="custom-control-input" id="customSwitch1">
-						<label class="custom-control-label" for="customSwitch1"></label>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row justify-content-center mb-5">
-			<div class="col">
 				<h5><?php _e( 'Infinite Uploads Plan', 'iup' ); ?></h5>
 				<p class="lead"><?php _e( 'Your current Infinite Uploads plan and storage.', 'iup' ); ?></p>
 			</div>

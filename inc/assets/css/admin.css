@@ -93,3 +93,13 @@ body {
 .bs-tooltip-bottom .arrow:before {
   border-bottom-color: #F1F1F1;
 }
+
+.mb-lc-0 > :last-child {
+  margin-bottom: 0 !important;
+}
+
+#iup-sync-errors, #iup-download-errors {
+  height: 3em;
+  display: none;
+  overflow-y: scroll;
+}

@@ -18,15 +18,15 @@
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center text-muted">
+							<div id="iup-delete-local-spinner" class="spinner-border" role="status" style="display: none;">
+								<span class="sr-only">Deleting...</span>
+							</div>
 							<span class="h3"><?php printf( __( '<span id="iup-delete-size">%s</span> / <span id="iup-delete-files">%s</span> Deletable Files', 'iup' ), $stats['deletable_size'], $stats['deletable_files'] ); ?></span>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
 						<div class="col-4 text-center">
 							<button class="btn btn-info btn-lg btn-block" id="iup-delete-local-button"><?php _e( 'Start Delete', 'iup' ); ?></button>
-							<div id="iup-delete-local-spinner" class="mb-4 mx-auto" style="width: 76px; height: 76px; display:none;">
-								<?php include( dirname( dirname( __FILE__ ) ) . '/assets/img/spinner-svg.html' ); ?>
-							</div>
 						</div>
 					</div>
 				</div>

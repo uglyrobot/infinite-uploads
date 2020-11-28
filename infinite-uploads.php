@@ -50,6 +50,7 @@ function infinite_uploads_install() {
 	            `type` VARCHAR(20) NOT NULL,
 	            `synced` BOOLEAN NOT NULL DEFAULT '0',
 	            `deleted` BOOLEAN NOT NULL DEFAULT '0',
+	            `errors` INT UNSIGNED NOT NULL DEFAULT '0',
 	            PRIMARY KEY (`file`(255)),
 	            INDEX (`type`),
 	            INDEX (`synced`),

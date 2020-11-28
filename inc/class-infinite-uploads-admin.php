@@ -140,7 +140,7 @@ class Infinite_Uploads_Admin {
 
 					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type, synced, deleted) VALUES ";
 					$query .= implode( ",\n", $values );
-					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1";
+					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1, errors = 0";
 					$wpdb->query( $query );
 				}
 
@@ -182,7 +182,7 @@ class Infinite_Uploads_Admin {
 		$path     = $this->iup_instance->get_original_upload_dir();
 		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 10" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 LIMIT 10" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -215,7 +215,7 @@ class Infinite_Uploads_Admin {
 								Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$uploaded ) {
 									$uploaded ++;
 									$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
-									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
+									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1, 'errors' => 0 ], [ 'file' => $file ] );
 
 									return $result;
 								} )
@@ -229,14 +229,21 @@ class Infinite_Uploads_Admin {
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file     = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
-					$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'iup' ), $file );
+					$file        = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
+					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
+					$error_count ++;
+					if ( $error_count >= 3 ) {
+						$errors[] = sprintf( __( 'Error uploading %s. Retries exceeded.', 'iup' ), $file );
+					} else {
+						$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'iup' ), $file );
+					}
+					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
 					$errors[] = __( 'Error uploading file. Queued for retry.', 'iup' );
 				}
 			}
 
-			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3" );
 			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
 				$break = true;
 
@@ -289,7 +296,7 @@ class Infinite_Uploads_Admin {
 		$path       = $this->iup_instance->get_original_upload_dir();
 		$s3         = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 LIMIT 10" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 LIMIT 10" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -308,7 +315,7 @@ class Infinite_Uploads_Admin {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {
 								$downloaded ++;
 								$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->iup_instance->bucket ) + strlen( $this->iup_instance->bucket ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0, 'errors' => 0 ], [ 'file' => $file ] );
 
 								return $result;
 							} )
@@ -321,14 +328,21 @@ class Infinite_Uploads_Admin {
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file     = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
-					$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file );
+					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() ) );
+					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
+					$error_count ++;
+					if ( $error_count >= 3 ) {
+						$errors[] = sprintf( __( 'Error downloading %s. Retries exceeded.', 'iup' ), $file );
+					} else {
+						$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file );
+					}
+					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
 					$errors[] = __( 'Error downloading file. Queued for retry.', 'iup' );
 				}
 			}
 
-			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3" );
 			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
 				$break = true;
 
@@ -486,17 +500,17 @@ class Infinite_Uploads_Admin {
 
 			<?php
 			if ( $this->api->has_token() && $api_data ) {
+				if ( ! $api_data->stats->site->files ) {
+					$synced           = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+					$cloud_size       = $synced->size;
+					$cloud_files      = $synced->files;
+					$cloud_total_size = $api_data->stats->cloud->storage + $synced->size;
+				} else {
+					$cloud_size       = $api_data->stats->site->storage;
+					$cloud_files      = $api_data->stats->site->files;
+					$cloud_total_size = $api_data->stats->cloud->storage;
+				}
 				if ( ! empty( $stats['sync_finished'] ) ) {
-					if ( ! $api_data->stats->site->files ) {
-						$synced           = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
-						$cloud_size       = $synced->size;
-						$cloud_files      = $synced->files;
-						$cloud_total_size = $api_data->stats->cloud->storage + $synced->size;
-					} else {
-						$cloud_size       = $api_data->stats->site->storage;
-						$cloud_files      = $api_data->stats->site->files;
-						$cloud_total_size = $api_data->stats->cloud->storage;
-					}
 					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
@@ -520,21 +534,6 @@ class Infinite_Uploads_Admin {
 				require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			}
 			?>
-
-			<?php if ( ! infinite_uploads_enabled() ) { ?>
-				<div class="jumbotron">
-					<h2 class="display-4"><?php _e( '3. Enable', 'iup' ); ?></h2>
-					<p class="lead"><?php _e( 'Enable syncing and serving new uploads from the the Infinite Uploads cloud and global CDN.', 'iup' ); ?></p>
-					<hr class="my-4">
-					<!-- Button trigger modal -->
-					<button type="button" class="btn btn-primary" id="iup-enable">
-						<?php _e( 'Enable Infinite Uploads', 'iup' ); ?>
-					</button>
-					<div class="spinner-border text-hide" id="iup-enable-spinner" role="status"><span class="sr-only"><?php _e( 'Enabling...', 'iup' ); ?></span></div>
-				</div>
-			<?php } ?>
-
-
 		</div>
 		<?php
 	}

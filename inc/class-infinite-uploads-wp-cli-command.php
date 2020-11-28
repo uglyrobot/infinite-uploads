@@ -227,7 +227,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$uploaded = 0;
 		$break    = false;
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 LIMIT 1000" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 LIMIT 1000" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -261,7 +261,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $args_assoc, $progress_bar, $command, $wpdb, $unsynced, &$uploaded ) {
 								$uploaded ++;
 								$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], Infinite_Uploads::get_instance()->bucket ) + strlen( Infinite_Uploads::get_instance()->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], Infinite_Uploads::get_instance()->bucket ) + strlen( Infinite_Uploads::get_instance()->bucket ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1 ], [ 'file' => $file ] );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1, 'errors' => 0 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
 									WP_CLI::success( sprintf( __( '%s - Synced %s of %s files.', 'iup' ), $file, number_format_i18n( $uploaded ), number_format_i18n( $unsynced ) ) );
@@ -279,11 +279,23 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$manager = new Transfer( $s3, $from, 's3://' . Infinite_Uploads::get_instance()->bucket . '/', $transfer_args );
 				$manager->transfer();
 			} catch ( Exception $e ) {
-				$file = str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() );
-				WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+				if ( method_exists( $e, 'getRequest' ) ) {
+					$file        = str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() );
+					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
+					$error_count ++;
+					if ( $error_count >= 3 ) {
+						WP_CLI::warning( sprintf( __( 'Error uploading %s. Retries exceeded.', 'iup' ), $file ) );
+					} else {
+						WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+					}
+					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
+
+				} else {
+					WP_CLI::warning( sprintf( __( '%s error uploading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+				}
 			}
 
-			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0" );
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3" );
 			if ( $is_done ) {
 				$break                     = true;
 				$progress                  = get_site_option( 'iup_files_scanned' );
@@ -291,6 +303,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				update_site_option( 'iup_files_scanned', $progress );
 				if ( ! $args_assoc['verbose'] ) {
 					$progress_bar->finish();
+				}
+
+				$error_count = $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors >= 3" );
+				if ( $error_count ) {
+					WP_CLI::warning( sprintf( __( 'Unable to upload %s files.', 'iup' ), number_format_i18n( $error_count ) ) );
 				}
 				WP_CLI::success( __( 'Sync complete!', 'iup' ) );
 			}
@@ -358,7 +375,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 					$query = "INSERT INTO {$wpdb->base_prefix}infinite_uploads_files (file, size, modified, type, synced, deleted) VALUES ";
 					$query .= implode( ",\n", $values );
-					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1";
+					$query .= " ON DUPLICATE KEY UPDATE size = VALUES(size), modified = VALUES(modified), type = VALUES(type), synced = 1, deleted = 1, errors = 0";
 					$wpdb->query( $query );
 				}
 			}
@@ -458,7 +475,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$downloaded = 0;
 		$break      = false;
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 LIMIT 1000" );
+			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 LIMIT 1000" );
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
@@ -478,7 +495,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $args_assoc, $progress_bar, $command, $wpdb, $unsynced, &$downloaded ) {
 								$downloaded ++;
 								$file = '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], Infinite_Uploads::get_instance()->bucket ) + strlen( Infinite_Uploads::get_instance()->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], Infinite_Uploads::get_instance()->bucket ) + strlen( Infinite_Uploads::get_instance()->bucket ) ) ) );
-								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0 ], [ 'file' => $file ] );
+								$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'deleted' => 0, 'errors' => 0 ], [ 'file' => $file ] );
 
 								if ( $args_assoc['verbose'] ) {
 									WP_CLI::success( sprintf( __( '%s - Downloaded %s of %s files.', 'iup' ), $file, number_format_i18n( $downloaded ), number_format_i18n( $unsynced->files ) ) );
@@ -496,11 +513,22 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$manager = new Transfer( $s3, $from, $path['basedir'], $transfer_args );
 				$manager->transfer();
 			} catch ( Exception $e ) {
-				$file = str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() );
-				WP_CLI::warning( sprintf( __( '%s error downloading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+				if ( method_exists( $e, 'getRequest' ) ) {
+					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() ) );
+					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
+					$error_count ++;
+					if ( $error_count >= 3 ) {
+						WP_CLI::warning( sprintf( __( 'Error downloading %s. Retries exceeded.', 'iup' ), $file ) );
+					} else {
+						WP_CLI::warning( sprintf( __( 'Error downloading %s. Queued for retry.', 'iup' ), $file ) );
+					}
+					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
+				} else {
+					WP_CLI::warning( sprintf( __( '%s error downloading %s. Queued for retry.', 'iup' ), $e->getAwsErrorCode(), $file ) );
+				}
 			}
 
-			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
+			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3" );
 			if ( $is_done ) {
 				$break                         = true;
 				$progress                      = get_site_option( 'iup_files_scanned' );
@@ -508,6 +536,10 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				update_site_option( 'iup_files_scanned', $progress );
 				if ( ! $args_assoc['verbose'] ) {
 					$progress_bar->finish();
+				}
+				$error_count = $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors >= 3" );
+				if ( $error_count ) {
+					WP_CLI::warning( sprintf( __( 'Unable to download %s files.', 'iup' ), number_format_i18n( $error_count ) ) );
 				}
 				WP_CLI::success( __( 'Download complete!', 'iup' ) );
 			}

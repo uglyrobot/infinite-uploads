@@ -89,14 +89,12 @@ jQuery(document).ready(function ($) {
           return true;
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
-          $('#iup-error p').html('<ul>');
           $.each(json.data.errors, function (i, value) {
-            $('#iup-error p').append('<li>' + value + '</li>');
+            $('#iup-sync-errors ul').append('<li><span class="dashicons dashicons-warning"></span> ' + value + '</li>');
           });
-          $('#iup-error p').append('</ul>');
-          $('#iup-error').show();
-        } else {
-          $('#iup-error').hide();
+          $('#iup-sync-errors').show();
+          var scroll = $("#iup-sync-errors")[0].scrollHeight;
+          $("#iup-sync-errors").animate({scrollTop: scroll}, 5000);
         }
 
       } else {
@@ -170,14 +168,12 @@ jQuery(document).ready(function ($) {
           return true;
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
-          $('#iup-error p').html('<ul>');
           $.each(json.data.errors, function (i, value) {
-            $('#iup-error p').append('<li>' + value + '</li>');
+            $('#iup-download-errors ul').append('<li><span class="dashicons dashicons-warning"></span> ' + value + '</li>');
           });
-          $('#iup-error p').append('</ul>');
-          $('#iup-error').show();
-        } else {
-          $('#iup-error').hide();
+          $('#iup-download-errors').show();
+          var scroll = $("#iup-download-errors")[0].scrollHeight;
+          $("#iup-download-errors").animate({scrollTop: scroll}, 5000);
         }
 
       } else {
@@ -212,6 +208,8 @@ jQuery(document).ready(function ($) {
   //Sync
   $('#upload-modal').on('show.bs.modal', function () {
     $('#iup-error').hide();
+    $('#iup-sync-errors').hide();
+    $('#iup-sync-errors ul').empty();
     stopLoop = false;
     syncFilelist();
   }).on('hide.bs.modal', function () {
@@ -221,6 +219,8 @@ jQuery(document).ready(function ($) {
   //Download
   $('#download-modal').on('show.bs.modal', function () {
     $('#iup-error').hide();
+    $('#iup-download-errors').hide();
+    $('#iup-download-errors ul').empty();
     stopLoop = false;
     downloadFiles();
   }).on('hide.bs.modal', function () {
