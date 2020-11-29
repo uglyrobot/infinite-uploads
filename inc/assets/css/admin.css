@@ -37,8 +37,8 @@ body {
 }
 
 .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-  background-color: rgba(38, 169, 224, 0.8);
-  border-width: 0;
+  background-color: rgba(38, 169, 224, 0.8) !important;
+  border-width: 0 !important;
 }
 
 .btn-info {
@@ -48,8 +48,8 @@ body {
 }
 
 .btn-info:hover, .btn-info:active, .btn-info:focus {
-  background-color: rgba(238, 124, 30, 0.8);
-  border-width: 0;
+  background-color: rgba(238, 124, 30, 0.8) !important;
+  border-width: 0 !important;
 }
 
 .btn .dashicons {
@@ -80,6 +80,7 @@ body {
 .tooltip .tooltip-inner {
   background-color: #f1f1f1;
   color: #2A2A2A;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2);
 }
 
 .bs-tooltip-top .arrow {
@@ -102,4 +103,16 @@ body {
   height: 3em;
   display: none;
   overflow-y: scroll;
+}
+
+.iup-enabled-status .dashicons {
+  font-size: 25px;
+}
+
+.iup-enabled-status .dashicons-cloud-saved {
+  color: rgba(38, 169, 224, 1);
+}
+
+.iup-enabled-status .dashicons-cloud-upload {
+  color: #EE7C1E;
 }

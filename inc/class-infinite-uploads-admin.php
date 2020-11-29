@@ -479,7 +479,7 @@ class Infinite_Uploads_Admin {
 
 		if ( $this->auth_error ) {
 			?>
-			<div class="error"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
+			<div class="alert alert-warning" role="alert"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
 		}
 
 		if ( isset( $_GET['clear'] ) ) {
@@ -491,7 +491,7 @@ class Infinite_Uploads_Admin {
 		//var_dump($api_data);
 		//var_dump($stats);
 		?>
-		<div id="iup-error" class="error" style="display: none;"><p></p></div>
+		<div id="iup-error" class="alert alert-warning" role="alert" style="display: none;"><p></p></div>
 		<div id="container" class="wrap iup-background">
 
 			<h1>

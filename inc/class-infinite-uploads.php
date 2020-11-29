@@ -60,6 +60,8 @@ class Infinite_Uploads {
 		if ( ! infinite_uploads_enabled() ) {
 			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
 			add_action( $hook, [ $this, 'setup_notice' ] );
+
+			return true;
 		}
 
 		$this->register_stream_wrapper();
@@ -89,6 +91,9 @@ class Infinite_Uploads {
 	}
 
 	public function setup_notice() {
+		if ( get_current_screen()->id == 'settings_page_infinite_uploads' ) {
+			return;
+		}
 		?>
 		<div class="notice notice-info">
 			<p style="font-size: 15px;line-height: 2.3;">

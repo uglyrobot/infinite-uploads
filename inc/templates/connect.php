@@ -1,5 +1,10 @@
 <div class="card">
-	<div class="card-header h5"><?php _e( 'Local File Overview', 'infinite-uploads' ); ?></div>
+	<div class="card-header">
+		<div class="d-flex align-items-center">
+			<h5 class="m-0 mr-auto p-0"><?php _e( 'Local File Overview', 'infinite-uploads' ); ?></h5>
+			<?php require_once( dirname( __FILE__ ) . '/status-icon.php' ); ?>
+		</div>
+	</div>
 	<div class="card-body cloud p-5">
 		<div class="row align-items-center justify-content-center">
 			<div class="col">

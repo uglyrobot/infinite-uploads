@@ -7,7 +7,9 @@ Version: 0.1-alpha-3
 Author URI: https://uglyrobot.com
 Text Domain: infinite-uploads
 
-Inspired by and borrowed heavily from S3 Uploads plugin from Human Made https://github.com/humanmade/S3-Uploads.
+Inspired by and borrowed heavily from S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
+
+Copyright 2020 UglyRobot.
 */
 
 define( 'INFINITE_UPLOADS_VERSION', '0.1-alpha-3' );
