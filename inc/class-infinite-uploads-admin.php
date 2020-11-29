@@ -245,15 +245,17 @@ class Infinite_Uploads_Admin {
 
 			$is_done = ! (bool) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3" );
 			if ( $is_done || timer_stop() >= $this->ajax_timelimit ) {
-				$break = true;
+				$break            = true;
+				$permanent_errors = false;
 
 				if ( $is_done ) {
+					$permanent_errors          = (int) $wpdb->get_var( "SELECT count(*) FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors >= 3" );
 					$progress                  = get_site_option( 'iup_files_scanned' );
 					$progress['sync_finished'] = time();
 					update_site_option( 'iup_files_scanned', $progress );
 				}
 
-				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
+				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors', 'permanent_errors' ), $this->iup_instance->get_sync_stats() ) );
 			}
 		}
 	}
@@ -491,7 +493,7 @@ class Infinite_Uploads_Admin {
 		//var_dump($api_data);
 		//var_dump($stats);
 		?>
-		<div id="iup-error" class="alert alert-warning" role="alert" style="display: none;"><p></p></div>
+		<div id="iup-error" class="alert alert-warning" role="alert" style="display: none;"></div>
 		<div id="container" class="wrap iup-background">
 
 			<h1>
@@ -510,13 +512,14 @@ class Infinite_Uploads_Admin {
 					$cloud_files      = $api_data->stats->site->files;
 					$cloud_total_size = $api_data->stats->cloud->storage;
 				}
-				if ( ! empty( $stats['sync_finished'] ) ) {
+				if ( infinite_uploads_enabled() ) {
 					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
+					require_once( dirname( __FILE__ ) . '/templates/modal-enable.php' );
 				}
 
 				require_once( dirname( __FILE__ ) . '/templates/settings.php' );

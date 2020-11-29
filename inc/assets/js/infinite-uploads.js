@@ -23,12 +23,12 @@ jQuery(document).ready(function ($) {
 
       } else {
         $('#scan-modal').modal('hide');
-        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json').fail(function () {
       $('#scan-modal').modal('hide');
-      $('#iup-error p').text("Unknown Error");
+      $('#iup-error').text("Unknown Error");
       $('#iup-error').show();
     });
   };
@@ -59,13 +59,13 @@ jQuery(document).ready(function ($) {
 
       } else {
         $('#scan-remote-modal').modal('hide');
-        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json')
       .fail(function () {
         $('#scan-remote-modal').modal('hide');
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').text("Unknown Error");
         $('#iup-error').show();
       });
   };
@@ -85,8 +85,14 @@ jQuery(document).ready(function ($) {
         if (!json.data.is_done) {
           syncFilelist();
         } else {
-          location.reload();
-          return true;
+          //update values in next modal
+          $('#iup-enable-errors span').text(json.data.permanent_errors);
+          if (json.data.permanent_errors) {
+            $('#iup-enable-errors').show();
+          }
+          $('#iup-sync-button').attr('data-target', '#enable-modal');
+          $('#upload-modal').modal('hide');
+          $('#enable-modal').modal('show');
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
           $.each(json.data.errors, function (i, value) {
@@ -99,13 +105,13 @@ jQuery(document).ready(function ($) {
 
       } else {
         $('#upload-modal').modal('hide');
-        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json')
       .fail(function () {
         $('#upload-modal').modal('hide');
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').text("Unknown Error");
         $('#iup-error').show();
       });
   };
@@ -128,23 +134,23 @@ jQuery(document).ready(function ($) {
           return true;
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
-          $('#iup-error p').html('<ul>');
+          $('#iup-error').html('<ul>');
           $.each(json.data.errors, function (i, value) {
-            $('#iup-error p').append('<li>' + value + '</li>');
+            $('#iup-error').append('<li>' + value + '</li>');
           });
-          $('#iup-error p').append('</ul>');
+          $('#iup-error').append('</ul>');
           $('#iup-error').show();
         } else {
           $('#iup-error').hide();
         }
 
       } else {
-        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').text("Unknown Error");
         $('#iup-error').show();
       });
   };
@@ -177,12 +183,12 @@ jQuery(document).ready(function ($) {
         }
 
       } else {
-        $('#iup-error p').text(json.data.substr(0, 200));
+        $('#iup-error').text(json.data.substr(0, 200));
         $('#iup-error').show();
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error').text("Unknown Error");
         $('#iup-error').show();
       });
   };
@@ -245,18 +251,21 @@ jQuery(document).ready(function ($) {
   });
 
   //Enable infinite uploads
-  $('#iup-enable').on('click', function () {
+  $('#iup-enable-button').on('click', function () {
+    $('#iup-enable-button').hide();
     $('#iup-enable-spinner').removeClass('text-hide');
     $.post(ajaxurl + '?action=infinite-uploads-toggle', {'enabled': true}, function (json) {
       if (json.success) {
-        $('#iup-enable').hide();
-        $('#iup-enable-spinner').addClass('text-hide');
+        location.reload();
+        return true;
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error').text("Unknown Error");
+        $('#iup-error').text("Unknown Ajax Error");
         $('#iup-error').show();
         $('#iup-enable-spinner').addClass('text-hide');
+        $('#iup-enable-button').show();
+        $('#enable-modal').modal('hide');
       });
   });
 
