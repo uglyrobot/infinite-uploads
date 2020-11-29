@@ -12,11 +12,11 @@
 				<span class="h1"><?php echo $this->size_format_zero( $cloud_size, 2 ); ?><small class="text-muted"> / <?php echo number_format_i18n( $cloud_files ); ?></small></span>
 
 				<div class="container">
-					<?php foreach ( $this->iup_instance->get_filetypes( false, $api_data->stats->cloud->types ) as $type ) { ?>
+					<?php foreach ( $this->iup_instance->get_filetypes( false, $api_data->stats->site->types ) as $type ) { ?>
 						<div class="row mt-2">
 							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type->color; ?>">&nbsp;</span></div>
 							<div class="col-3 lead"><?php echo $type->label; ?></div>
-							<div class="col-3"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
+							<div class="col-4"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
 						</div>
 					<?php } ?>
 				</div>

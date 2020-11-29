@@ -27,7 +27,13 @@ body {
 }
 
 .badge-primary:hover, .badge-primary:active, .badge-primary:focus {
-  background-color: rgba(38, 169, 224, 0.8);
+  background-color: rgba(38, 169, 224, 0.7);
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.badge-primary:active {
+  background-color: rgba(38, 169, 224, 0.9);
 }
 
 .btn-primary {
@@ -37,8 +43,13 @@ body {
 }
 
 .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-  background-color: rgba(38, 169, 224, 0.8) !important;
-  border-width: 0 !important;
+  background-color: rgba(38, 169, 224, 0.7) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary:active {
+  background-color: rgba(38, 169, 224, 0.9) !important;
 }
 
 .btn-info {
@@ -48,8 +59,13 @@ body {
 }
 
 .btn-info:hover, .btn-info:active, .btn-info:focus {
-  background-color: rgba(238, 124, 30, 0.8) !important;
-  border-width: 0 !important;
+  background-color: rgba(238, 124, 30, 0.7) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.btn-info:active {
+  background-color: rgba(238, 124, 30, 0.9) !important;
 }
 
 .btn .dashicons {

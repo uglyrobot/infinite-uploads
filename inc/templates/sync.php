@@ -16,7 +16,7 @@
 						<div class="row mt-2">
 							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type->color; ?>">&nbsp;</span></div>
 							<div class="col-3 lead"><?php echo $type->label; ?></div>
-							<div class="col-3"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
+							<div class="col-4"><strong><?php echo size_format( $type->size, 2 ); ?> / <?php echo number_format_i18n( $type->files ); ?></strong></div>
 						</div>
 					<?php } ?>
 					<div class="row mt-2">

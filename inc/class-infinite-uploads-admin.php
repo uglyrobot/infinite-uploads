@@ -351,7 +351,16 @@ class Infinite_Uploads_Admin {
 				if ( $is_done ) {
 					$progress                      = get_site_option( 'iup_files_scanned' );
 					$progress['download_finished'] = time();
-					update_site_option( 'iup_files_scanned', $progress );
+					//update_site_option( 'iup_files_scanned', $progress );
+
+					//logout and disable
+					$this->api->set_token( '' ); //logout
+					if ( is_multisite() ) {
+						update_site_option( 'iup_enabled', false );
+					} else {
+						update_option( 'iup_enabled', false, true );
+					}
+					delete_site_option( 'iup_files_scanned' );
 				}
 
 				wp_send_json_success( array_merge( compact( 'downloaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
@@ -435,7 +444,7 @@ class Infinite_Uploads_Admin {
 
 		$api_data = $this->api->get_site_data();
 		if ( $this->api->has_token() && $api_data ) {
-			$cloud_types = $this->iup_instance->get_filetypes( true, $api_data->stats->cloud->types );
+			$cloud_types = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
 			wp_localize_script( 'iup-js', 'cloud_types', $cloud_types );
 		}
 	}

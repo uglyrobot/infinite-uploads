@@ -269,6 +269,7 @@ jQuery(document).ready(function ($) {
       });
   });
 
+  //Charts
   var bandwidthFormat = function (bytes) {
     if (bytes < 1024) {
       return bytes + ' B';
@@ -285,62 +286,64 @@ jQuery(document).ready(function ($) {
     var label = ' ' + data.labels[tooltipItem.index] || '';
     return label;
   };
-  //Charts
-  var config_local = {
-    type: 'pie',
-    data: local_types,
-    options: {
-      responsive: true,
-      legend: false,
-      tooltips: {
-        callbacks: {
-          label: sizelabel
-        },
-        backgroundColor: '#F1F1F1',
-        bodyFontColor: '#2A2A2A',
-      },
-      title: {
-        display: true,
-        position: 'bottom',
-        fontSize: 18,
-        fontStyle: 'normal',
-        text: local_types.total
-      }
-    }
-  };
-
-  var config_cloud = {
-    type: 'pie',
-    data: cloud_types,
-    options: {
-      responsive: true,
-      legend: false,
-      tooltips: {
-        callbacks: {
-          label: sizelabel
-        },
-        backgroundColor: '#F1F1F1',
-        bodyFontColor: '#2A2A2A',
-      },
-      title: {
-        display: true,
-        position: 'bottom',
-        fontSize: 18,
-        fontStyle: 'normal',
-        text: cloud_types.total
-      }
-    }
-  };
 
   window.onload = function () {
     var pie1 = document.getElementById('iup-local-pie');
     if (pie1) {
+
+      var config_local = {
+        type: 'pie',
+        data: local_types,
+        options: {
+          responsive: true,
+          legend: false,
+          tooltips: {
+            callbacks: {
+              label: sizelabel
+            },
+            backgroundColor: '#F1F1F1',
+            bodyFontColor: '#2A2A2A',
+          },
+          title: {
+            display: true,
+            position: 'bottom',
+            fontSize: 18,
+            fontStyle: 'normal',
+            text: local_types.total
+          }
+        }
+      };
+
       var ctx = pie1.getContext('2d');
       window.myPieLocal = new Chart(ctx, config_local);
     }
 
     var pie2 = document.getElementById('iup-cloud-pie');
     if (pie2) {
+
+      var config_cloud = {
+        type: 'pie',
+        data: cloud_types,
+        options: {
+          responsive: true,
+          legend: false,
+          tooltips: {
+            callbacks: {
+              label: sizelabel
+            },
+            backgroundColor: '#F1F1F1',
+            bodyFontColor: '#2A2A2A',
+          },
+          title: {
+            display: true,
+            position: 'bottom',
+            fontSize: 18,
+            fontStyle: 'normal',
+            text: cloud_types.total
+          }
+        }
+      };
+
       var ctx = pie2.getContext('2d');
       window.myPieCloud = new Chart(ctx, config_cloud);
     }
