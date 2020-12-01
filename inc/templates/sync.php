@@ -8,7 +8,7 @@
 	<div class="card-body cloud p-5">
 		<div class="row align-items-center justify-content-center mb-5">
 			<div class="col">
-				<p class="lead mb-0"><?php _e( "Total Bytes / Files to Sync", 'infinite-uploads' ); ?></p>
+				<p class="lead mb-0"><?php _e( "Total Local Bytes / Files", 'infinite-uploads' ); ?></p>
 				<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 				<div class="container">
