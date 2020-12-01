@@ -20,6 +20,7 @@ class Infinite_Uploads_Admin {
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
+		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
 
 		add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
 		add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
@@ -384,7 +385,7 @@ class Infinite_Uploads_Admin {
 	 *
 	 * @param array $args Optional. Same as for add_query_arg()
 	 *
-	 * @return string
+	 * @return string Unescaped url to settings page.
 	 */
 	function settings_url( $args = [] ) {
 		if ( is_multisite() ) {
@@ -413,6 +414,27 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
+	 * Adds settings links to plugin row.
+	 */
+	function plugins_list_links( $actions ) {
+		// Build and escape the URL.
+		$url = esc_url( $this->settings_url() );
+
+		// Create the link.
+		$custom_links = [];
+		if ( $this->api->has_token() ) {
+			$custom_links['settings'] = "<a href='$url'>" . __( 'Settings', 'infinite-uploads' ) . '</a>';
+		} else {
+			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
+		}
+		$custom_links['support'] = '<a href="https://infiniteuploads.com/support/">' . __( 'Support', 'infinite-uploads' ) . '</a>';
+
+
+		// Adds the links to the beginning of the array.
+		return array_merge( $custom_links, $actions );
+	}
+
+	/**
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
@@ -430,7 +452,7 @@ class Infinite_Uploads_Admin {
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
 	}
-	/**/
+
 	/**
 	 *
 	 */
@@ -490,7 +512,7 @@ class Infinite_Uploads_Admin {
 
 		if ( $this->auth_error ) {
 			?>
-			<div class="alert alert-warning" role="alert"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
+			<div class="notice notice-error"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
 		}
 
 		if ( isset( $_GET['clear'] ) ) {
@@ -502,7 +524,7 @@ class Infinite_Uploads_Admin {
 		//var_dump($api_data);
 		//var_dump($stats);
 		?>
-		<div id="iup-error" class="alert alert-warning" role="alert" style="display: none;"></div>
+		<div id="iup-error" class="notice notice-error" style="display: none;"><p></p></div>
 		<div id="container" class="wrap iup-background">
 
 			<h1>
