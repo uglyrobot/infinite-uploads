@@ -66,7 +66,9 @@ class Infinite_Uploads {
 
 		$this->register_stream_wrapper();
 
+		$uploads_url = $this->get_original_upload_dir(); //prime the cached value before filtering
 		add_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
+
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
@@ -86,7 +88,7 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
-			new Infinite_Uploads_Rewriter( $this->bucket_url );
+			new Infinite_Uploads_Rewriter( $uploads_url['baseurl'], $this->bucket_url, $api_data->site->cname );
 		}
 	}
 
@@ -175,7 +177,7 @@ class Infinite_Uploads {
 
 	public function get_original_upload_dir() {
 		if ( empty( $this->original_upload_dir ) ) {
-			return wp_upload_dir();
+			$this->original_upload_dir = wp_get_upload_dir();
 		}
 
 		return $this->original_upload_dir;
@@ -351,8 +353,6 @@ class Infinite_Uploads {
 	}
 
 	public function filter_upload_dir( $dirs ) {
-
-		$this->original_upload_dir = $dirs;
 
 		$dirs['path']    = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['path'] );
 		$dirs['basedir'] = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['basedir'] );
