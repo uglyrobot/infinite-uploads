@@ -132,3 +132,7 @@ body {
 .iup-enabled-status .dashicons-cloud-upload {
   color: #EE7C1E;
 }
+
+p.lead {
+  font-size: 1em;
+}

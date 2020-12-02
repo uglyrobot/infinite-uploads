@@ -13,48 +13,80 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: infinite-uploads.php:106
+#: infinite-uploads.php:109
 msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
 msgstr ""
 
-#: infinite-uploads.php:120
+#: infinite-uploads.php:123
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:242
+#: inc/class-infinite-uploads-admin.php:247
 msgid "Error uploading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:238
+#: inc/class-infinite-uploads-admin.php:243
 msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:236, inc/class-infinite-uploads-wp-cli-command.php:287
+#: inc/class-infinite-uploads-admin.php:241, inc/class-infinite-uploads-wp-cli-command.php:287
 msgid "Error uploading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:341
+#: inc/class-infinite-uploads-admin.php:356
 msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:337, inc/class-infinite-uploads-wp-cli-command.php:523
+#: inc/class-infinite-uploads-admin.php:352, inc/class-infinite-uploads-wp-cli-command.php:523
 msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:335, inc/class-infinite-uploads-wp-cli-command.php:521
+#: inc/class-infinite-uploads-admin.php:350, inc/class-infinite-uploads-wp-cli-command.php:521
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:409, inc/class-infinite-uploads-admin.php:410
+#: inc/class-infinite-uploads-admin.php:440, inc/class-infinite-uploads.php:178, inc/templates/connect.php:49
+msgid "Connect"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:438
+msgid "Settings"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:442, inc/class-infinite-uploads-admin.php:592
+msgid "Support"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:454, inc/class-infinite-uploads-admin.php:455
 msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:476
+#: inc/class-infinite-uploads-admin.php:521
 msgid "United States"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:477
+#: inc/class-infinite-uploads-admin.php:522
 msgid "Europe"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:587
+msgid "The Cloud by Infinite Uploads"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:593
+msgid "Terms of Service"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:594
+msgid "Privacy Policy"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:599
+msgid "Twitter"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:600
+msgid "Facebook"
 msgstr ""
 
 #: inc/class-infinite-uploads-wp-cli-command.php:207, inc/class-infinite-uploads-wp-cli-command.php:409
@@ -133,107 +165,103 @@ msgstr ""
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:95
+#: inc/class-infinite-uploads.php:177
 msgid "Infinite Uploads is Ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:95
+#: inc/class-infinite-uploads.php:177
 msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:96, inc/templates/connect.php:43
-msgid "Connect"
-msgstr ""
-
-#: inc/class-infinite-uploads.php:242
+#: inc/class-infinite-uploads.php:259
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:247
+#: inc/class-infinite-uploads.php:264
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:257
+#: inc/class-infinite-uploads.php:274
 msgid "Images"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:258
+#: inc/class-infinite-uploads.php:275
 msgid "Audio"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:259
+#: inc/class-infinite-uploads.php:276
 msgid "Video"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:260
+#: inc/class-infinite-uploads.php:277
 msgid "Documents"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:261
+#: inc/class-infinite-uploads.php:278
 msgid "Archives"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:262
+#: inc/class-infinite-uploads.php:279
 msgid "Code"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:263
+#: inc/class-infinite-uploads.php:280
 msgid "Other"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:2
+#: inc/templates/cloud-overview.php:4
 msgid "Cloud Storage Overview"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:6
+#: inc/templates/cloud-overview.php:11
 msgid "This Site's Cloud Bytes / Files"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:6, inc/templates/settings.php:11, inc/templates/settings.php:27
+#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:11, inc/templates/settings.php:27
 msgid "Recalculated every 24 hours"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:20, inc/templates/settings.php:16, inc/templates/settings.php:31
+#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:16, inc/templates/settings.php:31
 msgid "%s / %s"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:26
+#: inc/templates/cloud-overview.php:31
 msgid "Visit the Infinite Uploads site to view, manage, or change your plan."
 msgstr ""
 
-#: inc/templates/cloud-overview.php:27
+#: inc/templates/cloud-overview.php:32
 msgid "Account Management"
 msgstr ""
 
-#: inc/templates/connect.php:2
+#: inc/templates/connect.php:4
 msgid "Local File Overview"
 msgstr ""
 
-#: inc/templates/connect.php:6, inc/templates/sync.php:6
+#: inc/templates/connect.php:11
 msgid "Total Bytes / Files"
 msgstr ""
 
-#: inc/templates/connect.php:18, inc/templates/sync.php:18
+#: inc/templates/connect.php:23, inc/templates/sync.php:23
 msgid "Scanned %s ago"
 msgstr ""
 
-#: inc/templates/connect.php:19, inc/templates/sync.php:19
+#: inc/templates/connect.php:25, inc/templates/sync.php:25
 msgid "Run a new scan to detect and sync recently uploaded files."
 msgstr ""
 
-#: inc/templates/connect.php:19, inc/templates/sync.php:19
+#: inc/templates/connect.php:25, inc/templates/sync.php:25
 msgid "Refresh"
 msgstr ""
 
-#: inc/templates/connect.php:30
+#: inc/templates/connect.php:36
 msgid "Ready to Connect!"
 msgstr ""
 
-#: inc/templates/connect.php:31
+#: inc/templates/connect.php:37
 msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
 msgstr ""
 
@@ -279,6 +307,26 @@ msgstr ""
 
 #: inc/templates/modal-download.php:34
 msgid "<span id=\"iup-download-size\">%s</span> / <span id=\"iup-download-files\">%s</span> Files Remaining"
+msgstr ""
+
+#: inc/templates/modal-enable.php:5
+msgid "Enable Infinite Uploads"
+msgstr ""
+
+#: inc/templates/modal-enable.php:14
+msgid "Enable the Infinite Uploads Cloud"
+msgstr ""
+
+#: inc/templates/modal-enable.php:15
+msgid "Your media library has finished syncing to the Infinite Uploads cloud. Enable now to serve all media from the cloud and global CDN. All new media uploaded will skip the local filesystem and be synced directly to the Infinite Uploads cloud."
+msgstr ""
+
+#: inc/templates/modal-enable.php:18
+msgid "Note <span>%s</span> files errored while syncing to the cloud. If they are referenced in posts or pages they could show as a 404 after enabling."
+msgstr ""
+
+#: inc/templates/modal-enable.php:23
+msgid "Enable"
 msgstr ""
 
 #: inc/templates/modal-remote-scan.php:5
@@ -437,19 +485,39 @@ msgstr ""
 msgid "%s / %s files to Download"
 msgstr ""
 
-#: inc/templates/sync.php:2
+#: inc/templates/status-icon.php:2
+msgid "Status"
+msgstr ""
+
+#: inc/templates/status-icon.php:8
+msgid "Disabled - waiting to connect"
+msgstr ""
+
+#: inc/templates/status-icon.php:6
+msgid "Disabled - waiting to sync media to the cloud"
+msgstr ""
+
+#: inc/templates/status-icon.php:4
+msgid "Enabled - new uploads are moved to the cloud"
+msgstr ""
+
+#: inc/templates/sync.php:4
 msgid "Ready to Sync"
 msgstr ""
 
-#: inc/templates/sync.php:31
+#: inc/templates/sync.php:11
+msgid "Total Local Bytes / Files"
+msgstr ""
+
+#: inc/templates/sync.php:37
 msgid "You have %s of premium storage available!"
 msgstr ""
 
-#: inc/templates/sync.php:32
+#: inc/templates/sync.php:38
 msgid "Move your media library to the Infinite Uploads cloud."
 msgstr ""
 
-#: inc/templates/sync.php:40, inc/templates/sync.php:38
+#: inc/templates/sync.php:48, inc/templates/sync.php:46, inc/templates/sync.php:44
 msgid "Sync Now"
 msgstr ""
 
