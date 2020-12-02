@@ -581,7 +581,7 @@ class Infinite_Uploads_Admin {
 			}
 			?>
 		</div>
-		<div class="container mt-5">
+		<div id="iup-footer" class="container mt-5">
 			<div class="row">
 				<div class="col-sm text-center text-muted">
 					<strong><?php _e( "The Cloud by Infinite Uploads", 'infinite-uploads' ); ?></strong>
@@ -589,9 +589,9 @@ class Infinite_Uploads_Admin {
 			</div>
 			<div class="row mt-3">
 				<div class="col-sm text-center text-muted">
-					<a href="#" class="text-muted"><?php _e( "Support", 'infinite-uploads' ); ?></a> |
-					<a href="#" class="text-muted"><?php _e( "Terms of Service", 'infinite-uploads' ); ?></a> |
-					<a href="#" class="text-muted"><?php _e( "Privacy Policy", 'infinite-uploads' ); ?></a>
+					<a href="https://infiniteuploads.com/support/" class="text-muted"><?php _e( "Support", 'infinite-uploads' ); ?></a> |
+					<a href="https://infiniteuploads.com/terms-of-service/" class="text-muted"><?php _e( "Terms of Service", 'infinite-uploads' ); ?></a> |
+					<a href="https://infiniteuploads.com/privacy/" class="text-muted"><?php _e( "Privacy Policy", 'infinite-uploads' ); ?></a>
 				</div>
 			</div>
 			<div class="row mt-3">

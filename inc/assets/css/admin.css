@@ -136,3 +136,7 @@ body {
 p.lead {
   font-size: 1em;
 }
+
+#iup-footer .text-muted {
+  color: rgba(108, 117, 125, 0.5) !important;
+}
