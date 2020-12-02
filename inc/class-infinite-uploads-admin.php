@@ -46,7 +46,7 @@ class Infinite_Uploads_Admin {
 	public function ajax_filelist() {
 
 		// check caps
-		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
 			wp_send_json_error();
 		}
 
@@ -78,7 +78,7 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		// check caps
-		if ( ! current_user_can( is_multisite() ? 'manage_network_options' : 'manage_options' ) ) {
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
 			wp_send_json_error();
 		}
 
@@ -170,6 +170,10 @@ class Infinite_Uploads_Admin {
 
 	public function ajax_sync() {
 		global $wpdb;
+
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error();
+		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
 		if ( ! $progress['sync_started'] ) {
@@ -264,6 +268,10 @@ class Infinite_Uploads_Admin {
 	public function ajax_delete() {
 		global $wpdb;
 
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error();
+		}
+
 		$deleted = 0;
 		$errors  = [];
 		$path    = $this->iup_instance->get_original_upload_dir();
@@ -286,6 +294,10 @@ class Infinite_Uploads_Admin {
 
 	public function ajax_download() {
 		global $wpdb;
+
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error();
+		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
 		if ( empty( $progress['download_started'] ) ) {
@@ -352,16 +364,9 @@ class Infinite_Uploads_Admin {
 				if ( $is_done ) {
 					$progress                      = get_site_option( 'iup_files_scanned' );
 					$progress['download_finished'] = time();
-					//update_site_option( 'iup_files_scanned', $progress );
+					update_site_option( 'iup_files_scanned', $progress );
 
-					//logout and disable
-					$this->api->set_token( '' ); //logout
-					if ( is_multisite() ) {
-						update_site_option( 'iup_enabled', false );
-					} else {
-						update_option( 'iup_enabled', false, true );
-					}
-					delete_site_option( 'iup_files_scanned' );
+					$this->api->disconnect();
 				}
 
 				wp_send_json_success( array_merge( compact( 'downloaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
@@ -369,7 +374,14 @@ class Infinite_Uploads_Admin {
 		}
 	}
 
+	/**
+	 * Enable or disable url rewriting
+	 */
 	public function ajax_toggle() {
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error();
+		}
+
 		$enabled = (bool) $_REQUEST['enabled'];
 		if ( is_multisite() ) {
 			update_site_option( 'iup_enabled', $enabled );

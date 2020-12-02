@@ -52,12 +52,16 @@ class Infinite_Uploads_Api_Handler {
 	 */
 	public $api_error = '';
 
+	private $iup_instance;
+
 	/**
 	 * Set up the API module.
 	 *
 	 * @internal
 	 */
 	public function __construct() {
+		$this->iup_instance = Infinite_Uploads::get_instance();
+
 		if ( defined( 'INFINITE_UPLOADS_CUSTOM_API_SERVER' ) ) {
 			$this->server_root = trailingslashit( INFINITE_UPLOADS_CUSTOM_API_SERVER );
 		}
@@ -412,7 +416,6 @@ class Infinite_Uploads_Api_Handler {
 			if ( $data ) {
 				$data = json_decode( $data );
 
-				return $data; //TODO REMOVE DEBUG CODE
 				if ( $data->refreshed >= ( time() - HOUR_IN_SECONDS * 12 ) ) {
 					return $data;
 				}
@@ -432,4 +435,36 @@ class Infinite_Uploads_Api_Handler {
 		return false;
 	}
 
+	/**
+	 * Disconnect from API
+	 */
+	public function disconnect() {
+		global $wpdb;
+
+		//Do a find replace on the posts table. For multisite or other tables would really need a big find-replace plugin or WP CLI.
+		$uploads_url = $this->iup_instance->get_original_upload_dir();
+		$api_data    = $this->get_site_data();
+
+		if ( $api_data ) {
+			$replace = trailingslashit( $uploads_url['baseurl'] );
+
+			$find = 'https://' . trailingslashit( $api_data->site->cname );
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET `post_content` = replace(`post_content`, %s, %s)", $find, $replace ) );
+
+			if ( $api_data->site->cdn_url != $api_data->site->cname ) {
+				$find = 'https://' . trailingslashit( $api_data->site->cdn_url );
+				$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET `post_content` = replace(`post_content`, %s, %s)", $find, $replace ) );
+			}
+			wp_cache_flush(); //unfortunately no other way to clean every post from cache.
+		}
+
+		//logout and disable
+		$this->api->set_token( '' ); //logout
+		if ( is_multisite() ) {
+			update_site_option( 'iup_enabled', false );
+		} else {
+			update_option( 'iup_enabled', false, true );
+		}
+		delete_site_option( 'iup_files_scanned' );
+	}
 }

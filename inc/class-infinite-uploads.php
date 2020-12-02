@@ -7,12 +7,15 @@ class Infinite_Uploads {
 	public $original_file;
 	public $bucket;
 	public $bucket_url;
+	public $capability;
 	private $key;
 	private $secret;
 	private $admin;
+	private $api;
 
 	public function __construct() {
-
+		//set the cap we should check
+		$this->capability = apply_filters( 'infinite_uploads_settings_capability', ( is_multisite() ? 'manage_network_options' : 'manage_options' ) );
 	}
 
 	/**
@@ -36,8 +39,17 @@ class Infinite_Uploads {
 		$this->admin = Infinite_Uploads_Admin::get_instance();
 		$this->api   = Infinite_Uploads_Api_Handler::get_instance();
 
+		// don't register all this until we've enabled rewriting.
+		if ( ! infinite_uploads_enabled() ) {
+			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
+			add_action( $hook, [ $this, 'setup_notice' ] );
+
+			return true;
+		}
+
+		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
-		if ( isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
+		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
 			$this->bucket = $api_data->site->upload_bucket;
 			//$this->bucket     = 'TESTING';
 			$this->key        = $api_data->site->upload_key;
@@ -54,13 +66,7 @@ class Infinite_Uploads {
 				//];
 				return $params;
 			} );
-		}
-
-		// don't register all this until we've enabled rewriting.
-		if ( ! infinite_uploads_enabled() ) {
-			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
-			add_action( $hook, [ $this, 'setup_notice' ] );
-
+		} else { //if we don't have cloud data we have to disable everything to avoid errors
 			return true;
 		}
 
@@ -92,21 +98,6 @@ class Infinite_Uploads {
 		}
 	}
 
-	public function setup_notice() {
-		if ( get_current_screen()->id == 'settings_page_infinite_uploads' ) {
-			return;
-		}
-		?>
-		<div class="notice notice-info">
-			<p style="font-size: 15px;line-height: 2.3;">
-				<strong><?php _e( 'Infinite Uploads is Ready!', 'infinite-uploads' ); ?></strong> <?php _e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' ); ?>
-				<a class="button button-primary" href="<?php echo $this->admin->settings_url(); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
-			</p>
-
-		</div>
-		<?php
-	}
-
 	/**
 	 * Register the stream wrapper for s3
 	 */
@@ -121,10 +112,6 @@ class Infinite_Uploads {
 
 		stream_context_set_option( stream_context_get_default(), 'iu', 'seekable', true );
 	}
-
-	/*
-	 *
-	 */
 
 	/**
 	 * @return Aws\S3\S3Client
@@ -164,6 +151,37 @@ class Infinite_Uploads {
 		return $this->s3;
 	}
 
+	/*
+	 *
+	 */
+
+	public function get_original_upload_dir() {
+		if ( empty( $this->original_upload_dir ) ) {
+			$this->original_upload_dir = wp_get_upload_dir();
+		}
+
+		return $this->original_upload_dir;
+	}
+
+	public function setup_notice() {
+		if ( ! current_user_can( $this->capability ) ) {
+			return;
+		}
+
+		if ( get_current_screen()->id == 'settings_page_infinite_uploads' ) {
+			return;
+		}
+		?>
+		<div class="notice notice-info">
+			<p style="font-size: 15px;line-height: 2.3;">
+				<strong><?php _e( 'Infinite Uploads is Ready!', 'infinite-uploads' ); ?></strong> <?php _e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' ); ?>
+				<a class="button button-primary" href="<?php echo $this->admin->settings_url(); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
+			</p>
+
+		</div>
+		<?php
+	}
+
 	/**
 	 * Tear down the hooks, url filtering etc for Infinite Uploads
 	 */
@@ -173,14 +191,6 @@ class Infinite_Uploads {
 		remove_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
 		remove_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		remove_filter( 'wp_handle_sideload_prefilter', [ $this, 'filter_sideload_move_temp_file_to_s3' ] );
-	}
-
-	public function get_original_upload_dir() {
-		if ( empty( $this->original_upload_dir ) ) {
-			$this->original_upload_dir = wp_get_upload_dir();
-		}
-
-		return $this->original_upload_dir;
 	}
 
 	public function get_sync_stats() {
