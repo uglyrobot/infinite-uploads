@@ -4,7 +4,6 @@ class Infinite_Uploads {
 
 	private static $instance;
 	public $original_upload_dir;
-	public $original_file;
 	public $bucket;
 	public $bucket_url;
 	public $capability;
@@ -39,14 +38,6 @@ class Infinite_Uploads {
 		$this->admin = Infinite_Uploads_Admin::get_instance();
 		$this->api   = Infinite_Uploads_Api_Handler::get_instance();
 
-		// don't register all this until we've enabled rewriting.
-		if ( ! infinite_uploads_enabled() ) {
-			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
-			add_action( $hook, [ $this, 'setup_notice' ] );
-
-			return true;
-		}
-
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
 		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
@@ -66,7 +57,18 @@ class Infinite_Uploads {
 				//];
 				return $params;
 			} );
-		} else { //if we don't have cloud data we have to disable everything to avoid errors
+		}
+
+		// don't register all this until we've enabled rewriting.
+		if ( ! infinite_uploads_enabled() ) {
+			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
+			add_action( $hook, [ $this, 'setup_notice' ] );
+
+			return true;
+		}
+
+		//if we don't have auth info from api we have to disable everything to avoid errors
+		if ( empty( $this->key ) ) {
 			return true;
 		}
 
