@@ -279,9 +279,9 @@ class Infinite_Uploads_Stream_Wrapper {
 	 * @param string $key    S3 path or prefix (key).
 	 */
 	private function debug( $action, $key ) {
-		if ( defined( 'INFINITE_UPLOADS_DEBUG' ) && INFINITE_UPLOADS_DEBUG ) {
+		if ( defined( 'INFINITE_UPLOADS_SW_DEBUG' ) && INFINITE_UPLOADS_SW_DEBUG ) {
 			$log = "InfUpl Debug: $action $key";
-			if ( defined( 'INFINITE_UPLOADS_DEBUG_BACKTRACE' ) && INFINITE_UPLOADS_DEBUG_BACKTRACE ) {
+			if ( defined( 'INFINITE_UPLOADS_SW_DEBUG_BACKTRACE' ) && INFINITE_UPLOADS_SW_DEBUG_BACKTRACE ) {
 				$error = new Error;
 				$log   .= PHP_EOL . $error->getTraceAsString();
 			}
@@ -503,7 +503,7 @@ class Infinite_Uploads_Stream_Wrapper {
 		return $this->boolCall( function () use ( $params ) {
 			$this->debug( 'PutObject', $params['Key'] );
 			$bool = (bool) $this->getClient()->putObject( $params );
-
+			$this->debug( 'PutObject', $params['Key'] );
 			/**
 			 * Action when a new object has been uploaded to s3.
 			 *
@@ -675,10 +675,11 @@ class Infinite_Uploads_Stream_Wrapper {
 			} catch ( S3Exception $e ) {
 				// Maybe this isn't an actual key, but a prefix. Do a prefix
 				// listing of objects to determine.
-				$this->debug( 'ListObjects (max 1)', rtrim( $parts['Key'], '/' ) . '/' );
+				$prefix = rtrim( $parts['Key'], '/' ) . '/';
+				$this->debug( 'ListObjects (max 1)', $prefix );
 				$result = $this->getClient()->listObjects( [
 					'Bucket'  => $parts['Bucket'],
-					'Prefix'  => rtrim( $parts['Key'], '/' ) . '/',
+					'Prefix'  => $prefix,
 					'MaxKeys' => 1,
 				] );
 				if ( ! $result['Contents'] && ! $result['CommonPrefixes'] ) {
@@ -866,7 +867,7 @@ class Infinite_Uploads_Stream_Wrapper {
 
 		return $this->boolCall( function () use ( $path ) {
 			$this->clearCacheKey( $path );
-			$this->debug( 'deleteObject', $this->withPath( $path ) );
+			$this->debug( 'deleteObject', $path );
 
 			$this->getClient()->deleteObject( $this->withPath( $path ) );
 

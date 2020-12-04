@@ -9,6 +9,7 @@ class Infinite_Uploads {
 	public $capability;
 	private $key;
 	private $secret;
+	private $region;
 	private $admin;
 	private $api;
 
@@ -76,6 +77,14 @@ class Infinite_Uploads {
 
 		$uploads_url = $this->get_original_upload_dir(); //prime the cached value before filtering
 		add_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
+
+		//block uploads if permissions are only read/delete
+		if ( ! $api_data->site->upload_writeable ) {
+			add_filter( 'pre-upload-ui', [ $this, 'blocked_uploads_header' ] );
+			add_filter( 'wp_handle_upload_prefilter', [ $this, 'block_uploads' ] );
+			add_filter( 'rest_pre_dispatch', [ $this, 'block_rest_upload' ], 10, 3 );
+			add_filter( 'wp_save_image_editor_file', '__return_false' );
+		}
 
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
@@ -161,7 +170,7 @@ class Infinite_Uploads {
 		}
 
 		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
-		$this->s3 = Aws\S3\S3Client::factory( $params );
+		$this->s3 = new Aws\S3\S3Client( $params );
 
 		return $this->s3;
 	}
@@ -379,18 +388,18 @@ class Infinite_Uploads {
 
 	public function filter_upload_dir( $dirs ) {
 
-		$dirs['path']    = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['path'] );
-		$dirs['basedir'] = str_replace( $dirs['basedir'], 'iu://' . $this->bucket, $dirs['basedir'] );
+		$dirs['path']    = str_replace( $dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['path'] );
+		$dirs['basedir'] = str_replace( $dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['basedir'] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 
 			if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
-				$dirs['url']     = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['path'] );
-				$dirs['baseurl'] = str_replace( 'iu://' . $this->bucket, $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['basedir'] );
+				$dirs['url']     = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['path'] );
+				$dirs['baseurl'] = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['basedir'] );
 
 			} else {
-				$dirs['url']     = str_replace( 'iu://' . $this->bucket, $this->get_s3_url(), $dirs['path'] );
-				$dirs['baseurl'] = str_replace( 'iu://' . $this->bucket, $this->get_s3_url(), $dirs['basedir'] );
+				$dirs['url']     = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $this->get_s3_url(), $dirs['path'] );
+				$dirs['baseurl'] = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $this->get_s3_url(), $dirs['basedir'] );
 			}
 		}
 
@@ -399,7 +408,7 @@ class Infinite_Uploads {
 
 	public function get_s3_url() {
 		if ( $this->bucket_url ) {
-			return $this->bucket_url;
+			return 'https://' . $this->bucket_url;
 		}
 
 		$bucket = strtok( $this->bucket, '/' );
@@ -443,8 +452,59 @@ class Infinite_Uploads {
 		return $bucket = strtok( $this->bucket, '/' );
 	}
 
+	/**
+	 * Ge the S3 bucket region
+	 *
+	 * @return string
+	 */
 	public function get_s3_bucket_region() {
 		return $this->region;
+	}
+
+	/**
+	 * Show error on uploads screen when readonly.
+	 */
+	public function blocked_uploads_header() {
+		if ( current_user_can( $this->capability ) ) {
+			?><div class="notice notice-error"><p><?php printf( __( "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>.", 'infinite-uploads' ), $this->admin->settings_url() ); ?></p></div><?php
+		} else {
+			?><div class="notice notice-error"><p><?php _e( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
+		}
+	}
+
+	/**
+	 * Return an error to display before trying to save newly uploaded media.
+	 *
+	 * @param $file
+	 *
+	 * @return array
+	 */
+	public function block_uploads( $file ) {
+		$file['error'] = __( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' );
+
+		return $file;
+	}
+
+	/**
+	 * Block editing media in Gutenberg WP 5.5+ block.
+	 *
+	 * @param $result null
+	 * @param WP_REST_Server $server
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error
+	 */
+	function block_rest_upload( $result, $server, $request ) {
+		//if route matches media edit return error
+		if ( preg_match( '%/wp/v2/media/\d+/edit%', $request->get_route() ) ) {
+			$result = new WP_Error(
+				'rest_cant_upload',
+				__( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		return $result;
 	}
 
 	public function filter_editors( $editors ) {
