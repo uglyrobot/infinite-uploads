@@ -436,6 +436,20 @@ class Infinite_Uploads_Api_Handler {
 	}
 
 	/**
+	 * Purge a list of urls from the CDN. We don't need to wait for a response from this so make it async.
+	 *
+	 * @param array $urls
+	 *
+	 * @return bool
+	 */
+	public function purge( $urls ) {
+		return $this->call( "site/" . $this->get_site_id() . "/purge", [ 'urls' => $urls ], 'POST', [
+			'timeout'   => 0.01,
+			'blocking'  => false,
+		] );
+	}
+
+	/**
 	 * Disconnect from API
 	 */
 	public function disconnect() {

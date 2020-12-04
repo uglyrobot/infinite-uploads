@@ -427,20 +427,33 @@ class Infinite_Uploads {
 	 * up the s3 files when an attachment is removed, and leave WordPress to try
 	 * a failed attempt at mangling the iu:// urls.
 	 *
+	 * UPDATE deletes seem to get issued properly now, only use this for purging from CDN.
+	 *
 	 * @param $post_id
 	 */
 	public function delete_attachment_files( $post_id ) {
 		$meta = wp_get_attachment_metadata( $post_id );
 		$file = get_attached_file( $post_id );
 
+		$to_purge = [];
 		if ( ! empty( $meta['sizes'] ) ) {
 			foreach ( $meta['sizes'] as $sizeinfo ) {
 				$intermediate_file = str_replace( basename( $file ), $sizeinfo['file'], $file );
-				wp_delete_file( $intermediate_file );
+				//wp_delete_file( $intermediate_file );
+				$to_purge[] = $intermediate_file;
 			}
 		}
 
-		wp_delete_file( $file );
+		//wp_delete_file( $file );
+		$to_purge[] = $file;
+
+		$dirs = wp_get_upload_dir();
+		foreach( $to_purge as $key => $file ) {
+			$to_purge[$key] = str_replace( $dirs['basedir'], $dirs['baseurl'], $file );
+		}
+
+		//purge these from CDN cache
+		$this->api->purge( $to_purge );
 	}
 
 	/**
