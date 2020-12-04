@@ -104,7 +104,7 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file', [ $this, 'after_export_personal_data', 11 ] );
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
-		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
+		if ( ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) && $api_data->site->cdn_enabled ) {
 			new Infinite_Uploads_Rewriter( $uploads_url['baseurl'], $this->bucket_url, $api_data->site->cname );
 		}
 	}
