@@ -595,11 +595,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Enable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function enable( $args, $assoc_args ) {
-		if ( is_multisite() ) {
-			update_site_option( 'iup_enabled', true );
-		} else {
-			update_option( 'iup_enabled', true, true );
-		}
+		Infinite_Uploads::get_instance()->toggle_cloud( true );
 
 		WP_CLI::success( 'Media URL rewriting enabled.' );
 	}
@@ -608,11 +604,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Disable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function disable( $args, $assoc_args ) {
-		if ( is_multisite() ) {
-			update_site_option( 'iup_enabled', false );
-		} else {
-			update_option( 'iup_enabled', false, true );
-		}
+		Infinite_Uploads::get_instance()->toggle_cloud( false );
 
 		WP_CLI::success( 'Media URL rewriting disabled.' );
 	}

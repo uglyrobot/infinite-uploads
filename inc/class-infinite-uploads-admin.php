@@ -383,11 +383,7 @@ class Infinite_Uploads_Admin {
 		}
 
 		$enabled = (bool) $_REQUEST['enabled'];
-		if ( is_multisite() ) {
-			update_site_option( 'iup_enabled', $enabled );
-		} else {
-			update_option( 'iup_enabled', $enabled, true );
-		}
+		$this->iup_instance->toggle_cloud( $enabled );
 
 		wp_send_json_success();
 	}

@@ -459,12 +459,8 @@ class Infinite_Uploads_Api_Handler {
 		}
 
 		//logout and disable
-		$this->api->set_token( '' ); //logout
-		if ( is_multisite() ) {
-			update_site_option( 'iup_enabled', false );
-		} else {
-			update_option( 'iup_enabled', false, true );
-		}
+		$this->set_token( '' ); //logout
+		$this->iup_instance->toggle_cloud( false );
 		delete_site_option( 'iup_files_scanned' );
 	}
 }

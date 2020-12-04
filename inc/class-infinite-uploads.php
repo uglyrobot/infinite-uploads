@@ -101,6 +101,19 @@ class Infinite_Uploads {
 	}
 
 	/**
+	 * Enable or disable cloud stream wrapper and url rewriting.
+	 *
+	 * @param bool $enabled
+	 */
+	public function toggle_cloud( $enabled ) {
+		if ( is_multisite() ) {
+			update_site_option( 'iup_enabled', $enabled );
+		} else {
+			update_option( 'iup_enabled', $enabled, true );
+		}
+	}
+
+	/**
 	 * Register the stream wrapper for s3
 	 */
 	public function register_stream_wrapper() {
