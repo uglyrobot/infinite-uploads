@@ -15,7 +15,7 @@ class Infinite_Uploads_Api_Handler {
 	 *
 	 * @var string (URL)
 	 */
-	protected $server_root = 'https://infiniteuploads.com/';
+	public $server_root = 'https://infiniteuploads.com/';
 
 	/**
 	 * Path to the REST API on the server.

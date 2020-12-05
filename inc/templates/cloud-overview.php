@@ -29,7 +29,7 @@
 		<div class="row justify-content-center mb-1">
 			<div class="col-4 text-center">
 				<p><?php _e( 'Visit the Infinite Uploads site to view, manage, or change your plan.', 'infinite-uploads' ); ?></p>
-				<a class="btn btn-info btn-lg" id="" href="https://infiniteuploads.com/?register=<?php echo urlencode( $this->settings_url() ); ?>" role="button"><?php _e( 'Account Management', 'infinite-uploads' ); ?></a>
+				<a class="btn btn-info btn-lg" id="" href="<?php echo $this->api_url( '/account/' ); ?>" role="button"><?php _e( 'Account Management', 'infinite-uploads' ); ?></a>
 			</div>
 		</div>
 	</div>

@@ -45,55 +45,63 @@ msgstr ""
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:436, inc/class-infinite-uploads.php:204, inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:453, inc/class-infinite-uploads.php:204, inc/templates/connect.php:49
 msgid "Connect"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:434
+#: inc/class-infinite-uploads-admin.php:451
 msgid "Settings"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:438, inc/class-infinite-uploads-admin.php:593
+#: inc/class-infinite-uploads-admin.php:455, inc/class-infinite-uploads-admin.php:627
 msgid "Support"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:450, inc/class-infinite-uploads-admin.php:451
+#: inc/class-infinite-uploads-admin.php:467, inc/class-infinite-uploads-admin.php:468
 msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:473
-msgid "Are you sure you want to leave this tab? The current sync or download action will be canceled and you will need to continue it where it left off."
+#: inc/class-infinite-uploads-admin.php:491
+msgid "Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:474
+#: inc/class-infinite-uploads-admin.php:492
 msgid "Unknown Error"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:522
+#: inc/class-infinite-uploads-admin.php:550
 msgid "United States"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:523
+#: inc/class-infinite-uploads-admin.php:551
 msgid "Europe"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:588
+#: inc/class-infinite-uploads-admin.php:577
+msgid "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:573
+msgid "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
+msgstr ""
+
+#: inc/class-infinite-uploads-admin.php:622
 msgid "The Cloud by Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:594
+#: inc/class-infinite-uploads-admin.php:628
 msgid "Terms of Service"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:595
+#: inc/class-infinite-uploads-admin.php:629
 msgid "Privacy Policy"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:600
+#: inc/class-infinite-uploads-admin.php:634
 msgid "Twitter"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:601
+#: inc/class-infinite-uploads-admin.php:635
 msgid "Facebook"
 msgstr ""
 
@@ -237,11 +245,11 @@ msgstr ""
 msgid "This Site's Cloud Bytes / Files"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:18, inc/templates/settings.php:34
+#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:22, inc/templates/settings.php:38
 msgid "Recalculated every 24 hours"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:23, inc/templates/settings.php:38
+#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:27, inc/templates/settings.php:42
 msgid "%s / %s"
 msgstr ""
 
@@ -281,7 +289,7 @@ msgstr ""
 msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
 msgstr ""
 
-#: inc/templates/modal-delete.php:5, inc/templates/settings.php:77
+#: inc/templates/modal-delete.php:5, inc/templates/settings.php:81
 msgid "Free Up Local Storage"
 msgstr ""
 
@@ -401,112 +409,108 @@ msgstr ""
 msgid "Includes usage data for all connected sites"
 msgstr ""
 
-#: inc/templates/settings.php:6
+#: inc/templates/settings.php:9
 msgid "Refresh account data"
 msgstr ""
 
-#: inc/templates/settings.php:6
+#: inc/templates/settings.php:10
 msgid "Updated %s ago"
 msgstr ""
 
-#: inc/templates/settings.php:13
+#: inc/templates/settings.php:17
 msgid "Infinite Uploads Plan"
 msgstr ""
 
-#: inc/templates/settings.php:14
+#: inc/templates/settings.php:18
 msgid "Your current Infinite Uploads plan and storage."
 msgstr ""
 
-#: inc/templates/settings.php:18, inc/templates/settings.php:34
+#: inc/templates/settings.php:22, inc/templates/settings.php:38
 msgid "Used / Available"
 msgstr ""
 
-#: inc/templates/settings.php:19
+#: inc/templates/settings.php:23
 msgid "Need more?"
 msgstr ""
 
-#: inc/templates/settings.php:19
+#: inc/templates/settings.php:23
 msgid "Switch to a new plan."
 msgstr ""
 
-#: inc/templates/settings.php:29
+#: inc/templates/settings.php:33
 msgid "CDN Bandwidth"
 msgstr ""
 
-#: inc/templates/settings.php:30
+#: inc/templates/settings.php:34
 msgid "Infinite Uploads includes allotted bandwidth for CDN delivery of your files."
 msgstr ""
 
-#: inc/templates/settings.php:45
+#: inc/templates/settings.php:49
 msgid "CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:46
+#: inc/templates/settings.php:50
 msgid "Your uploads are served from this CDN url via 45 edge locations around the world."
 msgstr ""
 
-#: inc/templates/settings.php:50
+#: inc/templates/settings.php:54
 msgid "Current CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:51
+#: inc/templates/settings.php:55
 msgid "Use your own domain!"
 msgstr ""
 
-#: inc/templates/settings.php:51
+#: inc/templates/settings.php:55
 msgid "Upgrade to a business plan."
 msgstr ""
 
-#: inc/templates/settings.php:61
+#: inc/templates/settings.php:65
 msgid "Storage Region"
 msgstr ""
 
-#: inc/templates/settings.php:62
+#: inc/templates/settings.php:66
 msgid "The location of our servers storing your uploads."
 msgstr ""
 
-#: inc/templates/settings.php:66
+#: inc/templates/settings.php:70
 msgid "Region"
 msgstr ""
 
-#: inc/templates/settings.php:66
+#: inc/templates/settings.php:70
 msgid "Region can only be selected when first connecting your site."
 msgstr ""
 
-#: inc/templates/settings.php:78
+#: inc/templates/settings.php:82
 msgid "There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space."
 msgstr ""
 
-#: inc/templates/settings.php:82
+#: inc/templates/settings.php:86
 msgid "This saves space and improves server performance."
 msgstr ""
 
-#: inc/templates/settings.php:86
+#: inc/templates/settings.php:90
 msgid "Delete"
 msgstr ""
 
-#: inc/templates/settings.php:87
+#: inc/templates/settings.php:91
 msgid "%s / %s deletable files"
 msgstr ""
 
-#: inc/templates/settings.php:95
+#: inc/templates/settings.php:99
 msgid "Import & Disconnect"
 msgstr ""
 
-#: inc/templates/settings.php:96
-msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com."
-msgstr ""
-
 #: inc/templates/settings.php:100
-msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
+msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href=\"%s\">account management</a>."
 msgstr ""
 
 #: inc/templates/settings.php:104
-msgid "Disconnect"
+msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/settings.php:105
-msgid "%s / %s files to Download"
+#: inc/templates/settings.php:108
+msgid "Disconnect"
 msgstr ""
 
 #: inc/templates/status-icon.php:2

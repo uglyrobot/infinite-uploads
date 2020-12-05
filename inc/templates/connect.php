@@ -39,13 +39,13 @@
 		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col-2 text-center">
-				<form method="post" action="https://one.wordpress.test/smart-pricing/">
+				<form method="post" action="<?php echo $this->api_url( '/smart-pricing/' ); ?>">
 					<input type="hidden" name="action" value="iup_connect">
 					<input type="hidden" name="site_id" value="<?php echo esc_attr( $this->api->get_site_id() ); ?>">
 					<input type="hidden" name="domain" value="<?php echo esc_url( network_site_url() ); ?>">
 					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $this->settings_url() ); ?>">
-					<input type="hidden" name="bytes" value="<?php echo $to_sync->size; ?>">
-					<input type="hidden" name="files" value="<?php echo $to_sync->files; ?>">
+					<input type="hidden" name="bytes" value="<?php echo esc_attr( $to_sync->size ); ?>">
+					<input type="hidden" name="files" value="<?php echo esc_attr( $to_sync->files ); ?>">
 					<button class="btn btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'infinite-uploads' ); ?></button>
 
 				</form>

@@ -406,6 +406,23 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
+	 * Get a url to the public Infinite Uploads site.
+	 *
+	 * @param string $path Optional path on the site.
+	 *
+	 * @return Infinite_Uploads_Api_Handler|string
+	 */
+	function api_url( $path = '' ) {
+		$url = $this->api->server_root;
+
+		if ( $path && is_string( $path ) ) {
+			$url .= '/' . ltrim( $path, '/' );
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Identical to WP core size_format() function except it returns "0 GB" instead of false on failure.
 	 *
 	 * @param int|string $bytes    Number of bytes. Note max integer size for integers.
@@ -435,7 +452,7 @@ class Infinite_Uploads_Admin {
 		} else {
 			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
 		}
-		$custom_links['support'] = '<a href="https://infiniteuploads.com/support/">' . __( 'Support', 'infinite-uploads' ) . '</a>';
+		$custom_links['support'] = '<a href="'.$this->api_url( '/support/' ).'">' . __( 'Support', 'infinite-uploads' ) . '</a>';
 
 
 		// Adds the links to the beginning of the array.
@@ -551,6 +568,16 @@ class Infinite_Uploads_Admin {
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
 			</h1>
 
+			<?php if ( ! $api_data->site->cdn_enabled ) { ?>
+			<div class="alert alert-danger mt-1" role="alert">
+				<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+			</div>
+			<?php } elseif ( ! $api_data->site->upload_writeable ) { ?>
+			<div class="alert alert-danger mt-1" role="alert">
+				<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+			</div>
+			<?php } ?>
+
 			<?php
 			if ( $this->api->has_token() && $api_data ) {
 				if ( ! $api_data->stats->site->files ) {
@@ -597,9 +624,9 @@ class Infinite_Uploads_Admin {
 			</div>
 			<div class="row mt-3">
 				<div class="col-sm text-center text-muted">
-					<a href="https://infiniteuploads.com/support/" class="text-muted"><?php _e( "Support", 'infinite-uploads' ); ?></a> |
-					<a href="https://infiniteuploads.com/terms-of-service/" class="text-muted"><?php _e( "Terms of Service", 'infinite-uploads' ); ?></a> |
-					<a href="https://infiniteuploads.com/privacy/" class="text-muted"><?php _e( "Privacy Policy", 'infinite-uploads' ); ?></a>
+					<a href="<?php echo $this->api_url( '/support/' ); ?>" class="text-muted"><?php _e( "Support", 'infinite-uploads' ); ?></a> |
+					<a href="<?php echo $this->api_url( '/terms-of-service/' ); ?>" class="text-muted"><?php _e( "Terms of Service", 'infinite-uploads' ); ?></a> |
+					<a href="<?php echo $this->api_url( '/privacy/' ); ?>" class="text-muted"><?php _e( "Privacy Policy", 'infinite-uploads' ); ?></a>
 				</div>
 			</div>
 			<div class="row mt-3">

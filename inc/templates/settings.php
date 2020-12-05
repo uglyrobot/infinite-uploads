@@ -6,7 +6,7 @@
 				<div class="spinner-grow spinner-grow-sm text-secondary text-hide" role="status">
 				  <span class="sr-only">Refreshing...</span>
 				</div>
-				<span class="dashicons dashicons-update-alt" role="button" data-target="<?php echo esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ); ?>" data-toggle="tooltip" title="<?php esc_attr_e( 'Refresh account data', 'infinite-uploads' ); ?>"></span>
+				<span class="dashicons dashicons-update-alt mr-1" role="button" data-target="<?php echo esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ); ?>" data-toggle="tooltip" title="<?php esc_attr_e( 'Refresh account data', 'infinite-uploads' ); ?>"></span>
 				<small><?php printf( __( 'Updated %s ago', 'infinite-uploads' ), human_time_diff( $api_data->refreshed ) ); ?></small>
 			</span>
 		</div>
@@ -97,7 +97,7 @@
 		<div class="row justify-content-center">
 			<div class="col">
 				<h5><?php _e( 'Import & Disconnect', 'infinite-uploads' ); ?></h5>
-				<p class="lead"><?php _e( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit infiniteuploads.com.', 'infinite-uploads' ); ?></p>
+				<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s">account management</a>.', 'infinite-uploads' ), $this->api_url( '/account/' ) ); ?></p>
 			</div>
 			<div class="col mt-4">
 				<div class="row text-center mb-3">
@@ -106,7 +106,6 @@
 				<div class="row justify-content-center">
 					<div class="col-4 text-center">
 						<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'infinite-uploads' ); ?></button>
-						<!--<p><?php printf( __( '%s / %s files to Download', 'infinite-uploads' ), '1.21 GB', '1,213' ); ?></p>-->
 					</div>
 				</div>
 			</div>
