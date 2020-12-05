@@ -469,14 +469,20 @@ class Infinite_Uploads_Admin {
 		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 
-		$types = $this->iup_instance->get_filetypes( true );
-		wp_localize_script( 'iup-js', 'local_types', $types );
+		$data = [];
+		$data['strings'] = [
+			'leave_confirm' => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
+			'ajax_error' => __( 'Unknown Error', 'infinite-uploads' ),
+		];
+
+		$data['local_types'] = $this->iup_instance->get_filetypes( true );
 
 		$api_data = $this->api->get_site_data();
 		if ( $this->api->has_token() && $api_data ) {
-			$cloud_types = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
-			wp_localize_script( 'iup-js', 'cloud_types', $cloud_types );
+			$data['cloud_types'] = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
 		}
+
+		wp_localize_script( 'iup-js', 'iup_data', $data );
 	}
 
 	/**
@@ -505,6 +511,16 @@ class Infinite_Uploads_Admin {
 				wp_safe_redirect( $this->settings_url() );
 			}
 		}
+
+		if ( isset( $_GET['clear'] ) ) {
+			delete_site_option( 'iup_files_scanned' );
+			wp_safe_redirect( $this->settings_url() );
+		}
+
+		if ( isset( $_GET['refresh'] ) ) {
+			$this->api->get_site_data( true );
+			wp_safe_redirect( $this->settings_url() );
+		}
 	}
 
 	/**
@@ -521,10 +537,6 @@ class Infinite_Uploads_Admin {
 		if ( $this->auth_error ) {
 			?>
 			<div class="notice notice-error"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
-		}
-
-		if ( isset( $_GET['clear'] ) ) {
-			delete_site_option( 'iup_files_scanned' );
 		}
 
 		$stats       = $this->iup_instance->get_sync_stats();

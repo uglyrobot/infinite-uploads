@@ -28,7 +28,7 @@ jQuery(document).ready(function ($) {
       }
     }, 'json').fail(function () {
       $('#scan-modal').modal('hide');
-      $('#iup-error p').text("Unknown Error");
+      $('#iup-error p').text(iup_data.strings.ajax_error);
       $('#iup-error p').show();
     });
   };
@@ -65,7 +65,7 @@ jQuery(document).ready(function ($) {
     }, 'json')
       .fail(function () {
         $('#scan-remote-modal').modal('hide');
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error p').text(iup_data.strings.ajax_error);
         $('#iup-error p').show();
       });
   };
@@ -111,7 +111,7 @@ jQuery(document).ready(function ($) {
     }, 'json')
       .fail(function () {
         $('#upload-modal').modal('hide');
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error p').text(iup_data.strings.ajax_error);
         $('#iup-error p').show();
       });
   };
@@ -150,7 +150,7 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error p').text(iup_data.strings.ajax_error);
         $('#iup-error p').show();
       });
   };
@@ -188,7 +188,7 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error p').text("Unknown Error");
+        $('#iup-error p').text(iup_data.strings.ajax_error);
         $('#iup-error p').show();
       });
   };
@@ -261,12 +261,19 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        $('#iup-error p').text("Unknown Ajax Error");
+        $('#iup-error p').text(iup_data.strings.ajax_error);
         $('#iup-error p').show();
         $('#iup-enable-spinner').addClass('text-hide');
         $('#iup-enable-button').show();
         $('#enable-modal').modal('hide');
       });
+  });
+
+  //refresh api data
+  $('.iup-refresh-icon .dashicons').on('click', function () {
+    $(this).hide();
+    $('.iup-refresh-icon .spinner-grow').removeClass('text-hide');
+    window.location = $(this).attr('data-target');
   });
 
   //Charts
@@ -293,7 +300,7 @@ jQuery(document).ready(function ($) {
 
       var config_local = {
         type: 'pie',
-        data: local_types,
+        data: iup_data.local_types,
         options: {
           responsive: true,
           legend: false,
@@ -309,7 +316,7 @@ jQuery(document).ready(function ($) {
             position: 'bottom',
             fontSize: 18,
             fontStyle: 'normal',
-            text: local_types.total
+            text: iup_data.local_types.total
           }
         }
       };
@@ -323,7 +330,7 @@ jQuery(document).ready(function ($) {
 
       var config_cloud = {
         type: 'pie',
-        data: cloud_types,
+        data: iup_data.cloud_types,
         options: {
           responsive: true,
           legend: false,
@@ -339,7 +346,7 @@ jQuery(document).ready(function ($) {
             position: 'bottom',
             fontSize: 18,
             fontStyle: 'normal',
-            text: cloud_types.total
+            text: iup_data.cloud_types.total
           }
         }
       };

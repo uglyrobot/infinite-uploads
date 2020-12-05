@@ -1,5 +1,16 @@
 <div class="card">
-	<div class="card-header h5"><?php _e( 'Account & Settings', 'infinite-uploads' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Includes usage data for all connected sites', 'infinite-uploads' ); ?>"></span></div>
+	<div class="card-header h5">
+		<div class="d-flex align-items-center">
+			<h5 class="m-0 mr-auto p-0"><?php _e( 'Account & Settings', 'infinite-uploads' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Includes usage data for all connected sites', 'infinite-uploads' ); ?>"></span></h5>
+			<span class="m-0 p-0 text-muted iup-refresh-icon">
+				<div class="spinner-grow spinner-grow-sm text-secondary text-hide" role="status">
+				  <span class="sr-only">Refreshing...</span>
+				</div>
+				<span class="dashicons dashicons-update-alt" role="button" data-target="<?php echo esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ); ?>" data-toggle="tooltip" title="<?php esc_attr_e( 'Refresh account data', 'infinite-uploads' ); ?>"></span>
+				<small><?php printf( __( 'Updated %s ago', 'infinite-uploads' ), human_time_diff( $api_data->refreshed ) ); ?></small>
+			</span>
+		</div>
+	</div>
 	<div class="card-body p-5">
 		<div class="row justify-content-center mb-5">
 			<div class="col">
