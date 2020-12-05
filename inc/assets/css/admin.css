@@ -144,3 +144,7 @@ p.lead {
 .iup-refresh-icon .dashicons {
   font-size: 25px;
 }
+
+.text-warning {
+  color: #EE7C1E !important;
+}
