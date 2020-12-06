@@ -46,8 +46,8 @@ class Infinite_Uploads_Admin {
 	public function ajax_filelist() {
 
 		// check caps
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_scan' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$path = $this->iup_instance->get_original_upload_dir();
@@ -64,8 +64,9 @@ class Infinite_Uploads_Admin {
 		$this_file_count = count( $filelist->file_list );
 		$remaining_dirs  = $filelist->paths_left;
 		$is_done         = $filelist->is_done;
+		$nonce           = wp_create_nonce( 'iup_scan' );
 
-		$data  = compact( 'this_file_count', 'is_done', 'remaining_dirs' );
+		$data  = compact( 'this_file_count', 'is_done', 'remaining_dirs', 'nonce' );
 		$stats = $this->iup_instance->get_sync_stats();
 		if ( $stats ) {
 			$data = array_merge( $data, $stats );
@@ -78,8 +79,8 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		// check caps
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_scan' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$s3 = $this->iup_instance->s3();
@@ -156,7 +157,9 @@ class Infinite_Uploads_Admin {
 				update_site_option( 'iup_files_scanned', $progress );
 			}
 
-			$data  = compact( 'file_count', 'req_count', 'is_done', 'next_token', 'timer' );
+
+			$nonce = wp_create_nonce( 'iup_scan' );
+			$data  = compact( 'file_count', 'req_count', 'is_done', 'next_token', 'timer', 'nonce' );
 			$stats = $this->iup_instance->get_sync_stats();
 			if ( $stats ) {
 				$data = array_merge( $data, $stats );
@@ -171,8 +174,8 @@ class Infinite_Uploads_Admin {
 	public function ajax_sync() {
 		global $wpdb;
 
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_sync' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -260,7 +263,8 @@ class Infinite_Uploads_Admin {
 					update_site_option( 'iup_files_scanned', $progress );
 				}
 
-				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors', 'permanent_errors' ), $this->iup_instance->get_sync_stats() ) );
+				$nonce = wp_create_nonce( 'iup_sync' );
+				wp_send_json_success( array_merge( compact( 'uploaded', 'is_done', 'errors', 'permanent_errors', 'nonce' ), $this->iup_instance->get_sync_stats() ) );
 			}
 		}
 	}
@@ -268,8 +272,8 @@ class Infinite_Uploads_Admin {
 	public function ajax_delete() {
 		global $wpdb;
 
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_delete' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$deleted = 0;
@@ -295,8 +299,8 @@ class Infinite_Uploads_Admin {
 	public function ajax_download() {
 		global $wpdb;
 
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_download' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -369,7 +373,8 @@ class Infinite_Uploads_Admin {
 					$this->api->disconnect();
 				}
 
-				wp_send_json_success( array_merge( compact( 'downloaded', 'is_done', 'errors' ), $this->iup_instance->get_sync_stats() ) );
+				$nonce = wp_create_nonce( 'iup_download' );
+				wp_send_json_success( array_merge( compact( 'downloaded', 'is_done', 'errors', 'nonce' ), $this->iup_instance->get_sync_stats() ) );
 			}
 		}
 	}
@@ -378,14 +383,51 @@ class Infinite_Uploads_Admin {
 	 * Enable or disable url rewriting
 	 */
 	public function ajax_toggle() {
-		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_send_json_error();
+		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_toggle' ) ) {
+			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$enabled = (bool) $_REQUEST['enabled'];
 		$this->iup_instance->toggle_cloud( $enabled );
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Identical to WP core size_format() function except it returns "0 GB" instead of false on failure.
+	 *
+	 * @param int|string $bytes    Number of bytes. Note max integer size for integers.
+	 * @param int        $decimals Optional. Precision of number of decimal places. Default 0.
+	 *
+	 * @return string Number string on success.
+	 */
+	function size_format_zero( $bytes, $decimals = 0 ) {
+		if ( $bytes > 0 ) {
+			return size_format( $bytes, $decimals );
+		} else {
+			return '0 GB';
+		}
+	}
+
+	/**
+	 * Adds settings links to plugin row.
+	 */
+	function plugins_list_links( $actions ) {
+		// Build and escape the URL.
+		$url = esc_url( $this->settings_url() );
+
+		// Create the link.
+		$custom_links = [];
+		if ( $this->api->has_token() ) {
+			$custom_links['settings'] = "<a href='$url'>" . __( 'Settings', 'infinite-uploads' ) . '</a>';
+		} else {
+			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
+		}
+		$custom_links['support'] = '<a href="' . $this->api_url( '/support/' ) . '">' . __( 'Support', 'infinite-uploads' ) . '</a>';
+
+
+		// Adds the links to the beginning of the array.
+		return array_merge( $custom_links, $actions );
 	}
 
 	/**
@@ -423,43 +465,6 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
-	 * Identical to WP core size_format() function except it returns "0 GB" instead of false on failure.
-	 *
-	 * @param int|string $bytes    Number of bytes. Note max integer size for integers.
-	 * @param int        $decimals Optional. Precision of number of decimal places. Default 0.
-	 *
-	 * @return string Number string on success.
-	 */
-	function size_format_zero( $bytes, $decimals = 0 ) {
-		if ( $bytes > 0 ) {
-			return size_format( $bytes, $decimals );
-		} else {
-			return '0 GB';
-		}
-	}
-
-	/**
-	 * Adds settings links to plugin row.
-	 */
-	function plugins_list_links( $actions ) {
-		// Build and escape the URL.
-		$url = esc_url( $this->settings_url() );
-
-		// Create the link.
-		$custom_links = [];
-		if ( $this->api->has_token() ) {
-			$custom_links['settings'] = "<a href='$url'>" . __( 'Settings', 'infinite-uploads' ) . '</a>';
-		} else {
-			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
-		}
-		$custom_links['support'] = '<a href="'.$this->api_url( '/support/' ).'">' . __( 'Support', 'infinite-uploads' ) . '</a>';
-
-
-		// Adds the links to the beginning of the array.
-		return array_merge( $custom_links, $actions );
-	}
-
-	/**
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
@@ -486,10 +491,10 @@ class Infinite_Uploads_Admin {
 		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
 
-		$data = [];
+		$data            = [];
 		$data['strings'] = [
 			'leave_confirm' => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
-			'ajax_error' => __( 'Unknown Error', 'infinite-uploads' ),
+			'ajax_error'    => __( 'Unknown Error', 'infinite-uploads' ),
 		];
 
 		$data['local_types'] = $this->iup_instance->get_filetypes( true );
@@ -498,6 +503,14 @@ class Infinite_Uploads_Admin {
 		if ( $this->api->has_token() && $api_data ) {
 			$data['cloud_types'] = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
 		}
+
+		$data['nonce'] = [
+			'scan'     => wp_create_nonce( 'iup_scan' ),
+			'sync'     => wp_create_nonce( 'iup_sync' ),
+			'delete'   => wp_create_nonce( 'iup_delete' ),
+			'download' => wp_create_nonce( 'iup_download' ),
+			'toggle'   => wp_create_nonce( 'iup_toggle' ),
+		];
 
 		wp_localize_script( 'iup-js', 'iup_data', $data );
 	}
@@ -520,6 +533,10 @@ class Infinite_Uploads_Admin {
 	 * Checks for temp_token in url and processes auth if present.
 	 */
 	function intercept_auth() {
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_die( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+		}
+
 		if ( ! empty( $_GET['temp_token'] ) ) {
 			$result = $this->api->authorize( $_GET['temp_token'] );
 			if ( ! $result ) {
@@ -551,31 +568,36 @@ class Infinite_Uploads_Admin {
 			'EU' => __( 'Europe', 'infinite-uploads' ),
 		];
 
-		if ( $this->auth_error ) {
-			?>
-			<div class="notice notice-error"><p><?php echo esc_html( $this->auth_error ); ?></p></div><?php
-		}
-
-		$stats       = $this->iup_instance->get_sync_stats();
-		$api_data    = $this->api->get_site_data();
+		$stats    = $this->iup_instance->get_sync_stats();
+		$api_data = $this->api->get_site_data();
 		//var_dump($api_data);
 		//var_dump($stats);
 		?>
-		<div id="iup-error" class="notice notice-error" style="display: none;"><p></p></div>
 		<div id="container" class="wrap iup-background">
 
 			<h1>
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
 			</h1>
 
+			<?php if ( $this->auth_error ) { ?>
+				<div class="alert alert-danger mt-1 alert-dismissible fade show" role="alert">
+					<?php echo esc_html( $this->auth_error ); ?>
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			<?php } ?>
+
+			<div id="iup-error" class="alert alert-danger mt-1" role="alert"></div>
+
 			<?php if ( ! $api_data->site->cdn_enabled ) { ?>
-			<div class="alert alert-danger mt-1" role="alert">
-				<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
-			</div>
+				<div class="alert alert-warning mt-1" role="alert">
+					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+				</div>
 			<?php } elseif ( ! $api_data->site->upload_writeable ) { ?>
-			<div class="alert alert-danger mt-1" role="alert">
-				<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
-			</div>
+				<div class="alert alert-warning mt-1" role="alert">
+					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+				</div>
 			<?php } ?>
 
 			<?php
@@ -616,26 +638,7 @@ class Infinite_Uploads_Admin {
 			}
 			?>
 		</div>
-		<div id="iup-footer" class="container mt-5">
-			<div class="row">
-				<div class="col-sm text-center text-muted">
-					<strong><?php _e( "The Cloud by Infinite Uploads", 'infinite-uploads' ); ?></strong>
-				</div>
-			</div>
-			<div class="row mt-3">
-				<div class="col-sm text-center text-muted">
-					<a href="<?php echo $this->api_url( '/support/' ); ?>" class="text-muted"><?php _e( "Support", 'infinite-uploads' ); ?></a> |
-					<a href="<?php echo $this->api_url( '/terms-of-service/' ); ?>" class="text-muted"><?php _e( "Terms of Service", 'infinite-uploads' ); ?></a> |
-					<a href="<?php echo $this->api_url( '/privacy/' ); ?>" class="text-muted"><?php _e( "Privacy Policy", 'infinite-uploads' ); ?></a>
-				</div>
-			</div>
-			<div class="row mt-3">
-				<div class="col-sm text-center text-muted">
-					<a href="#" class="text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Twitter', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-twitter"></span></a>
-					<a href="#" class="text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Facebook', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-facebook-alt"></span></a>
-				</div>
-			</div>
-		</div>
 		<?php
+		require_once( dirname( __FILE__ ) . '/templates/footer.php' );
 	}
 }

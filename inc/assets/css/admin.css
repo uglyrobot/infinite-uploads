@@ -147,4 +147,9 @@ p.lead {
 
 .text-warning {
   color: #EE7C1E !important;
+  font-weight: 500;
+}
+
+#iup-error {
+  display: none;
 }

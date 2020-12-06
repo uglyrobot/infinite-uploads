@@ -58,6 +58,13 @@ class Infinite_Uploads {
 				//];
 				return $params;
 			} );
+		} else { //if we don't have cloud data we have to disable everything to avoid errors
+			//turn of enabled flag
+			if ( infinite_uploads_enabled() ) {
+				$this->toggle_cloud( false );
+			}
+
+			return true;
 		}
 
 		// don't register all this until we've enabled rewriting.
