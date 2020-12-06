@@ -493,8 +493,9 @@ class Infinite_Uploads_Admin {
 
 		$data            = [];
 		$data['strings'] = [
-			'leave_confirm' => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
-			'ajax_error'    => __( 'Unknown Error', 'infinite-uploads' ),
+			'leave_confirm'      => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
+			'ajax_error'         => __( 'Unknown Error', 'infinite-uploads' ),
+			'leave_confirmation' => __( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
 		];
 
 		$data['local_types'] = $this->iup_instance->get_filetypes( true );

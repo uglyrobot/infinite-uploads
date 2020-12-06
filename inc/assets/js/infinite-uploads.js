@@ -2,18 +2,28 @@ jQuery(document).ready(function ($) {
   $('[data-toggle="tooltip"]').tooltip();
 
   var stopLoop = false;
+  var processingLoop = false;
+
+  //show a confirmation warning if leaving page during a bulk action
+  $(window).bind('beforeunload', function () {
+    if (processingLoop) {
+      return iup_data.strings.leave_confirmation;
+    }
+  });
 
   //show an error at top of main settings page
-  var showError = function(error_message) {
+  var showError = function (error_message) {
     $('#iup-error').text(error_message.substr(0, 200)).show();
-    $("html, body").animate({ scrollTop: 0 }, 1000);
+    $("html, body").animate({scrollTop: 0}, 1000);
   }
 
   var buildFilelist = function (remaining_dirs, nonce = '') {
     if (stopLoop) {
       stopLoop = false;
+      processingLoop = false;
       return false;
     }
+    processingLoop = true;
 
     var data = {"remaining_dirs": remaining_dirs};
     if ( nonce ) {
@@ -45,8 +55,10 @@ jQuery(document).ready(function ($) {
   var fetchRemoteFilelist = function (next_token, nonce = '') {
     if (stopLoop) {
       stopLoop = false;
+      processingLoop = false;
       return false;
     }
+    processingLoop = true;
 
     var data = {"next_token": next_token};
     if ( nonce ) {
@@ -85,8 +97,10 @@ jQuery(document).ready(function ($) {
   var syncFilelist = function (nonce = '') {
     if (stopLoop) {
       stopLoop = false;
+      processingLoop = false;
       return false;
     }
+    processingLoop = true;
 
     var data = {};
     if ( nonce ) {
@@ -164,8 +178,10 @@ jQuery(document).ready(function ($) {
   var downloadFiles = function (nonce = '') {
     if (stopLoop) {
       stopLoop = false;
+      processingLoop = false;
       return false;
     }
+    processingLoop = true;
 
     var data = {};
     if ( nonce ) {
@@ -212,6 +228,7 @@ jQuery(document).ready(function ($) {
     buildFilelist([]);
   }).on('hide.bs.modal', function () {
     stopLoop = true;
+    processingLoop = false;
   })
 
   //Compare to live
@@ -221,6 +238,7 @@ jQuery(document).ready(function ($) {
     fetchRemoteFilelist(null);
   }).on('hide.bs.modal', function () {
     stopLoop = true;
+    processingLoop = false;
   })
 
   //Sync
@@ -232,6 +250,7 @@ jQuery(document).ready(function ($) {
     syncFilelist();
   }).on('hide.bs.modal', function () {
     stopLoop = true;
+    processingLoop = false;
   })
 
   //Download
@@ -243,6 +262,7 @@ jQuery(document).ready(function ($) {
     downloadFiles();
   }).on('hide.bs.modal', function () {
     stopLoop = true;
+    processingLoop = false;
   })
 
   //Delete
