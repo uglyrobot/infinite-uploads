@@ -75,11 +75,6 @@ class Infinite_Uploads {
 			return true;
 		}
 
-		//if we don't have auth info from api we have to disable everything to avoid errors
-		if ( empty( $this->key ) ) {
-			return true;
-		}
-
 		$this->register_stream_wrapper();
 
 		$uploads_url = $this->get_original_upload_dir(); //prime the cached value before filtering
