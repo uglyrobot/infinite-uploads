@@ -19,15 +19,18 @@ class Infinite_Uploads_Admin {
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
 		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
 
-		add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
-		add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
-		add_action( 'wp_ajax_infinite-uploads-sync', [ &$this, 'ajax_sync' ] );
-		add_action( 'wp_ajax_infinite-uploads-delete', [ &$this, 'ajax_delete' ] );
-		add_action( 'wp_ajax_infinite-uploads-download', [ &$this, 'ajax_download' ] );
-		add_action( 'wp_ajax_infinite-uploads-toggle', [ &$this, 'ajax_toggle' ] );
+		if ( is_main_site() ) {
+			add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
+			add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
+			add_action( 'wp_ajax_infinite-uploads-sync', [ &$this, 'ajax_sync' ] );
+			add_action( 'wp_ajax_infinite-uploads-delete', [ &$this, 'ajax_delete' ] );
+			add_action( 'wp_ajax_infinite-uploads-download', [ &$this, 'ajax_download' ] );
+			add_action( 'wp_ajax_infinite-uploads-toggle', [ &$this, 'ajax_toggle' ] );
+		}
 	}
 
 	/**
@@ -468,16 +471,30 @@ class Infinite_Uploads_Admin {
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
-		$page = add_options_page(
-			__( 'Infinite Uploads', 'infinite-uploads' ),
-			__( 'Infinite Uploads', 'infinite-uploads' ),
-			'manage_options',
-			'infinite_uploads',
-			[
-				$this,
-				'settings_page',
-			]
-		);
+		if ( is_multisite() ) {
+			$page = add_submenu_page(
+				'settings.php',
+				__( 'Infinite Uploads', 'infinite-uploads' ),
+				__( 'Infinite Uploads', 'infinite-uploads' ),
+				$this->iup_instance->capability,
+				'infinite_uploads',
+				[
+					$this,
+					'settings_page',
+				]
+			);
+		} else {
+			$page = add_options_page(
+				__( 'Infinite Uploads', 'infinite-uploads' ),
+				__( 'Infinite Uploads', 'infinite-uploads' ),
+				$this->iup_instance->capability,
+				'infinite_uploads',
+				[
+					$this,
+					'settings_page',
+				]
+			);
+		}
 
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );

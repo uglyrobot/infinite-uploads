@@ -515,7 +515,7 @@ class Infinite_Uploads {
 			$result = new WP_Error(
 				'rest_cant_upload',
 				__( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ),
-				array( 'status' => 403 )
+				[ 'status' => 403 ]
 			);
 		}
 

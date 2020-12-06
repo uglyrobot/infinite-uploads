@@ -76,11 +76,8 @@ class Infinite_Uploads_Api_Handler {
 				wp_schedule_event( time(), 'daily', 'infinite_uploads_sync' );
 			}
 
-			add_action(
-				'infinite_uploads_sync',
-				array( $this, 'get_site_data' )
-			);
-
+			add_action( 'infinite_uploads_sync', [ $this, 'get_site_data' ] );
+			add_action( 'wp_ajax_nopriv_infinite-uploads-refresh', [ &$this, 'remote_refresh' ] );
 		}
 	}
 
@@ -205,7 +202,7 @@ class Infinite_Uploads_Api_Handler {
 	 *
 	 * @return object|boolean Results of the API call response body.
 	 */
-	public function call( $remote_path, $data = [], $method = 'GET', $options = array() ) {
+	public function call( $remote_path, $data = [], $method = 'GET', $options = [] ) {
 		$link = $this->rest_url( $remote_path );
 
 		$options = wp_parse_args(
@@ -333,7 +330,7 @@ class Infinite_Uploads_Api_Handler {
 		$caller_dump = '';
 		if ( INFINITE_UPLOADS_API_DEBUG ) {
 			$trace     = debug_backtrace();
-			$caller    = array();
+			$caller    = [];
 			$last_line = '';
 			foreach ( $trace as $level => $item ) {
 				if ( ! isset( $item['class'] ) ) {
@@ -436,6 +433,46 @@ class Infinite_Uploads_Api_Handler {
 	}
 
 	/**
+	 * Listen for remote ping from API telling us to refresh data.
+	 *
+	 * The security of this doesn't have to be perfect, we just want to stop any possible DoS vector.
+	 */
+	public function remote_refresh( $urls ) {
+		if ( defined( 'INFINITE_UPLOADS_API_DEBUG' ) && INFINITE_UPLOADS_API_DEBUG ) {
+			$log = '[INFINITE_UPLOADS API remote call] %s | %s';
+
+			$msg = sprintf(
+				$log,
+				INFINITE_UPLOADS_VERSION,
+				$_REQUEST['action']
+			);
+			error_log( $msg );
+		}
+
+		if ( empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! preg_match( '/[a-f0-9]{64}/', $_SERVER['HTTP_AUTHORIZATION'], $matches ) ) {
+			wp_send_json_error( [ 'code' => 'missing_auth_header', 'message' => 'Missing authentication header' ] );
+		}
+
+		$hash  = $matches[0]; //an SHA256 hash of request
+		$token = hash( 'sha256', $this->get_token() );
+
+		$hash_string = $_POST['req_id'] . $_POST['site_id'];
+
+		$valid = hash_hmac( 'sha256', $hash_string, $token );
+
+		$is_valid = hash_equals( $this->get_site_id(), $_POST['site_id'] ) && hash_equals( $valid, $hash ); //Timing attack safe string comparison, PHP <5.6 compat added in WP 3.9.2
+		if ( ! $is_valid ) {
+			wp_send_json_error(
+				[ 'code' => 'incorrect_auth', 'message' => 'Incorrect authentication' ]
+			);
+		}
+
+		$this->get_site_data( true );
+
+		wp_send_json_success();
+	}
+
+	/**
 	 * Purge a list of urls from the CDN. We don't need to wait for a response from this so make it async.
 	 *
 	 * @param array $urls
@@ -444,8 +481,8 @@ class Infinite_Uploads_Api_Handler {
 	 */
 	public function purge( $urls ) {
 		return $this->call( "site/" . $this->get_site_id() . "/purge", [ 'urls' => $urls ], 'POST', [
-			'timeout'   => 0.01,
-			'blocking'  => false,
+			'timeout'  => 0.01,
+			'blocking' => false,
 		] );
 	}
 

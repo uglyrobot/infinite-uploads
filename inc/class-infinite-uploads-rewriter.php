@@ -42,7 +42,7 @@ class Infinite_Uploads_Rewriter {
 	 * @since   1.0
 	 */
 	public function protocolize_url( $url ) {
-		if ( strpos( $url, ':' ) === false && ! in_array( $url[0], array( '/', '#', '?' ), true ) &&
+		if ( strpos( $url, ':' ) === false && ! in_array( $url[0], [ '/', '#', '?' ], true ) &&
 		     ! preg_match( '/^[a-z0-9-]+?\.php/i', $url ) ) {
 			$url = 'https://' . $url;
 		}

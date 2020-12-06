@@ -42,7 +42,7 @@
 				<form method="post" action="<?php echo $this->api_url( '/smart-pricing/' ); ?>">
 					<input type="hidden" name="action" value="iup_connect">
 					<input type="hidden" name="site_id" value="<?php echo esc_attr( $this->api->get_site_id() ); ?>">
-					<input type="hidden" name="domain" value="<?php echo esc_url( network_site_url() ); ?>">
+					<input type="hidden" name="domain" value="<?php echo esc_url( $this->api->network_site_url() ); ?>">
 					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $this->settings_url() ); ?>">
 					<input type="hidden" name="bytes" value="<?php echo esc_attr( $to_sync->size ); ?>">
 					<input type="hidden" name="files" value="<?php echo esc_attr( $to_sync->files ); ?>">
