@@ -433,23 +433,31 @@ class Infinite_Uploads_Api_Handler {
 	}
 
 	/**
+	 * Purge a list of urls from the CDN. We don't need to wait for a response from this so make it async.
+	 *
+	 * @param array $urls
+	 *
+	 * @return bool
+	 */
+	public function purge( $urls ) {
+		return $this->call( "site/" . $this->get_site_id() . "/purge", [ 'urls' => $urls ], 'POST', [
+			'timeout'  => 0.01,
+			'blocking' => false,
+		] );
+	}
+
+	/**
 	 * Listen for remote ping from API telling us to refresh data.
 	 *
 	 * The security of this doesn't have to be perfect, we just want to stop any possible DoS vector.
 	 */
 	public function remote_refresh( $urls ) {
-		if ( defined( 'INFINITE_UPLOADS_API_DEBUG' ) && INFINITE_UPLOADS_API_DEBUG ) {
-			$log = '[INFINITE_UPLOADS API remote call] %s | %s';
 
-			$msg = sprintf(
-				$log,
-				INFINITE_UPLOADS_VERSION,
-				$_REQUEST['action']
-			);
-			error_log( $msg );
+		if ( ! $this->has_token() ) {
+			wp_send_json_error( [ 'code' => 'disconnected', 'message' => 'Site is disconnected from API' ] );
 		}
 
-		if ( empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! preg_match( '/[a-f0-9]{64}/', $_SERVER['HTTP_AUTHORIZATION'], $matches ) ) {
+		if ( empty( $_SERVER['HTTP_SIGNATURE'] ) || ! preg_match( '/[a-f0-9]{64}/', $_SERVER['HTTP_SIGNATURE'], $matches ) ) {
 			wp_send_json_error( [ 'code' => 'missing_auth_header', 'message' => 'Missing authentication header' ] );
 		}
 
@@ -469,21 +477,19 @@ class Infinite_Uploads_Api_Handler {
 
 		$this->get_site_data( true );
 
-		wp_send_json_success();
-	}
 
-	/**
-	 * Purge a list of urls from the CDN. We don't need to wait for a response from this so make it async.
-	 *
-	 * @param array $urls
-	 *
-	 * @return bool
-	 */
-	public function purge( $urls ) {
-		return $this->call( "site/" . $this->get_site_id() . "/purge", [ 'urls' => $urls ], 'POST', [
-			'timeout'  => 0.01,
-			'blocking' => false,
-		] );
+		if ( defined( 'INFINITE_UPLOADS_API_DEBUG' ) && INFINITE_UPLOADS_API_DEBUG ) {
+			$log = '[INFINITE_UPLOADS API remote call] %s | %s';
+
+			$msg = sprintf(
+				$log,
+				INFINITE_UPLOADS_VERSION,
+				$_REQUEST['action']
+			);
+			error_log( $msg );
+		}
+
+		wp_send_json_success();
 	}
 
 	/**

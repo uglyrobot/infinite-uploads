@@ -458,10 +458,10 @@ class Infinite_Uploads_Admin {
 	 * @return Infinite_Uploads_Api_Handler|string
 	 */
 	function api_url( $path = '' ) {
-		$url = $this->api->server_root;
+		$url = trailingslashit( $this->api->server_root );
 
 		if ( $path && is_string( $path ) ) {
-			$url .= '/' . ltrim( $path, '/' );
+			$url .= ltrim( $path, '/' );
 		}
 
 		return $url;
@@ -608,11 +608,11 @@ class Infinite_Uploads_Admin {
 
 			<div id="iup-error" class="alert alert-danger mt-1" role="alert"></div>
 
-			<?php if ( ! $api_data->site->cdn_enabled ) { ?>
+			<?php if ( isset( $api_data->site ) && ! $api_data->site->cdn_enabled ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
 					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
-			<?php } elseif ( ! $api_data->site->upload_writeable ) { ?>
+			<?php } elseif ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
 					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
