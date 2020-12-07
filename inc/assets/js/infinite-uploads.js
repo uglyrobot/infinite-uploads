@@ -38,6 +38,7 @@ jQuery(document).ready(function ($) {
         if (!json.data.is_done) {
           buildFilelist(json.data.remaining_dirs, json.data.nonce);
         } else {
+          processingLoop = false;
           location.reload();
           return true;
         }
@@ -198,6 +199,7 @@ jQuery(document).ready(function ($) {
         if (!json.data.is_done) {
           downloadFiles(json.data.nonce);
         } else {
+          processingLoop = false;
           location.reload();
           return true;
         }
