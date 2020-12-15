@@ -21,6 +21,7 @@ gulp.task('zip', gulp.series('pot', function () {
     '!./package.json',
     '!./package-lock.json',
     '!./phpunit.xml.dist',
+    '!./README.md',
     '!./.*'
   ])
     .pipe(zip('infinite-uploads.zip'))

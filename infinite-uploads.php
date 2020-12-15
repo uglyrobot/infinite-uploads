@@ -3,7 +3,7 @@
 Plugin Name: Infinite Uploads
 Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
 Author: UglyRobot
-Version: 0.1-alpha-3
+Version: 1.0-alpha-1
 Author URI: https://uglyrobot.com
 Text Domain: infinite-uploads
 
@@ -12,7 +12,7 @@ Inspired by and borrowed heavily from S3 Uploads plugin by Human Made https://gi
 Copyright 2020 UglyRobot.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '0.1-alpha-3' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-1' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';

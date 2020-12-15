@@ -368,9 +368,9 @@ class Infinite_Uploads {
 					return $type;
 				}
 			}
-
-			return 'other';
 		}
+
+		return 'other';
 	}
 
 	/**
