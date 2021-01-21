@@ -20,7 +20,7 @@
 			<div class="col">
 				<div class="row">
 					<div class="col"><?php _e( 'Used / Available', 'infinite-uploads' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'infinite-uploads' ); ?>"></span></div>
-					<div class="col text-right"><?php _e( 'Need more?', 'infinite-uploads' ); ?> <a href="<?php echo $this->api_url( '/account/' ); ?>" class="text-warning"><?php _e( 'Switch to a new plan.', 'infinite-uploads' ); ?></a></div>
+					<div class="col text-right"><?php _e( 'Need more?', 'infinite-uploads' ); ?> <a href="<?php echo esc_url( $this->api_url( '/account/billing/' ) ); ?>" class="text-warning"><?php _e( 'Switch to a new plan.', 'infinite-uploads' ); ?></a></div>
 				</div>
 				<div class="row">
 					<div class="col badge badge-pill badge-light text-left p-3">
@@ -53,7 +53,7 @@
 				<div class="row">
 					<div class="col"><?php _e( 'Current CDN URL', 'infinite-uploads' ); ?></div>
 					<?php if ( $api_data->site->cname == $api_data->site->cdn_url ) { ?>
-					<div class="col text-right"><a href="<?php echo $this->api_url( '/account/' ); ?>" class="text-warning"><?php _e( 'Use your own custom domain!', 'infinite-uploads' ); ?></a></div>
+						<div class="col text-right"><a href="<?php echo esc_url( $this->api_url( '/account/sites/?site=' . $this->api->get_site_id() ) ); ?>" class="text-warning"><?php _e( 'Use your own custom domain!', 'infinite-uploads' ); ?></a></div>
 					<?php } ?>
 				</div>
 				<div class="row">
@@ -99,7 +99,7 @@
 		<div class="row justify-content-center">
 			<div class="col">
 				<h5><?php _e( 'Import & Disconnect', 'infinite-uploads' ); ?></h5>
-				<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s" class="text-warning">account management</a>.', 'infinite-uploads' ), $this->api_url( '/account/' ) ); ?></p>
+				<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s" class="text-warning">account management</a>.', 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ) ); ?></p>
 			</div>
 			<div class="col mt-4">
 				<div class="row text-center mb-3">

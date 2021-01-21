@@ -39,7 +39,7 @@
 		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col-2 text-center">
-				<form method="post" action="<?php echo $this->api_url( '/connect/' ); ?>">
+				<form method="post" action="<?php echo esc_url( $this->api_url( '/connect/' ) ); ?>">
 					<input type="hidden" name="action" value="iup_connect">
 					<input type="hidden" name="site_id" value="<?php echo esc_attr( $this->api->get_site_id() ); ?>">
 					<input type="hidden" name="domain" value="<?php echo esc_url( $this->api->network_site_url() ); ?>">
