@@ -193,18 +193,27 @@ class Infinite_Uploads_Admin {
 		$path     = $this->iup_instance->get_original_upload_dir();
 		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 LIMIT 10" );
+			$to_sync = $wpdb->get_results( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT 100" );
 			//build full paths
 			$to_sync_full = [];
-			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = $path['basedir'] . $file;
+			$to_sync_size = 0;
+			$to_sync_sql  = [];
+			foreach ( $to_sync as $file ) {
+				$to_sync_size += $file->size;
+				if ( count( $to_sync_full ) && $to_sync_size > INFINITE_UPLOADS_SYNC_MAX_BYTES ) { //upload at minimum one file even if it's huuuge
+					break;
+				}
+				$to_sync_full[] = $path['basedir'] . $file->file;
+				$to_sync_sql[]  = esc_sql( $file->file );
 			}
+			//preset the error count in case request times out. Successful sync will clear error count.
+			$wpdb->query( "UPDATE `{$wpdb->base_prefix}infinite_uploads_files` SET errors = ( errors + 1 ) WHERE file IN ('" . implode( "','", $to_sync_sql ) . "')" );
 
 			$obj  = new ArrayObject( $to_sync_full );
 			$from = $obj->getIterator();
 
 			$transfer_args = [
-				'concurrency' => 5,
+				'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY,
 				'base_dir'    => $path['basedir'],
 				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$uploaded ) {
 					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
@@ -242,14 +251,12 @@ class Infinite_Uploads_Admin {
 				if ( method_exists( $e, 'getRequest' ) ) {
 					$file        = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
-					$error_count ++;
 					if ( $error_count >= 3 ) {
 						$errors[] = sprintf( __( 'Error uploading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
 						$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
-					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
-				} else {
+				} else { //I don't know which error case trigger this but it's common
 					$errors[] = __( 'Error uploading file. Queued for retry.', 'infinite-uploads' );
 				}
 			}
@@ -318,18 +325,27 @@ class Infinite_Uploads_Admin {
 		$path       = $this->iup_instance->get_original_upload_dir();
 		$s3         = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 LIMIT 10" );
+			$to_sync = $wpdb->get_results( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT 100" );
 			//build full paths
 			$to_sync_full = [];
-			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = 's3://' . untrailingslashit( $this->iup_instance->bucket ) . $file;
+			$to_sync_size = 0;
+			$to_sync_sql  = [];
+			foreach ( $to_sync as $file ) {
+				$to_sync_size += $file->size;
+				if ( count( $to_sync_full ) && $to_sync_size > INFINITE_UPLOADS_SYNC_MAX_BYTES ) { //upload at minimum one file even if it's huuuge
+					break;
+				}
+				$to_sync_full[] = 's3://' . untrailingslashit( $this->iup_instance->bucket ) . $file->file;
+				$to_sync_sql[]  = esc_sql( $file->file );
 			}
+			//preset the error count in case request times out. Successful sync will clear error count.
+			$wpdb->query( "UPDATE `{$wpdb->base_prefix}infinite_uploads_files` SET errors = ( errors + 1 ) WHERE file IN ('" . implode( "','", $to_sync_sql ) . "')" );
 
 			$obj  = new ArrayObject( $to_sync_full );
 			$from = $obj->getIterator();
 
 			$transfer_args = [
-				'concurrency' => 5,
+				'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY,
 				'base_dir'    => 's3://' . $this->iup_instance->bucket,
 				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$downloaded ) {//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
@@ -352,13 +368,11 @@ class Infinite_Uploads_Admin {
 				if ( method_exists( $e, 'getRequest' ) ) {
 					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() ) );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
-					$error_count ++;
 					if ( $error_count >= 3 ) {
 						$errors[] = sprintf( __( 'Error downloading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
 						$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
-					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 				} else {
 					$errors[] = __( 'Error downloading file. Queued for retry.', 'infinite-uploads' );
 				}
@@ -426,7 +440,7 @@ class Infinite_Uploads_Admin {
 		} else {
 			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
 		}
-		$custom_links['support'] = '<a href="' . $this->api_url( '/support/' ) . '">' . __( 'Support', 'infinite-uploads' ) . '</a>';
+		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/' ) ) . '">' . __( 'Support', 'infinite-uploads' ) . '</a>';
 
 
 		// Adds the links to the beginning of the array.
@@ -511,7 +525,7 @@ class Infinite_Uploads_Admin {
 		$data            = [];
 		$data['strings'] = [
 			'leave_confirm'      => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
-			'ajax_error'         => __( 'Unknown Error', 'infinite-uploads' ),
+			'ajax_error'         => __( 'Too many server errors. Please try again.', 'infinite-uploads' ),
 			'leave_confirmation' => __( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
 		];
 
@@ -610,11 +624,11 @@ class Infinite_Uploads_Admin {
 
 			<?php if ( isset( $api_data->site ) && ! $api_data->site->cdn_enabled ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } elseif ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), $this->api_url( '/account/' ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } ?>
 

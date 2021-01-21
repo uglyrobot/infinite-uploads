@@ -2,17 +2,17 @@
 /*
 Plugin Name: Infinite Uploads
 Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
-Author: UglyRobot
-Version: 1.0-alpha-1
-Author URI: https://uglyrobot.com
+Author: UglyRobot, LLC
+Version: 1.0-alpha-2
+Author URI: https://infiniteuploads.com/
 Text Domain: infinite-uploads
 
 Inspired by and borrowed heavily from S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
 
-Copyright 2020 UglyRobot.
+Copyright 2020 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-1' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-2' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -21,6 +21,21 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 add_action( 'plugins_loaded', 'infinite_uploads_init' );
 
 function infinite_uploads_init() {
+
+	//how much to try uploading/downloading per ajax loop (we want as much as possible without exceeding (php timeout - ajax_timeout) to avoid 504s
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_MB' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_MAX_BYTES', MB_IN_BYTES * 10 );
+	}
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_CONCURRENCY' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_CONCURRENCY', 5 );
+	}
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_SIZE' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_MAX_SIZE', 5 );
+	}
+	if ( ! defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
+		define( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL', YEAR_IN_SECONDS );
+	}
+
 	// Ensure the AWS SDK can be loaded.
 	if ( ! class_exists( '\\Aws\\S3\\S3Client' ) ) {
 		// Require AWS Autoloader file.

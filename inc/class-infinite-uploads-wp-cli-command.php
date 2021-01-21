@@ -157,7 +157,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		$s3         = Infinite_Uploads::get_instance()->s3();
-		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'verbose' => false ] );
+		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY, 'verbose' => false ] );
 
 		$transfer_args = [
 			'concurrency' => $args_assoc['concurrency'],
@@ -197,7 +197,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		global $wpdb;
 		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
-		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false, 'verbose' => false ] );
+		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY, 'noscan' => false, 'verbose' => false ] );
 
 		$path = $instance->get_original_upload_dir();
 
@@ -447,7 +447,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		global $wpdb;
 		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
-		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 5, 'noscan' => false, 'verbose' => false ] );
+		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY, 'noscan' => false, 'verbose' => false ] );
 
 		$path = $instance->get_original_upload_dir();
 

@@ -3,6 +3,7 @@ jQuery(document).ready(function ($) {
 
   var stopLoop = false;
   var processingLoop = false;
+  var loopErrors = 0;
 
   //show a confirmation warning if leaving page during a bulk action
   $(window).bind('beforeunload', function () {
@@ -110,12 +111,14 @@ jQuery(document).ready(function ($) {
       data.nonce = iup_data.nonce.sync;
     }
     $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
+      loopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-progress-size').text(json.data.remaining_size);
         $('#iup-progress-files').text(json.data.remaining_files);
         $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
         if (!json.data.is_done) {
+          data.nonce = json.data.nonce; //save for future errors
           syncFilelist(json.data.nonce);
         } else {
           //update values in next modal
@@ -142,8 +145,15 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        showError(iup_data.strings.ajax_error);
-        $('#upload-modal').modal('hide');
+        //if we get an error like 504 try up to 6 times before giving up.
+        loopErrors++;
+        if (loopErrors > 6) {
+          showError(iup_data.strings.ajax_error);
+          $('#upload-modal').modal('hide');
+          loopErrors = 0;
+        } else {
+          syncFilelist(data.nonce);
+        }
       });
   };
 
@@ -191,12 +201,14 @@ jQuery(document).ready(function ($) {
       data.nonce = iup_data.nonce.download;
     }
     $.post(ajaxurl + '?action=infinite-uploads-download', data, function (json) {
+      loopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-download-size').text(json.data.deleted_size);
         $('#iup-download-files').text(json.data.deleted_files);
         $('#iup-download-progress-bar').css('width', json.data.pcnt_downloaded + "%").attr('aria-valuenow', json.data.pcnt_downloaded).text(json.data.pcnt_downloaded + "%");
         if (!json.data.is_done) {
+          data.nonce = json.data.nonce; //save for future errors
           downloadFiles(json.data.nonce);
         } else {
           processingLoop = false;
@@ -218,8 +230,15 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        showError(iup_data.strings.ajax_error);
-        $('#download-modal').modal('hide');
+        //if we get an error like 504 try up to 6 times before giving up.
+        loopErrors++;
+        if (loopErrors > 6) {
+          showError(iup_data.strings.ajax_error);
+          $('#download-modal').modal('hide');
+          loopErrors = 0;
+        } else {
+          downloadFiles(data.nonce);
+        }
       });
   };
 
