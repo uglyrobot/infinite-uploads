@@ -57,7 +57,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:443, inc/templates/footer.php:10
+#: inc/class-infinite-uploads-admin.php:443, inc/templates/footer.php:9
 msgid "Support"
 msgstr ""
 
@@ -277,23 +277,23 @@ msgstr ""
 msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
 msgstr ""
 
-#: inc/templates/footer.php:5
+#: inc/templates/footer.php:4
 msgid "The Cloud by Infinite Uploads"
 msgstr ""
 
-#: inc/templates/footer.php:11
+#: inc/templates/footer.php:10
 msgid "Terms of Service"
 msgstr ""
 
-#: inc/templates/footer.php:12
+#: inc/templates/footer.php:11
 msgid "Privacy Policy"
 msgstr ""
 
-#: inc/templates/footer.php:17
+#: inc/templates/footer.php:16
 msgid "Twitter"
 msgstr ""
 
-#: inc/templates/footer.php:18
+#: inc/templates/footer.php:17
 msgid "Facebook"
 msgstr ""
 

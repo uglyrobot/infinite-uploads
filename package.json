@@ -24,12 +24,13 @@
     "s3",
     "storage",
     "wordpress",
-    "plugin"
+    "plugin",
+    "cloud"
   ],
-  "author": "UglyRobot",
+  "author": "UglyRobot, LLC",
   "license": "GPL-2.0-only",
   "bugs": {
     "url": "https://github.com/uglyrobot/infinite-uploads/issues"
   },
-  "homepage": "https://github.com/uglyrobot/infinite-uploads#readme"
+  "homepage": "https://infiniteuploads.com"
 }

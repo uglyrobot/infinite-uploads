@@ -23,14 +23,14 @@ add_action( 'plugins_loaded', 'infinite_uploads_init' );
 function infinite_uploads_init() {
 
 	//how much to try uploading/downloading per ajax loop (we want as much as possible without exceeding (php timeout - ajax_timeout) to avoid 504s
-	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_MB' ) ) {
-		define( 'INFINITE_UPLOADS_SYNC_MAX_BYTES', MB_IN_BYTES * 10 );
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_BYTES' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_MAX_BYTES', MB_IN_BYTES * 5 );
 	}
 	if ( ! defined( 'INFINITE_UPLOADS_SYNC_CONCURRENCY' ) ) {
-		define( 'INFINITE_UPLOADS_SYNC_CONCURRENCY', 5 );
+		define( 'INFINITE_UPLOADS_SYNC_CONCURRENCY', 10 );
 	}
-	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_SIZE' ) ) {
-		define( 'INFINITE_UPLOADS_SYNC_MAX_SIZE', 5 );
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_PER_LOOP' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_PER_LOOP', 1000 );
 	}
 	if ( ! defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
 		define( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL', YEAR_IN_SECONDS );

@@ -193,7 +193,7 @@ class Infinite_Uploads_Admin {
 		$path     = $this->iup_instance->get_original_upload_dir();
 		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_results( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT 100" );
+			$to_sync = $wpdb->get_results( $wpdb->prepare( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT %d", INFINITE_UPLOADS_SYNC_PER_LOOP ) );
 			//build full paths
 			$to_sync_full = [];
 			$to_sync_size = 0;
@@ -325,7 +325,7 @@ class Infinite_Uploads_Admin {
 		$path       = $this->iup_instance->get_original_upload_dir();
 		$s3         = $this->iup_instance->s3();
 		while ( ! $break ) {
-			$to_sync = $wpdb->get_results( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT 100" );
+			$to_sync = $wpdb->get_results( $wpdb->prepare( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT %d", INFINITE_UPLOADS_SYNC_PER_LOOP ) );
 			//build full paths
 			$to_sync_full = [];
 			$to_sync_size = 0;
