@@ -27,6 +27,7 @@ Now everyone can take full advantage of both the cost-savings and performance be
 - Easy File Manager - Use the WordPress Media Library to manage files in the cloud without an FTP/SFTP manager
 - Bulk transfer - move existing media files to or from the cloud with a click or WP CLI command
 - Simple restore - no contract and easy to restore all your files to your media library
+- Universal compatability - Works with all well-coded plugins and themes including eCommerce and performance optimization
 
 ### Better Performance, Less Time, Lower-cost
 If you upload a lot of images, publish video content, share motion graphics, want to add big beautiful video backgrounds, have a podcast, or stream large audio files for sermons or lectures, you will save time, resources, and improve performance by moving your files to Infinite Uploads. Keep your site moving at top-speed with dedicated media delivery that seamlessly integrates with WordPress.
@@ -37,17 +38,21 @@ The Infinite Uploads plugin makes it so anyone can connect to the cloud without 
 
 ### Media File Storage Calculator
 
-Install Infinite Uploads, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up
+Install Infinite Uploads, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up.
 
 [youtube https://www.youtube.com/]
 
 Infinite Uploads helps you identify which files are using the most space on your server and allows you to move all your media files to cloud storage.
+
+### Ecommerce Ready
+Not only is Infinite Uploads great for delivering highquality product images and videos, store and deliver your large digital download files in the cloud. Infinite Uploads works with both Forced Downloads PHP protection and X-Accel-Redirect/X-Sendfile (nginx/apache).
 
 ### Tested Plugin Integrations
 
 Infinite Uploads is built with the latest in cloud technology so it should work flawlessly with the widest variety of your favorite themes and plugins and has been tested with:
 
 - [WooCommerce](https://wordpress.org/plugins/woocommerce/)
+- [Easy Digital Downloads](https://wordpress.org/plugins/easy-digital-downloads/)
 - [Divi Theme and Page Builder](https://www.elegantthemes.com/gallery/divi/)
 - [WP Smush & Smush Pro](https://wordpress.org/plugins/wp-smushit/) (not CDN)
 - [WP Retina 2x](https://wordpress.org/plugins/wp-retina-2x/)
