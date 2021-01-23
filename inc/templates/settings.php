@@ -89,7 +89,7 @@
 					</div>
 					<div class="row justify-content-center">
 						<div class="col-4 text-center">
-							<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#delete-modal"><?php _e( 'Delete', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#delete-modal"><?php _e( 'Delete', 'infinite-uploads' ); ?></button>
 							<p><strong><?php printf( __( '%s / %s deletable files', 'infinite-uploads' ), $stats['deletable_size'], $stats['deletable_files'] ); ?></strong></p>
 						</div>
 					</div>
@@ -107,7 +107,7 @@
 				</div>
 				<div class="row justify-content-center">
 					<div class="col-4 text-center">
-						<button class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'infinite-uploads' ); ?></button>
+						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php _e( 'Disconnect', 'infinite-uploads' ); ?></button>
 					</div>
 				</div>
 			</div>

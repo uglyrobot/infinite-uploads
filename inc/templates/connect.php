@@ -46,7 +46,7 @@
 					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $this->settings_url() ); ?>">
 					<input type="hidden" name="bytes" value="<?php echo esc_attr( $to_sync->size ); ?>">
 					<input type="hidden" name="files" value="<?php echo esc_attr( $to_sync->files ); ?>">
-					<button class="btn btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'infinite-uploads' ); ?></button>
+					<button class="btn text-nowrap btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'infinite-uploads' ); ?></button>
 
 				</form>
 			</div>

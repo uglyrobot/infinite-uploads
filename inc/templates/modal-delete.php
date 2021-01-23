@@ -26,7 +26,7 @@
 					</div>
 					<div class="row justify-content-center mb-4">
 						<div class="col-4 text-center">
-							<button class="btn btn-info btn-lg btn-block" id="iup-delete-local-button"><?php _e( 'Start Delete', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-info btn-lg btn-block" id="iup-delete-local-button"><?php _e( 'Start Delete', 'infinite-uploads' ); ?></button>
 						</div>
 					</div>
 				</div>

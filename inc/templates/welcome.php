@@ -9,7 +9,7 @@
 		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col-2 text-center">
-				<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#scan-modal"><?php _e( 'Run Scan', 'infinite-uploads' ); ?></button>
+				<button class="btn text-nowrap btn-primary btn-lg btn-block" data-toggle="modal" data-target="#scan-modal"><?php _e( 'Run Scan', 'infinite-uploads' ); ?></button>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-1">

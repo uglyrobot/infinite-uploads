@@ -41,11 +41,11 @@
 				<div class="row justify-content-center">
 					<div class="col-4 text-center">
 						<?php if ( ! empty( $stats['sync_finished'] ) ) { //if sync is finished show enable button ?>
-							<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#enable-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-primary btn-lg btn-block" data-toggle="modal" data-target="#enable-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
 						<?php } elseif ( ! empty( $stats['compare_finished'] ) ) { ?>
-							<button class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-primary btn-lg btn-block" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
 						<?php } else { ?>
-							<button class="btn btn-primary btn-lg btn-block" id="iup-sync-button" data-toggle="modal" data-target="#scan-remote-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-primary btn-lg btn-block" id="iup-sync-button" data-toggle="modal" data-target="#scan-remote-modal"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Sync Now', 'infinite-uploads' ); ?></button>
 						<?php } ?>
 					</div>
 				</div>
