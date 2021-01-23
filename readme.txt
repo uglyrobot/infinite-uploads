@@ -1,17 +1,24 @@
+Name: Infinite Uploads
+Requires at least: 5.5
+Tested up to: 5.6.1
+Stable tag: trunk
+Requires PHP: 5.6
+Contributors: uglyrobot
+
 Move and serve all your images, video, audio, and other media files from the cloud to boost performance and save huge on storage and bandwidth.
 
 == Description ==
 
 **Infinite Uploads is a free Media Library file analyzer and simple cloud tool for connecting, offloading and serving all your media files from the cloud**
 
-Upload directly to cloud storage and manage your files right from the WordPress Media Library. Eliminate SFTP client managers and skip confusing Amazon S3, Google Cloud, Azure, or other cloud provider account setup, API integration, or expensive 3rd-party tools.
+Upload directly to cloud storage and manage your files right from the WordPress Media Library. Eliminate FTP file managers and skip confusing Amazon S3, Google Cloud, Azure, or other cloud provider account setup, API integration, or expensive 3rd-party tools.
 
-Now everyone can take full advantage of both the cost-savings and performance benefits of the cloud. The Infinite Uploads plugin includes unlimited file uploads and can be used to connect an unlimited number of websites for free. Just create and sync to your Infinite Uploads storage account with auto-connect and only ever pay one simple price for storage and bandwidth.
+Now everyone can take full advantage of both the cost-savings and performance benefits of the cloud! The Infinite Uploads plugin includes unlimited file uploads and can be used to connect an unlimited number of websites for free. Just create and sync to your Infinite Uploads storage account with auto-connect and only ever pay one simple price for storage and bandwidth.
 
 ### Infinite Uploads - Smart Cloud Plugin Features
 
-- Unlimited files – no limits to the number of files you add each month
-- Unlimited sites - you can connect just one site, hundreds, or thousands...no extra cost
+- Unlimited files – no limits to the number of files you can add each month
+- Unlimited sites - you can connect just one site, hundreds, or thousands...no extra license costs
 - Media storage analyzer - For both your local and cloud-connected media files located in the Media Library
 - Auto-connect – no confusing cloud account API's. Simply click to connect
 - No 3rd-party utility needed - developed and maintained by the team behind Infinite Uploads
@@ -54,7 +61,8 @@ Infinite Uploads is built with the latest in cloud technology so it should work 
 - And many, many, more!
 
 ### Fast and Incredibly Secure
-Infinite Uploads uses encrypted SSL to transfer files, is stored in highly resilient and available storage with 99.999999999% (11 x 9s) of durability, and our API was designed from the ground up with with bulletproof security. All API tokens and credentials are hashed, encrypted, segmented per customer and site, and regularly rotated without you having to do a thing. We support multiple 2-factor login methods including phish-proof UTF security keys to protect access to your account and data.
+Infinite Uploads uses encrypted SSL to transfer files, is stored in highly resilient and available storage with 99.999999999% (11 x 9s) of durability, and our API was designed from the ground up with with bulletproof security. All API tokens and credentials are hashed, encrypted, segmented per customer and site, and rotated without you having to do a thing. We support multiple 2-factor login methods including phish-proof U2F security keys to protect access to your account and data.
+
 For low latency and legal compliance with laws like GDPR you can choose a USA or Europe (Germany) cloud storage location for each site you connect. And for lightning fast download speeds all files are served from the location closest to your visitors via our world-wide enterprise-class Content Delivery Network (CDN) with 45+ points of presence!
 
 ### FTP/SFTP Client-free File Manager
