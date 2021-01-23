@@ -47,7 +47,7 @@ Infinite Uploads helps you identify which files are using the most space on your
 ### Ecommerce Ready
 Not only is Infinite Uploads great for delivering highquality product images and videos, store and deliver your large digital download files in the cloud. Infinite Uploads works with both Forced Downloads PHP protection and X-Accel-Redirect/X-Sendfile (nginx/apache).
 
-### Tested Plugin Integrations
+### Widely Compatible
 
 Infinite Uploads is built with the latest in cloud technology so it should work flawlessly with the widest variety of your favorite themes and plugins and has been tested with:
 
