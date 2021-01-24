@@ -22,6 +22,7 @@ class Infinite_Uploads_Admin {
 		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
 		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		add_action( 'admin_init', [ &$this, 'privacy_policy' ] );
 
 		if ( is_main_site() ) {
 			add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
@@ -44,6 +45,21 @@ class Infinite_Uploads_Admin {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Adds a privacy policy statement.
+	 */
+	function privacy_policy() {
+		if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
+			return;
+		}
+		$content = '<p>'
+		           . sprintf(
+			           __( 'When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is <a href="%1$s" target="_blank">here</a>.', 'infinite-uploads' ),
+			           'https://infiniteuploads.com/privacy/'
+		           ) . '</p>';
+		wp_add_privacy_policy_content( __( 'Infinite Uploads', 'infinite-uploads' ), wp_kses_post( wpautop( $content, false ) ) );
 	}
 
 	public function ajax_filelist() {
