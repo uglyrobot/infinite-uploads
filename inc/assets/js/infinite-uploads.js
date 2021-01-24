@@ -46,11 +46,11 @@ jQuery(document).ready(function ($) {
 
       } else {
         showError(json.data);
-        $('#scan-modal').modal('hide');
+        $('.modal').modal('hide');
       }
     }, 'json').fail(function () {
       showError(iup_data.strings.ajax_error);
-      $('#scan-modal').modal('hide');
+      $('.modal').modal('hide');
     });
   };
 
@@ -81,18 +81,18 @@ jQuery(document).ready(function ($) {
           $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
 
           $('#iup-sync-button').attr('data-target', '#upload-modal');
-          $('#scan-remote-modal').modal('hide');
+          $('.modal').modal('hide');
           $('#upload-modal').modal('show');
         }
 
       } else {
         showError(json.data);
-        $('#scan-remote-modal').modal('hide');
+        $('.modal').modal('hide');
       }
     }, 'json')
       .fail(function () {
         showError(iup_data.strings.ajax_error);
-        $('#scan-remote-modal').modal('hide');
+        $('.modal').modal('hide');
       });
   };
 
@@ -127,7 +127,7 @@ jQuery(document).ready(function ($) {
             $('#iup-enable-errors').show();
           }
           $('#iup-sync-button').attr('data-target', '#enable-modal');
-          $('#upload-modal').modal('hide');
+          $('.modal').modal('hide');
           $('#enable-modal').modal('show');
         }
         if (Array.isArray(json.data.errors) && json.data.errors.length) {
@@ -141,7 +141,7 @@ jQuery(document).ready(function ($) {
 
       } else {
         showError(json.data);
-        $('#upload-modal').modal('hide');
+        $('.modal').modal('hide');
       }
     }, 'json')
       .fail(function () {
@@ -149,7 +149,7 @@ jQuery(document).ready(function ($) {
         loopErrors++;
         if (loopErrors > 6) {
           showError(iup_data.strings.ajax_error);
-          $('#upload-modal').modal('hide');
+          $('.modal').modal('hide');
           loopErrors = 0;
         } else {
           syncFilelist(data.nonce);
@@ -177,12 +177,12 @@ jQuery(document).ready(function ($) {
 
       } else {
         showError(json.data);
-        $('#delete-modal').modal('hide');
+        $('.modal').modal('hide');
       }
     }, 'json')
       .fail(function () {
         showError(iup_data.strings.ajax_error);
-        $('#delete-modal').modal('hide');
+        $('.modal').modal('hide');
       });
   };
 
@@ -226,7 +226,7 @@ jQuery(document).ready(function ($) {
 
       } else {
         showError(json.data);
-        $('#download-modal').modal('hide');
+        $('.modal').modal('hide');
       }
     }, 'json')
       .fail(function () {
@@ -234,7 +234,7 @@ jQuery(document).ready(function ($) {
         loopErrors++;
         if (loopErrors > 6) {
           showError(iup_data.strings.ajax_error);
-          $('#download-modal').modal('hide');
+          $('.modal').modal('hide');
           loopErrors = 0;
         } else {
           downloadFiles(data.nonce);
@@ -317,7 +317,7 @@ jQuery(document).ready(function ($) {
         showError(iup_data.strings.ajax_error);
         $('#iup-enable-spinner').addClass('text-hide');
         $('#iup-enable-button').show();
-        $('#enable-modal').modal('hide');
+        $('.modal').modal('hide');
       });
   });
 
