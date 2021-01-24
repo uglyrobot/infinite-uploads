@@ -120,6 +120,17 @@ class Infinite_Uploads_Rewriter {
 	 *
 	 */
 	protected function rewrite_url( $matches ) {
+		/**
+		 * Filters the find/replace url rewriter that replaces matches in HTML output with CDN url.
+		 *
+		 * @param  {string}  $cdn_url  The base url to replace the match with, like `https://xxxxx.infiniteuploads.cloud/`.
+		 * @param  {string}  $match  The base url of the match found in HTML, like `https://mysite.com/wp-content/uploads/`.
+		 *
+		 * @return {string} The base url to replace the match with.
+		 * @since  1.0
+		 * @hook   infinite_uploads_rewrite_url
+		 *
+		 */
 		return apply_filters( 'infinite_uploads_rewrite_url', $this->cdn_url, $matches[0] );
 	}
 }

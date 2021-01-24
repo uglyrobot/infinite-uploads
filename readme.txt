@@ -4,7 +4,7 @@ Requires at least: 5.3
 Tested up to: 5.6.1
 Stable tag: trunk
 Requires PHP: 5.6
-Contributors: uglyrobot
+Contributors: uglyrobot, jdailey
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -147,7 +147,7 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 1. Adds a complete media library disk utility for anylizing storage.
 1. Sync your files to the cloud with a click.
 1. Connect an unlimited number of sites.
-1. Create a custom CDN URL, track storage, and free up space. 
+1. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
 

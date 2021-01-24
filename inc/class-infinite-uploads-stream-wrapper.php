@@ -490,11 +490,16 @@ class Infinite_Uploads_Stream_Wrapper {
 		}
 
 		/**
-		 * Filter the parameters passed to S3
+		 * Filter the parameters passed to object storage via AWS PHP SDK
 		 * Theses are the parameters passed to S3Client::putObject()
-		 * See; http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.S3.S3Client.html#_putObject
+		 * See; https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		 *
-		 * @param array $params S3Client::putObject parameters.
+		 * @param  {array} $params S3Client::putObject parameters.
+		 *
+		 * @return {array} $params S3Client::putObject parameters.
+		 * @since  1.0
+		 * @hook   infinite_uploads_putObject_params
+		 *
 		 */
 		$params = apply_filters( 'infinite_uploads_putObject_params', $params );
 
@@ -505,11 +510,16 @@ class Infinite_Uploads_Stream_Wrapper {
 			$bool = (bool) $this->getClient()->putObject( $params );
 			$this->debug( 'PutObject', $params['Key'] );
 			/**
-			 * Action when a new object has been uploaded to s3.
+			 * Action when a new object has been uploaded to cloud storage.
 			 *
-			 * @param array $params S3Client::putObject parameters.
+			 * @param {array} $params S3Client::putObject parameters used to upload the object.
+			 * @param {boolean} $result Whether the putObject request succeeded or failed.
+			 *
+			 * @since 1.0
+			 * @hook  infinite_uploads_putObject
+			 *
 			 */
-			do_action( 'infinite_uploads_putObject', $params );
+			do_action( 'infinite_uploads_putObject', $params, $bool );
 
 			return $bool;
 		} );

@@ -14,7 +14,16 @@ class Infinite_Uploads {
 	private $api;
 
 	public function __construct() {
-		//set the cap we should check
+		/**
+		 * Filters the capability that is checked for access to Infinite Uploads settings page.
+		 *
+		 * @param  {string}  $capability  The capability checked for access and editing settings. Default `manage_network_options` or `manage_options` depending on if multisite.
+		 *
+		 * @return {string}  $capability  The capability checked for access and editing settings.
+		 * @since  1.0
+		 * @hook   infinite_uploads_settings_capability
+		 *
+		 */
 		$this->capability = apply_filters( 'infinite_uploads_settings_capability', ( is_multisite() ? 'manage_network_options' : 'manage_options' ) );
 	}
 
@@ -43,7 +52,6 @@ class Infinite_Uploads {
 		$api_data = $this->api->get_site_data();
 		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
 			$this->bucket = $api_data->site->upload_bucket;
-			//$this->bucket     = 'TESTING';
 			$this->key        = $api_data->site->upload_key;
 			$this->secret     = $api_data->site->upload_secret;
 			$this->bucket_url = $api_data->site->cdn_url;
@@ -128,10 +136,22 @@ class Infinite_Uploads {
 	 * Register the stream wrapper for s3
 	 */
 	public function register_stream_wrapper() {
+		/**
+		 * INFINITE_UPLOADS_USE_LOCAL define. If true will use the local stream wrapper to write files to local directory instead of cloud.
+		 *
+		 * @constant {boolean} INFINITE_UPLOADS_USE_LOCAL
+		 * @default false
+		 */
 		if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
 			stream_wrapper_register( 'iu', 'Infinite_Uploads_Local_Stream_Wrapper', STREAM_IS_URL );
 		} else {
 			Infinite_Uploads_Stream_Wrapper::register( $this->s3() );
+			/**
+			 * INFINITE_UPLOADS_OBJECT_ACL define. If set will override the object ACL for new objects stored in the cloud.
+			 *
+			 * @constant {string} INFINITE_UPLOADS_OBJECT_ACL
+			 * @default `public-read`
+			 */
 			$objectAcl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
 			stream_context_set_option( stream_context_get_default(), 'iu', 'ACL', $objectAcl );
 		}
@@ -171,6 +191,17 @@ class Infinite_Uploads {
 			$params['request.options']['proxy'] = $proxy_auth . $proxy_address;
 		}
 
+		/**
+		 * Filter the parameters passed when creating the Aws\S3\S3Client via the AWS PHP SDK.
+		 * See; https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_configuration.html
+		 *
+		 * @param  {array} $params S3Client::_construct() parameters.
+		 *
+		 * @return {array} $params S3Client::_construct() parameters.
+		 * @since  1.0
+		 * @hook   infinite_uploads_s3_client_params
+		 *
+		 */
 		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
 		$this->s3 = new Aws\S3\S3Client( $params );
 

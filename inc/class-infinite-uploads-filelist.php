@@ -151,6 +151,16 @@ class Infinite_Uploads_Filelist {
 	 *
 	 */
 	protected function is_excluded( $path ) {
+		/**
+		 * Filters the built in list of file/directory exclusions that should not be synced to the Infinite Uploads cloud. Be specific it's a simple strpos() search for the strings.
+		 *
+		 * @param  {array}  $exclusions  A list of file or directory names in the format of `/do-not-sync-this-dir/` or `somefilename.ext`.
+		 *
+		 * @return {array} A list of file or directory names in the format of `/do-not-sync-this-dir/` or `somefilename.ext`.
+		 * @since  1.0
+		 * @hook   infinite_uploads_sync_exclusions
+		 *
+		 */
 		$exclusions = apply_filters( 'infinite_uploads_sync_exclusions', $this->exclusions );
 		foreach ( $exclusions as $string ) {
 			if ( false !== strpos( $path, $string ) ) {
