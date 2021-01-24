@@ -13,11 +13,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: infinite-uploads.php:124
+#: infinite-uploads.php:128
 msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
 msgstr ""
 
-#: infinite-uploads.php:138
+#: infinite-uploads.php:142
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 
@@ -57,7 +57,7 @@ msgstr ""
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:457, inc/class-infinite-uploads.php:204, inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:457, inc/class-infinite-uploads.php:235, inc/templates/connect.php:49
 msgid "Connect"
 msgstr ""
 
@@ -173,59 +173,59 @@ msgstr ""
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:203
+#: inc/class-infinite-uploads.php:234
 msgid "Infinite Uploads is Ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:203
+#: inc/class-infinite-uploads.php:234
 msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:285
+#: inc/class-infinite-uploads.php:316
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:290
+#: inc/class-infinite-uploads.php:321
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:300
+#: inc/class-infinite-uploads.php:331
 msgid "Images"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:301
+#: inc/class-infinite-uploads.php:332
 msgid "Audio"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:302
+#: inc/class-infinite-uploads.php:333
 msgid "Video"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:303
+#: inc/class-infinite-uploads.php:334
 msgid "Documents"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:304
+#: inc/class-infinite-uploads.php:335
 msgid "Archives"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:305
+#: inc/class-infinite-uploads.php:336
 msgid "Code"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:306
+#: inc/class-infinite-uploads.php:337
 msgid "Other"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:486, inc/class-infinite-uploads.php:498, inc/class-infinite-uploads.php:517
+#: inc/class-infinite-uploads.php:517, inc/class-infinite-uploads.php:529, inc/class-infinite-uploads.php:548
 msgid "Files can't be uploaded due to an issue with your Infinite Uploads account."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:484
+#: inc/class-infinite-uploads.php:515
 msgid "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>."
 msgstr ""
 

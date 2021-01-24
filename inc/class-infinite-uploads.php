@@ -232,7 +232,7 @@ class Infinite_Uploads {
 		<div class="notice notice-info">
 			<p style="font-size: 15px;line-height: 2.3;">
 				<strong><?php _e( 'Infinite Uploads is Ready!', 'infinite-uploads' ); ?></strong> <?php _e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' ); ?>
-				<a class="button button-primary" href="<?php echo $this->admin->settings_url(); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
+				<a class="button button-primary" href="<?php echo esc_url( $this->admin->settings_url() ); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
 			</p>
 
 		</div>
@@ -512,7 +512,8 @@ class Infinite_Uploads {
 	 */
 	public function blocked_uploads_header() {
 		if ( current_user_can( $this->capability ) ) {
-			?><div class="notice notice-error"><p><?php printf( __( "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>.", 'infinite-uploads' ), $this->admin->settings_url() ); ?></p></div><?php
+			?>
+			<div class="notice notice-error"><p><?php printf( __( "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>.", 'infinite-uploads' ), esc_url( $this->admin->settings_url() ) ); ?></p></div><?php
 		} else {
 			?><div class="notice notice-error"><p><?php _e( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
 		}
