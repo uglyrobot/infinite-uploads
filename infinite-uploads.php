@@ -1,18 +1,22 @@
 <?php
 /*
-Plugin Name: Infinite Uploads
-Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
-Author: UglyRobot, LLC
-Version: 1.0-alpha-2
-Author URI: https://infiniteuploads.com/
-Text Domain: infinite-uploads
-
-Inspired by and borrowed heavily from S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
-
-Copyright 2020 UglyRobot, LLC.
+ * Plugin Name: Infinite Uploads
+ * Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
+ * Version: 1.0-alpha-3
+ * Author: UglyRobot, LLC
+ * Author URI: https://infiniteuploads.com/
+ * Text Domain: infinite-uploads
+ * Requires at least: 5.3
+ * Requires PHP: 5.6
+ * License: GPLv2
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * Inspired by and borrowed some code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
+ *
+ * Copyright 2020 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-2' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-3' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -98,7 +102,7 @@ function infinite_uploads_check_requirements() {
 	global $wp_version;
 	$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
 
-	if ( version_compare( PHP_VERSION, '5.5.0', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
 		add_action( $hook, 'infinite_uploads_outdated_php_version_notice' );
 
 		return false;

@@ -1,9 +1,12 @@
-Name: Infinite Uploads
-Requires at least: 5.5
+=== Infinite Uploads ===
+
+Requires at least: 5.3
 Tested up to: 5.6.1
 Stable tag: trunk
 Requires PHP: 5.6
 Contributors: uglyrobot
+License: GPLv2
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Move and serve all your images, video, audio, and other media files from the cloud to boost performance and save huge on storage and bandwidth.
 
