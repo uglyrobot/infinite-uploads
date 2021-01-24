@@ -140,8 +140,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Screenshots ==
 
-1. Scan your existing media library and get smart storage recommendations.
-1. Connect and move files to the cloud with a click.
+1. Run a quick scan to determin usage.
+1. Adds a complete media library disk utility for anylizing storage.
+1. Sync your files to the cloud with a click.
+1. Connect an unlimited number of sites.
+1. Create a custom CDN URL, track storage, and free up space. 
 
 == Changelog ==
 
