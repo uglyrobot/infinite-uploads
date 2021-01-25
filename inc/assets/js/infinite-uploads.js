@@ -269,9 +269,16 @@ jQuery(document).ready(function ($) {
     $('#iup-sync-errors ul').empty();
     stopLoop = false;
     syncFilelist();
+  }).on('shown.bs.modal', function () {
+    $('#scan-remote-modal').modal('hide');
   }).on('hide.bs.modal', function () {
     stopLoop = true;
     processingLoop = false;
+  })
+
+  //Make sure upload modal closes
+  $('#enable-modal').on('shown.bs.modal', function () {
+    $('#upload-modal').modal('hide');
   })
 
   //Download

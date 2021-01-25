@@ -132,7 +132,7 @@ Upload as many files as you like and only ever pay for the cost of your storage 
 
 = What servers is Infinite Uploads using? =
 
-Infinite Uploads is a hybrid custom stack built and hosted with multiple enterprise-grade cloud services for the ultimate in security, speed, power, and performance. All without the cost of a sysadmin or complexity configuring servers, policies, permissions, keys, etc...pure magic.
+Infinite Uploads is a hybrid custom stack built and hosted with multiple enterprise-grade cloud services for the ultimate in security, speed, power, and performance. All without the cost of a sysadmin or the complexity of configuring servers, policies, permissions, keys, etc...pure magic.
 
 = Why can't I just use AWS S3, Google Cloud Storage, Azure, etc? =
 
@@ -143,11 +143,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Screenshots ==
 
-1. Run a quick scan to determin usage.
-1. Adds a complete media library disk utility for anylizing storage.
-1. Sync your files to the cloud with a click.
-1. Connect an unlimited number of sites.
-1. Create a custom CDN URL, track storage, and free up space.
+1. Run a quick scan to determine usage.
+2. Shows a complete media library report for analyzing storage.
+3. Sync your files to the cloud with a click.
+4. Connect an unlimited number of sites to the cloud.
+5. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
 

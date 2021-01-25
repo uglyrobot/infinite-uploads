@@ -221,11 +221,11 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:517, inc/class-infinite-uploads.php:529, inc/class-infinite-uploads.php:548
+#: inc/class-infinite-uploads.php:518, inc/class-infinite-uploads.php:530, inc/class-infinite-uploads.php:549
 msgid "Files can't be uploaded due to an issue with your Infinite Uploads account."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:515
+#: inc/class-infinite-uploads.php:516
 msgid "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>."
 msgstr ""
 
