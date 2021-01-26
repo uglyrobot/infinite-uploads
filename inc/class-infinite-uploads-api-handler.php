@@ -498,6 +498,12 @@ class Infinite_Uploads_Api_Handler {
 	public function disconnect() {
 		global $wpdb;
 
+		//ping the API to let them know we've disconnected
+		$this->call( "site/" . $this->get_site_id() . "/disconnect", [], 'POST', [
+			'timeout'  => 0.01,
+			'blocking' => false,
+		] );
+
 		//Do a find replace on the posts table. For multisite or other tables would really need a big find-replace plugin or WP CLI.
 		$uploads_url = $this->iup_instance->get_original_upload_dir();
 		$api_data    = $this->get_site_data();

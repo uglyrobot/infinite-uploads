@@ -13,17 +13,20 @@ gulp.task('pot', function () {
 
 gulp.task('zip', gulp.series('pot', function () {
   return gulp.src([
-    './**/*',
-    '!node_modules/**',
-    '!bin/**',
-    '!tests/**',
-    '!./gulpfile.js',
-    '!./package.json',
-    '!./package-lock.json',
-    '!./phpunit.xml.dist',
-    '!./README.md',
-    '!./.*'
-  ])
+      './**/*',
+      '!node_modules/**',
+      '!bin/**',
+      '!tests/**',
+      '!./gulpfile.js',
+      '!./package.json',
+      '!./package-lock.json',
+      '!./phpunit.xml.dist',
+      '!./README.md',
+      '!./.*'
+    ],
+    {
+      base: './'
+    })
     .pipe(zip('infinite-uploads.zip'))
     .pipe(gulp.dest('./../'));
 }));
