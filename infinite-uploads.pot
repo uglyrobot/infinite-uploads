@@ -13,11 +13,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: infinite-uploads.php:128
+#: infinite-uploads.php:129
 msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
 msgstr ""
 
-#: infinite-uploads.php:142
+#: infinite-uploads.php:143
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 

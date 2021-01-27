@@ -65,13 +65,14 @@ function infinite_uploads_install() {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$wpdb->base_prefix}infinite_uploads_files (
-	            `file` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
+	            `file` VARCHAR(255) NOT NULL,
 	            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
 	            `modified` INT UNSIGNED NOT NULL,
 	            `type` VARCHAR(20) NOT NULL,
 	            `synced` BOOLEAN NOT NULL DEFAULT '0',
 	            `deleted` BOOLEAN NOT NULL DEFAULT '0',
 	            `errors` INT UNSIGNED NOT NULL DEFAULT '0',
+	            `transfer_status` TEXT NULL DEFAULT NULL,
 	            PRIMARY KEY (`file`(255)),
 	            INDEX (`type`),
 	            INDEX (`synced`),
