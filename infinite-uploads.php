@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
- * Version: 1.0-alpha-4
+ * Version: 1.0-alpha-5
  * Author: UglyRobot, LLC
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
@@ -16,11 +16,13 @@
  * Copyright 2020 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-4' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-5' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
 }
+
+register_activation_hook( __FILE__, 'infinite_uploads_db_install' );
 
 add_action( 'plugins_loaded', 'infinite_uploads_init' );
 
@@ -50,48 +52,53 @@ function infinite_uploads_init() {
 		return;
 	}
 
-	infinite_uploads_install();
+	infinite_uploads_upgrade();
 
 	$instance = Infinite_Uploads::get_instance();
 	$instance->setup();
 }
 
-function infinite_uploads_install() {
-	global $wpdb;
+function infinite_uploads_upgrade() {
 
 	// Install the needed DB table if not already.
 	$installed = get_site_option( 'iup_installed' );
 	if ( INFINITE_UPLOADS_VERSION != $installed ) {
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE {$wpdb->base_prefix}infinite_uploads_files (
-	            `file` VARCHAR(255) NOT NULL,
-	            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
-	            `modified` INT UNSIGNED NOT NULL,
-	            `type` VARCHAR(20) NOT NULL,
-	            `synced` BOOLEAN NOT NULL DEFAULT '0',
-	            `deleted` BOOLEAN NOT NULL DEFAULT '0',
-	            `errors` INT UNSIGNED NOT NULL DEFAULT '0',
-	            `transfer_status` TEXT NULL DEFAULT NULL,
-	            PRIMARY KEY (`file`(255)),
-	            INDEX (`type`),
-	            INDEX (`synced`),
-	            INDEX (`deleted`)
-	        ) {$charset_collate};";
-
-		if ( ! function_exists( 'dbDelta' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		}
-
-		//prevent race condition during upgrade by setting option before running potentially long query
-		if ( is_multisite() ) {
-			update_site_option( 'iup_installed', INFINITE_UPLOADS_VERSION );
-		} else {
-			update_option( 'iup_installed', INFINITE_UPLOADS_VERSION, true );
-		}
-
-		dbDelta( $sql );
+		infinite_uploads_install();
 	}
+}
+
+function infinite_uploads_install() {
+	global $wpdb;
+
+	//prevent race condition during upgrade by setting option before running potentially long query
+	if ( is_multisite() ) {
+		update_site_option( 'iup_installed', INFINITE_UPLOADS_VERSION );
+	} else {
+		update_option( 'iup_installed', INFINITE_UPLOADS_VERSION, true );
+	}
+
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE {$wpdb->base_prefix}infinite_uploads_files (
+            `file` VARCHAR(255) NOT NULL,
+            `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
+            `modified` INT UNSIGNED NOT NULL,
+            `type` VARCHAR(20) NOT NULL,
+            `synced` BOOLEAN NOT NULL DEFAULT '0',
+            `deleted` BOOLEAN NOT NULL DEFAULT '0',
+            `errors` INT UNSIGNED NOT NULL DEFAULT '0',
+            `transfer_status` TEXT NULL DEFAULT NULL,
+            PRIMARY KEY (`file`(255)),
+            INDEX (`type`),
+            INDEX (`synced`),
+            INDEX (`deleted`)
+        ) {$charset_collate};";
+
+	if ( ! function_exists( 'dbDelta' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	}
+
+	dbDelta( $sql );
 }
 
 /**
@@ -157,7 +164,7 @@ function infinite_uploads_enabled() {
 /**
  * Autoload callback.
  *
- * @param $class_name Name of the class to load.
+ * @param $class_name string Name of the class to load.
  */
 function infinite_uploads_autoload( $class_name ) {
 	/*
