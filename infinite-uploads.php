@@ -22,7 +22,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
 }
 
-register_activation_hook( __FILE__, 'infinite_uploads_db_install' );
+register_activation_hook( __FILE__, 'infinite_uploads_install' );
 
 add_action( 'plugins_loaded', 'infinite_uploads_init' );
 
@@ -88,17 +88,17 @@ function infinite_uploads_install() {
             `deleted` BOOLEAN NOT NULL DEFAULT '0',
             `errors` INT UNSIGNED NOT NULL DEFAULT '0',
             `transfer_status` TEXT NULL DEFAULT NULL,
-            PRIMARY KEY (`file`(255)),
-            INDEX (`type`),
-            INDEX (`synced`),
-            INDEX (`deleted`)
+            PRIMARY KEY (`file`(200)),
+            INDEX `type` (`type`),
+            INDEX `synced` (`synced`),
+            INDEX `deleted` (`deleted`)
         ) {$charset_collate};";
 
 	if ( ! function_exists( 'dbDelta' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	}
 
-	dbDelta( $sql );
+	return dbDelta( $sql );
 }
 
 /**

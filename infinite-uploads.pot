@@ -565,6 +565,6 @@ msgstr ""
 msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library for smart recommendations choosing the best plan for your site, create or connect your account, and voilà – you're ready to push to the cloud."
 msgstr ""
 
-#: inc/templates/welcome.php:12
+#: inc/templates/welcome.php:17
 msgid "Run Scan"
 msgstr ""
