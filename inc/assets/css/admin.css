@@ -2,6 +2,11 @@ body {
   background-color: rgb(241, 241, 241);
 }
 
+/* Fixes conflict with woosquared */
+.modal {
+  z-index: 99999;
+}
+
 .card {
   margin-top: inherit;
   padding: inherit;
