@@ -75,8 +75,8 @@ class Infinite_Uploads {
 
 		// don't register all this until we've enabled rewriting.
 		if ( ! infinite_uploads_enabled() ) {
-			$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
-			add_action( $hook, [ $this, 'setup_notice' ] );
+			add_action( 'admin_notices', [ $this, 'setup_notice' ] );
+			add_action( 'network_admin_notices', [ $this, 'setup_notice' ] );
 
 			return true;
 		}
@@ -223,7 +223,7 @@ class Infinite_Uploads {
 			return;
 		}
 
-		if ( get_current_screen()->id == 'settings_page_infinite_uploads' ) {
+		if ( get_current_screen()->id == 'settings_page_infinite_uploads' || get_current_screen()->id == 'settings_page_infinite_uploads-network' ) {
 			return;
 		}
 		?>

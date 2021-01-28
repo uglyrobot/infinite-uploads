@@ -328,7 +328,7 @@ class Infinite_Uploads_Api_Handler {
 
 		// Collect back-trace information for the logfile.
 		$caller_dump = '';
-		if ( INFINITE_UPLOADS_API_DEBUG ) {
+		if ( defined( 'INFINITE_UPLOADS_API_DEBUG' ) && INFINITE_UPLOADS_API_DEBUG ) {
 			$trace     = debug_backtrace();
 			$caller    = [];
 			$last_line = '';

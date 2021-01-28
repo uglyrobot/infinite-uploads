@@ -13,87 +13,87 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: infinite-uploads.php:136
+#: infinite-uploads.php:137
 msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
 msgstr ""
 
-#: infinite-uploads.php:150
+#: infinite-uploads.php:151
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:59
+#: inc/class-infinite-uploads-admin.php:60
 msgid "When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:62, inc/class-infinite-uploads-admin.php:518, inc/class-infinite-uploads-admin.php:519, inc/class-infinite-uploads-admin.php:507, inc/class-infinite-uploads-admin.php:508
+#: inc/class-infinite-uploads-admin.php:63, inc/class-infinite-uploads-admin.php:519, inc/class-infinite-uploads-admin.php:520, inc/class-infinite-uploads-admin.php:508, inc/class-infinite-uploads-admin.php:509
 msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:69, inc/class-infinite-uploads-admin.php:102, inc/class-infinite-uploads-admin.php:197, inc/class-infinite-uploads-admin.php:302, inc/class-infinite-uploads-admin.php:329, inc/class-infinite-uploads-admin.php:420, inc/class-infinite-uploads-admin.php:585
+#: inc/class-infinite-uploads-admin.php:70, inc/class-infinite-uploads-admin.php:103, inc/class-infinite-uploads-admin.php:198, inc/class-infinite-uploads-admin.php:303, inc/class-infinite-uploads-admin.php:330, inc/class-infinite-uploads-admin.php:421, inc/class-infinite-uploads-admin.php:586
 msgid "Permissions Error: Please refresh the page and try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:276
+#: inc/class-infinite-uploads-admin.php:277
 msgid "Error uploading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:273
+#: inc/class-infinite-uploads-admin.php:274
 msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:271, inc/class-infinite-uploads-wp-cli-command.php:287
+#: inc/class-infinite-uploads-admin.php:272, inc/class-infinite-uploads-wp-cli-command.php:287
 msgid "Error uploading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:393
+#: inc/class-infinite-uploads-admin.php:394
 msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:390, inc/class-infinite-uploads-wp-cli-command.php:523
+#: inc/class-infinite-uploads-admin.php:391, inc/class-infinite-uploads-wp-cli-command.php:523
 msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:388, inc/class-infinite-uploads-wp-cli-command.php:521
+#: inc/class-infinite-uploads-admin.php:389, inc/class-infinite-uploads-wp-cli-command.php:521
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:457, inc/class-infinite-uploads.php:242, inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:458, inc/class-infinite-uploads.php:242, inc/templates/connect.php:49
 msgid "Connect"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:455
+#: inc/class-infinite-uploads-admin.php:456
 msgid "Settings"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:459, inc/templates/footer.php:9
+#: inc/class-infinite-uploads-admin.php:460, inc/templates/footer.php:9
 msgid "Support"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:543
+#: inc/class-infinite-uploads-admin.php:544
 msgid "Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:544
+#: inc/class-infinite-uploads-admin.php:545
 msgid "Too many server errors. Please try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:545
+#: inc/class-infinite-uploads-admin.php:546
 msgid "If you leave this page the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:615
+#: inc/class-infinite-uploads-admin.php:616
 msgid "United States"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:616
+#: inc/class-infinite-uploads-admin.php:617
 msgid "Europe"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:647
+#: inc/class-infinite-uploads-admin.php:648
 msgid "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:643
+#: inc/class-infinite-uploads-admin.php:644
 msgid "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
@@ -349,7 +349,7 @@ msgstr ""
 msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
 msgstr ""
 
-#: inc/templates/modal-download.php:34
+#: inc/templates/modal-download.php:35
 msgid "<span id=\"iup-download-size\">%s</span> / <span id=\"iup-download-files\">%s</span> Files Remaining"
 msgstr ""
 
@@ -385,7 +385,7 @@ msgstr ""
 msgid "Checking for files already uploaded to the cloud. Please leave this tab open while we complete your scan."
 msgstr ""
 
-#: inc/templates/modal-remote-scan.php:23
+#: inc/templates/modal-remote-scan.php:24
 msgid "<span id=\"iup-scan-remote-storage\">%s</span> / <span id=\"iup-scan-remote-files\">%s</span> Files Synced"
 msgstr ""
 
