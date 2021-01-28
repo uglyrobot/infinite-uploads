@@ -36,6 +36,7 @@ jQuery(document).ready(function ($) {
       if (json.success) {
         $('#iup-scan-storage').text(json.data.local_size);
         $('#iup-scan-files').text(json.data.local_files);
+        $('#iup-scan-progress').show();
         if (!json.data.is_done) {
           buildFilelist(json.data.remaining_dirs, json.data.nonce);
         } else {
@@ -72,12 +73,18 @@ jQuery(document).ready(function ($) {
       if (json.success) {
         $('#iup-scan-remote-storage').text(json.data.cloud_size);
         $('#iup-scan-remote-files').text(json.data.cloud_files);
+        $('#iup-scan-remote-progress').show();
         if (!json.data.is_done) {
           fetchRemoteFilelist(json.data.next_token, json.data.nonce);
         } else {
           //update values in next modal
           $('#iup-progress-size').text(json.data.remaining_size);
           $('#iup-progress-files').text(json.data.remaining_files);
+          if ('0' == json.data.remaining_files) {
+            $('#iup-upload-progress').hide();
+          } else {
+            $('#iup-upload-progress').show();
+          }
           $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
 
           $('#iup-sync-button').attr('data-target', '#upload-modal');
@@ -116,11 +123,13 @@ jQuery(document).ready(function ($) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-progress-size').text(json.data.remaining_size);
         $('#iup-progress-files').text(json.data.remaining_files);
+        $('#iup-upload-progress').show();
         $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
         if (!json.data.is_done) {
           data.nonce = json.data.nonce; //save for future errors
           syncFilelist(json.data.nonce);
         } else {
+          $('#iup-upload-progress').hide();
           //update values in next modal
           $('#iup-enable-errors span').text(json.data.permanent_errors);
           if (json.data.permanent_errors) {
@@ -206,6 +215,7 @@ jQuery(document).ready(function ($) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-download-size').text(json.data.deleted_size);
         $('#iup-download-files').text(json.data.deleted_files);
+        $('#iup-download-progress').show();
         $('#iup-download-progress-bar').css('width', json.data.pcnt_downloaded + "%").attr('aria-valuenow', json.data.pcnt_downloaded).text(json.data.pcnt_downloaded + "%");
         if (!json.data.is_done) {
           data.nonce = json.data.nonce; //save for future errors

@@ -20,7 +20,7 @@
 					</div>
 					<div class="row justify-content-center mb-5">
 						<div class="col text-center text-muted">
-							<span class="h3">
+							<span class="h3" id="iup-scan-progress">
 								<?php
 								printf(
 								// translators: %1$s is the opening a tag for storage
