@@ -2,21 +2,22 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
- * Version: 1.0-alpha-5
+ * Version: 1.0-alpha-6
  * Author: UglyRobot, LLC
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
  * Requires at least: 5.3
- * Requires PHP: 5.6
+ * Requires PHP: 5.5
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Network: true
  *
  * Inspired by and borrowed some code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
  *
  * Copyright 2020 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-5' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-6' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -133,7 +134,7 @@ function infinite_uploads_check_requirements() {
 function infinite_uploads_outdated_php_version_notice() {
 	?>
 	<div class="notice notice-warning is-dismissible"><p>
-			<?php printf( __( 'The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s.', 'infinite-uploads' ), PHP_VERSION ); ?>
+			<?php printf( esc_html__( 'The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s.', 'infinite-uploads' ), PHP_VERSION ); ?>
 		</p></div>
 	<?php
 }
@@ -147,7 +148,7 @@ function infinite_uploads_outdated_wp_version_notice() {
 	global $wp_version;
 	?>
 	<div class="notice notice-warning is-dismissible"><p>
-			<?php printf( __( 'The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s.', 'infinite-uploads' ), $wp_version ); ?>
+			<?php printf( esc_html__( 'The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s.', 'infinite-uploads' ), $wp_version ); ?>
 		</p></div>
 	<?php
 }

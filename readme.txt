@@ -3,7 +3,7 @@
 Requires at least: 5.3
 Tested up to: 5.6.1
 Stable tag: trunk
-Requires PHP: 5.6
+Requires PHP: 5.5
 Contributors: uglyrobot, jdailey
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -30,7 +30,7 @@ Now everyone can take full advantage of both the cost-savings and performance be
 - Easy File Manager - Use the WordPress Media Library to manage files in the cloud without an FTP/SFTP manager
 - Bulk transfer - move existing media files to or from the cloud with a click or WP CLI command
 - Simple restore - no contract and easy to restore all your files to your media library
-- Universal compatability - Works with all well-coded plugins and themes including eCommerce and performance optimization
+- Universal compatibility - Works with all well-coded plugins and themes including eCommerce and performance optimization
 
 ### Better Performance, Less Time, Lower-cost
 If you upload a lot of images, publish video content, share motion graphics, want to add big beautiful video backgrounds, have a podcast, or stream large audio files for sermons or lectures, you will save time, resources, and improve performance by moving your files to Infinite Uploads. Keep your site moving at top-speed with dedicated media delivery that seamlessly integrates with WordPress.

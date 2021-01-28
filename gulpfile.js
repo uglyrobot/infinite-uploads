@@ -25,7 +25,7 @@ gulp.task('zip', gulp.series('pot', function () {
       '!./.*'
     ],
     {
-      base: './'
+      base: "../"
     })
     .pipe(zip('infinite-uploads.zip'))
     .pipe(gulp.dest('./../'));

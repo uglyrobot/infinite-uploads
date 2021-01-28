@@ -56,17 +56,17 @@ class Infinite_Uploads_Admin {
 		}
 		$content = '<p>'
 		           . sprintf(
-			           __( 'When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is <a href="%1$s" target="_blank">here</a>.', 'infinite-uploads' ),
-			           'https://infiniteuploads.com/privacy/'
+			           esc_html__( 'When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s.', 'infinite-uploads' ),
+			           '<a href="https://infiniteuploads.com/privacy/" target="_blank">', '</a>'
 		           ) . '</p>';
-		wp_add_privacy_policy_content( __( 'Infinite Uploads', 'infinite-uploads' ), wp_kses_post( wpautop( $content, false ) ) );
+		wp_add_privacy_policy_content( esc_html__( 'Infinite Uploads', 'infinite-uploads' ), wp_kses_post( wpautop( $content, false ) ) );
 	}
 
 	public function ajax_filelist() {
 
 		// check caps
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_scan' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$path = $this->iup_instance->get_original_upload_dir();
@@ -99,7 +99,7 @@ class Infinite_Uploads_Admin {
 
 		// check caps
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_scan' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$s3 = $this->iup_instance->s3();
@@ -194,7 +194,7 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_sync' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -268,12 +268,12 @@ class Infinite_Uploads_Admin {
 					$file        = str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					if ( $error_count >= 3 ) {
-						$errors[] = sprintf( __( 'Error uploading %s. Retries exceeded.', 'infinite-uploads' ), $file );
+						$errors[] = sprintf( esc_html__( 'Error uploading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
-						$errors[] = sprintf( __( 'Error uploading %s. Queued for retry.', 'infinite-uploads' ), $file );
+						$errors[] = sprintf( esc_html__( 'Error uploading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
 				} else { //I don't know which error case trigger this but it's common
-					$errors[] = __( 'Error uploading file. Queued for retry.', 'infinite-uploads' );
+					$errors[] = esc_html__( 'Error uploading file. Queued for retry.', 'infinite-uploads' );
 				}
 			}
 
@@ -299,7 +299,7 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_delete' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$deleted = 0;
@@ -326,7 +326,7 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_download' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$progress = get_site_option( 'iup_files_scanned' );
@@ -385,12 +385,12 @@ class Infinite_Uploads_Admin {
 					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( $this->iup_instance->bucket ), '', $e->getRequest()->getRequestTarget() ) );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					if ( $error_count >= 3 ) {
-						$errors[] = sprintf( __( 'Error downloading %s. Retries exceeded.', 'infinite-uploads' ), $file );
+						$errors[] = sprintf( esc_html__( 'Error downloading %s. Retries exceeded.', 'infinite-uploads' ), $file );
 					} else {
-						$errors[] = sprintf( __( 'Error downloading %s. Queued for retry.', 'infinite-uploads' ), $file );
+						$errors[] = sprintf( esc_html__( 'Error downloading %s. Queued for retry.', 'infinite-uploads' ), $file );
 					}
 				} else {
-					$errors[] = __( 'Error downloading file. Queued for retry.', 'infinite-uploads' );
+					$errors[] = esc_html__( 'Error downloading file. Queued for retry.', 'infinite-uploads' );
 				}
 			}
 
@@ -417,7 +417,7 @@ class Infinite_Uploads_Admin {
 	 */
 	public function ajax_toggle() {
 		if ( ! current_user_can( $this->iup_instance->capability ) || ! wp_verify_nonce( $_POST['nonce'], 'iup_toggle' ) ) {
-			wp_send_json_error( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		$enabled = (bool) $_REQUEST['enabled'];
@@ -452,11 +452,11 @@ class Infinite_Uploads_Admin {
 		// Create the link.
 		$custom_links = [];
 		if ( $this->api->has_token() ) {
-			$custom_links['settings'] = "<a href='$url'>" . __( 'Settings', 'infinite-uploads' ) . '</a>';
+			$custom_links['settings'] = "<a href='$url'>" . esc_html__( 'Settings', 'infinite-uploads' ) . '</a>';
 		} else {
-			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . __( 'Connect', 'infinite-uploads' ) . '</a>';
+			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . esc_html__( 'Connect', 'infinite-uploads' ) . '</a>';
 		}
-		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/' ) ) . '">' . __( 'Support', 'infinite-uploads' ) . '</a>';
+		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/' ) ) . '">' . esc_html__( 'Support', 'infinite-uploads' ) . '</a>';
 
 
 		// Adds the links to the beginning of the array.
@@ -540,9 +540,9 @@ class Infinite_Uploads_Admin {
 
 		$data            = [];
 		$data['strings'] = [
-			'leave_confirm'      => __( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
-			'ajax_error'         => __( 'Too many server errors. Please try again.', 'infinite-uploads' ),
-			'leave_confirmation' => __( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
+			'leave_confirm'      => esc_html__( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
+			'ajax_error'         => esc_html__( 'Too many server errors. Please try again.', 'infinite-uploads' ),
+			'leave_confirmation' => esc_html__( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
 		];
 
 		$data['local_types'] = $this->iup_instance->get_filetypes( true );
@@ -582,7 +582,7 @@ class Infinite_Uploads_Admin {
 	 */
 	function intercept_auth() {
 		if ( ! current_user_can( $this->iup_instance->capability ) ) {
-			wp_die( __( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+			wp_die( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
 		if ( ! empty( $_GET['temp_token'] ) ) {
@@ -612,8 +612,8 @@ class Infinite_Uploads_Admin {
 		global $wpdb;
 
 		$region_labels = [
-			'US' => __( 'United States', 'infinite-uploads' ),
-			'EU' => __( 'Europe', 'infinite-uploads' ),
+			'US' => esc_html__( 'United States', 'infinite-uploads' ),
+			'EU' => esc_html__( 'Europe', 'infinite-uploads' ),
 		];
 
 		$stats    = $this->iup_instance->get_sync_stats();

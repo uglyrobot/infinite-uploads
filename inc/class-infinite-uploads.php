@@ -51,7 +51,7 @@ class Infinite_Uploads {
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
 		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
-			$this->bucket = $api_data->site->upload_bucket;
+			$this->bucket     = $api_data->site->upload_bucket;
 			$this->key        = $api_data->site->upload_key;
 			$this->secret     = $api_data->site->upload_secret;
 			$this->bucket_url = $api_data->site->cdn_url;
@@ -71,8 +71,6 @@ class Infinite_Uploads {
 			if ( infinite_uploads_enabled() ) {
 				$this->toggle_cloud( false );
 			}
-
-			return true;
 		}
 
 		// don't register all this until we've enabled rewriting.
@@ -229,12 +227,20 @@ class Infinite_Uploads {
 			return;
 		}
 		?>
-		<div class="notice notice-info">
-			<p style="font-size: 15px;line-height: 2.3;">
-				<strong><?php _e( 'Infinite Uploads is Ready!', 'infinite-uploads' ); ?></strong> <?php _e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' ); ?>
-				<a class="button button-primary" href="<?php echo esc_url( $this->admin->settings_url() ); ?>" style="float: right;font-size: 15px;"><?php _e( 'Connect', 'infinite-uploads' ); ?></a>
-			</p>
-
+		<div class="notice notice-info" style="white-space: nowrap;padding: 10px 15px 10px 10px;">
+			<span style="display: inline-block;vertical-align: middle;white-space: normal;width: 80%;font-size: 15px;">
+				<strong><?php esc_html_e( 'Infinite Uploads is almost ready!', 'infinite-uploads' ); ?></strong>
+				<?php
+				if ( $this->api->has_token() ) {
+					esc_html_e( 'Finish syncing your images, audio, video, and documents to the cloud to enable.', 'infinite-uploads' );
+				} else {
+					esc_html_e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' );
+				}
+				?>
+			</span>
+			<span style="display: inline-block;vertical-align: middle;width: 20%;text-align: right;">
+				<a class="button button-primary" href="<?php echo esc_url( $this->admin->settings_url() ); ?>" style="font-size: 15px;"><?php echo $this->api->has_token() ? esc_html__( 'Finish Sync', 'infinite-uploads' ) : esc_html__( 'Connect', 'infinite-uploads' ); ?></a>
+			</span>
 		</div>
 		<?php
 	}
@@ -328,13 +334,13 @@ class Infinite_Uploads {
 
 	public function get_file_type_format( $type, $key ) {
 		$labels = [
-			'image'    => [ 'color' => '#26A9E0', 'label' => __( 'Images', 'infinite-uploads' ) ],
-			'audio'    => [ 'color' => '#00A167', 'label' => __( 'Audio', 'infinite-uploads' ) ],
-			'video'    => [ 'color' => '#C035E2', 'label' => __( 'Video', 'infinite-uploads' ) ],
-			'document' => [ 'color' => '#EE7C1E', 'label' => __( 'Documents', 'infinite-uploads' ) ],
-			'archive'  => [ 'color' => '#EC008C', 'label' => __( 'Archives', 'infinite-uploads' ) ],
-			'code'     => [ 'color' => '#EFED27', 'label' => __( 'Code', 'infinite-uploads' ) ],
-			'other'    => [ 'color' => '#F1F1F1', 'label' => __( 'Other', 'infinite-uploads' ) ],
+			'image'    => [ 'color' => '#26A9E0', 'label' => esc_html__( 'Images', 'infinite-uploads' ) ],
+			'audio'    => [ 'color' => '#00A167', 'label' => esc_html__( 'Audio', 'infinite-uploads' ) ],
+			'video'    => [ 'color' => '#C035E2', 'label' => esc_html__( 'Video', 'infinite-uploads' ) ],
+			'document' => [ 'color' => '#EE7C1E', 'label' => esc_html__( 'Documents', 'infinite-uploads' ) ],
+			'archive'  => [ 'color' => '#EC008C', 'label' => esc_html__( 'Archives', 'infinite-uploads' ) ],
+			'code'     => [ 'color' => '#EFED27', 'label' => esc_html__( 'Code', 'infinite-uploads' ) ],
+			'other'    => [ 'color' => '#F1F1F1', 'label' => esc_html__( 'Other', 'infinite-uploads' ) ],
 		];
 
 		if ( isset( $labels[ $type ] ) ) {
@@ -481,8 +487,8 @@ class Infinite_Uploads {
 		$to_purge[] = $file;
 
 		$dirs = wp_get_upload_dir();
-		foreach( $to_purge as $key => $file ) {
-			$to_purge[$key] = str_replace( $dirs['basedir'], $dirs['baseurl'], $file );
+		foreach ( $to_purge as $key => $file ) {
+			$to_purge[ $key ] = str_replace( $dirs['basedir'], $dirs['baseurl'], $file );
 		}
 
 		//purge these from CDN cache
@@ -515,7 +521,8 @@ class Infinite_Uploads {
 			?>
 			<div class="notice notice-error"><p><?php printf( __( "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>.", 'infinite-uploads' ), esc_url( $this->admin->settings_url() ) ); ?></p></div><?php
 		} else {
-			?><div class="notice notice-error"><p><?php _e( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
+			?>
+			<div class="notice notice-error"><p><?php esc_html_e( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
 		}
 	}
 
@@ -527,7 +534,7 @@ class Infinite_Uploads {
 	 * @return array
 	 */
 	public function block_uploads( $file ) {
-		$file['error'] = __( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' );
+		$file['error'] = esc_html__( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' );
 
 		return $file;
 	}
@@ -535,8 +542,8 @@ class Infinite_Uploads {
 	/**
 	 * Block editing media in Gutenberg WP 5.5+ block.
 	 *
-	 * @param $result null
-	 * @param WP_REST_Server $server
+	 * @param                 $result null
+	 * @param WP_REST_Server  $server
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error

@@ -2,7 +2,7 @@
 	<div class="modal-dialog modal-dialog-centered modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="delete-modal-label"><?php _e( 'Free Up Local Storage', 'infinite-uploads' ); ?></h5>
+				<h5 class="modal-title" id="delete-modal-label"><?php esc_html_e( 'Free Up Local Storage', 'infinite-uploads' ); ?></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -11,9 +11,9 @@
 				<div class="container-fluid">
 					<div class="row justify-content-center mb-4 mt-3">
 						<div class="col text-center">
-							<h4><?php _e( 'Delete Local Files', 'infinite-uploads' ); ?></h4>
-							<p class="lead"><?php _e( "This will delete the duplicate copies of your files stored in your local media library. This saves space and improves server performance but will require downloading these files back to the uploads directory before disconnecting to prevent broken media on your site.", 'infinite-uploads' ); ?></p>
-							<p><?php _e( 'If your host provides access to WP CLI, you can also execute the command:', 'infinite-uploads' ); ?> <code>wp infinite-uploads delete</code></p>
+							<h4><?php esc_html_e( 'Delete Local Files', 'infinite-uploads' ); ?></h4>
+							<p class="lead"><?php esc_html_e( "This will delete the duplicate copies of your files stored in your local media library. This saves space and improves server performance but will require downloading these files back to the uploads directory before disconnecting to prevent broken media on your site.", 'infinite-uploads' ); ?></p>
+							<p><?php esc_html_e( 'If your host provides access to WP CLI, you can also execute the command:', 'infinite-uploads' ); ?> <code>wp infinite-uploads delete</code></p>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-5">
@@ -26,7 +26,7 @@
 					</div>
 					<div class="row justify-content-center mb-4">
 						<div class="col-4 text-center">
-							<button class="btn text-nowrap btn-info btn-lg btn-block" id="iup-delete-local-button"><?php _e( 'Start Delete', 'infinite-uploads' ); ?></button>
+							<button class="btn text-nowrap btn-info btn-lg btn-block" id="iup-delete-local-button"><?php esc_html_e( 'Start Delete', 'infinite-uploads' ); ?></button>
 						</div>
 					</div>
 				</div>

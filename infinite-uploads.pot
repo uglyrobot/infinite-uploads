@@ -22,7 +22,7 @@ msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. You
 msgstr ""
 
 #: inc/class-infinite-uploads-admin.php:59
-msgid "When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is <a href=\"%1$s\" target=\"_blank\">here</a>."
+msgid "When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s."
 msgstr ""
 
 #: inc/class-infinite-uploads-admin.php:62, inc/class-infinite-uploads-admin.php:518, inc/class-infinite-uploads-admin.php:519, inc/class-infinite-uploads-admin.php:507, inc/class-infinite-uploads-admin.php:508
@@ -57,7 +57,7 @@ msgstr ""
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:457, inc/class-infinite-uploads.php:235, inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:457, inc/class-infinite-uploads.php:242, inc/templates/connect.php:49
 msgid "Connect"
 msgstr ""
 
@@ -173,59 +173,67 @@ msgstr ""
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:234
-msgid "Infinite Uploads is Ready!"
+#: inc/class-infinite-uploads.php:232
+msgid "Infinite Uploads is almost ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:234
+#: inc/class-infinite-uploads.php:237
 msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:316
+#: inc/class-infinite-uploads.php:235
+msgid "Finish syncing your images, audio, video, and documents to the cloud to enable."
+msgstr ""
+
+#: inc/class-infinite-uploads.php:242
+msgid "Finish Sync"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:322
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:321
+#: inc/class-infinite-uploads.php:327
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:331
+#: inc/class-infinite-uploads.php:337
 msgid "Images"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:332
+#: inc/class-infinite-uploads.php:338
 msgid "Audio"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:333
+#: inc/class-infinite-uploads.php:339
 msgid "Video"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:334
+#: inc/class-infinite-uploads.php:340
 msgid "Documents"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:335
+#: inc/class-infinite-uploads.php:341
 msgid "Archives"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:336
+#: inc/class-infinite-uploads.php:342
 msgid "Code"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:337
+#: inc/class-infinite-uploads.php:343
 msgid "Other"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:518, inc/class-infinite-uploads.php:530, inc/class-infinite-uploads.php:549
+#: inc/class-infinite-uploads.php:525, inc/class-infinite-uploads.php:537, inc/class-infinite-uploads.php:556
 msgid "Files can't be uploaded due to an issue with your Infinite Uploads account."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:516
+#: inc/class-infinite-uploads.php:522
 msgid "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>."
 msgstr ""
 
@@ -393,8 +401,9 @@ msgstr ""
 msgid "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan."
 msgstr ""
 
-#: inc/templates/modal-scan.php:23
-msgid "Found <span id=\"iup-scan-storage\">0 MB</span> / <span id=\"iup-scan-files\">0</span> Files..."
+#. translators: %3$s is the opening a tag for files
+#: inc/templates/modal-scan.php:30
+msgid "Found %1$s0 MB%2$s / %3$s0%4$s Files..."
 msgstr ""
 
 #: inc/templates/modal-upload.php:5
@@ -565,6 +574,6 @@ msgstr ""
 msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library for smart recommendations choosing the best plan for your site, create or connect your account, and voilà – you're ready to push to the cloud."
 msgstr ""
 
-#: inc/templates/welcome.php:17
+#: inc/templates/welcome.php:12
 msgid "Run Scan"
 msgstr ""

@@ -1,14 +1,14 @@
 <div class="card">
 	<div class="card-header">
 		<div class="d-flex align-items-center">
-			<h5 class="m-0 mr-auto p-0"><?php _e( 'Local File Overview', 'infinite-uploads' ); ?></h5>
+			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Local File Overview', 'infinite-uploads' ); ?></h5>
 			<?php require_once( dirname( __FILE__ ) . '/status-icon.php' ); ?>
 		</div>
 	</div>
 	<div class="card-body cloud p-5">
 		<div class="row align-items-center justify-content-center">
 			<div class="col">
-				<p class="lead mb-0"><?php _e( "Total Bytes / Files", 'infinite-uploads' ); ?></p>
+				<p class="lead mb-0"><?php esc_html_e( "Total Bytes / Files", 'infinite-uploads' ); ?></p>
 				<span class="h1"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
 				<div class="container">
@@ -20,9 +20,9 @@
 						</div>
 					<?php } ?>
 					<div class="row mt-2">
-						<div class="col-7 text-muted text-center"><small><?php printf( __( 'Scanned %s ago', 'infinite-uploads' ), human_time_diff( $stats['files_finished'] ) ); ?> &dash; <a href="#" class="badge badge-primary" data-toggle="modal" data-target="#scan-modal"><span
+						<div class="col-7 text-muted text-center"><small><?php printf( esc_html__( 'Scanned %s ago', 'infinite-uploads' ), human_time_diff( $stats['files_finished'] ) ); ?> &dash; <a href="#" class="badge badge-primary" data-toggle="modal" data-target="#scan-modal"><span
 										data-toggle="tooltip"
-										title="<?php esc_attr_e( 'Run a new scan to detect and sync recently uploaded files.', 'infinite-uploads' ); ?>"><?php _e( 'Refresh', 'infinite-uploads' ); ?></span></a></small>
+										title="<?php esc_attr_e( 'Run a new scan to detect and sync recently uploaded files.', 'infinite-uploads' ); ?>"><?php esc_html_e( 'Refresh', 'infinite-uploads' ); ?></span></a></small>
 						</div>
 					</div>
 				</div>
@@ -33,8 +33,8 @@
 		</div>
 		<div class="row justify-content-center mb-3">
 			<div class="col text-center">
-				<h4><?php _e( 'Ready to Connect!', 'infinite-uploads' ); ?></h4>
-				<p class="lead"><?php _e( 'Get smart plan recommendations, create or connect to existing account, and sync to the cloud.', 'infinite-uploads' ); ?></p>
+				<h4><?php esc_html_e( 'Ready to Connect!', 'infinite-uploads' ); ?></h4>
+				<p class="lead"><?php esc_html_e( 'Get smart plan recommendations, create or connect to existing account, and sync to the cloud.', 'infinite-uploads' ); ?></p>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-5">
@@ -46,7 +46,7 @@
 					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $this->settings_url() ); ?>">
 					<input type="hidden" name="bytes" value="<?php echo esc_attr( $to_sync->size ); ?>">
 					<input type="hidden" name="files" value="<?php echo esc_attr( $to_sync->files ); ?>">
-					<button class="btn text-nowrap btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php _e( 'Connect', 'infinite-uploads' ); ?></button>
+					<button class="btn text-nowrap btn-primary btn-lg btn-block" type="submit"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Connect', 'infinite-uploads' ); ?></button>
 
 				</form>
 			</div>
