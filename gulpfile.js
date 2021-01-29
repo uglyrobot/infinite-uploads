@@ -31,4 +31,4 @@ gulp.task('zip', gulp.series('pot', function () {
     .pipe(gulp.dest('./../'));
 }));
 
-gulp.task('default', gulp.series('pot'));
+gulp.task('default', gulp.series('zip'));
