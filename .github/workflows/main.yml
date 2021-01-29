@@ -2,7 +2,7 @@
 
 name: Release to github
 
-on: 
+on:
   push:
     tags:
     - '*'
@@ -25,14 +25,14 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
-          
-    - name: Install dependencies
+
+    - name: Install Composer dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
-      
-    - name: Build zip package
-      run: gulp zip
-      
+
+    - name: Compile with Gulp
+      uses: elstudio/actions-js-build/build@v2
+
     - name: Create Github release
       uses: ncipollo/release-action@v1
       with:
@@ -40,4 +40,4 @@ jobs:
         artifactContentType: "application/zip"
         body: "${{ env.GITHUB_REF }} plugin release."
         token: ${{ secrets.GITHUB_TOKEN }}
-  
+
