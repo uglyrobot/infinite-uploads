@@ -36,8 +36,7 @@ jobs:
     - name: Create Github release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/infinite-uploads.zip"
-        artifactContentType: "application/zip"
-        body: "${{ env.GITHUB_REF }} plugin release."
+        artifact: "build/infinite-uploads.zip"
+        body: "Plugin release."
         token: ${{ secrets.GITHUB_TOKEN }}
 
