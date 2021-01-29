@@ -11,12 +11,13 @@ gulp.task('pot', function () {
     .pipe(gulp.dest('infinite-uploads.pot'));
 });
 
-gulp.task('zip', gulp.series('pot', function () {
+gulp.task('zip', function () {
   return gulp.src([
       './**/*',
       '!node_modules/**',
       '!bin/**',
       '!tests/**',
+      '!build/**',
       '!./gulpfile.js',
       '!./package.json',
       '!./package-lock.json',
@@ -27,8 +28,8 @@ gulp.task('zip', gulp.series('pot', function () {
     {
       base: "../"
     })
-    .pipe(zip('infinite-uploads.zip'))
+    .pipe(zip('infinite-uploads/build/infinite-uploads.zip'))
     .pipe(gulp.dest('./../'));
-}));
+});
 
 gulp.task('default', gulp.series('zip'));
