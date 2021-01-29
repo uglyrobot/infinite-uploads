@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release to github
+
+on: 
+  push:
+    tags:
+    - '*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+          
+    - name: Install dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
+      
+    - name: Build zip package
+      run: gulp zip
+      
+    - name: Create Github release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "../infinite-uploads.zip"
+        artifactContentType: "application/zip"
+        body: "${{ env.GITHUB_REF }} plugin release."
+        token: ${{ secrets.GITHUB_TOKEN }}
+  
