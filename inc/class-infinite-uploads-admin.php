@@ -666,13 +666,13 @@ class Infinite_Uploads_Admin {
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
-					require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-enable.php' );
 				}
 
 				require_once( dirname( __FILE__ ) . '/templates/settings.php' );
 
+				require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
 

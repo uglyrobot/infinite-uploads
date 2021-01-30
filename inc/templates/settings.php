@@ -107,7 +107,7 @@
 				</div>
 				<div class="row justify-content-center">
 					<div class="col-4 text-center">
-						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#download-modal"><?php esc_html_e( 'Disconnect', 'infinite-uploads' ); ?></button>
+						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#scan-remote-modal"><?php esc_html_e( 'Disconnect', 'infinite-uploads' ); ?></button>
 					</div>
 				</div>
 			</div>

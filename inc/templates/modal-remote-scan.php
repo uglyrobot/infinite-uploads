@@ -15,7 +15,7 @@
 								<?php include( dirname( dirname( __FILE__ ) ) . '/assets/img/spinner-svg-2.html' ); ?>
 							</div>
 							<h4><?php esc_html_e( 'Comparing to Cloud', 'infinite-uploads' ); ?></h4>
-							<p class="lead"><?php esc_html_e( "Checking for files already uploaded to the cloud. Please leave this tab open while we complete your scan.", 'infinite-uploads' ); ?></p>
+							<p class="lead"><?php esc_html_e( "Checking for files already existing in the cloud. Please leave this tab open while we complete your scan.", 'infinite-uploads' ); ?></p>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-5">
@@ -24,11 +24,13 @@
 								class="h3" <?php echo ! $stats['cloud_files'] ? 'id="iup-scan-remote-progress"' : ''; ?>><?php printf( __( '<span id="iup-scan-remote-storage">%s</span> / <span id="iup-scan-remote-files">%s</span> Files Synced', 'infinite-uploads' ), $stats['cloud_size'], $stats['cloud_files'] ); ?></span>
 						</div>
 					</div>
-					<div class="row justify-content-center mb-4">
-						<div class="col-2 text-center">
-							<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-3.svg', dirname( __FILE__ ) ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+					<?php if ( ! infinite_uploads_enabled() ) { ?>
+						<div class="row justify-content-center mb-4">
+							<div class="col-2 text-center">
+								<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-3.svg', dirname( __FILE__ ) ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
+							</div>
 						</div>
-					</div>
+					<?php } //end not enabled ?>
 				</div>
 			</div>
 		</div>

@@ -4,6 +4,7 @@ jQuery(document).ready(function ($) {
   var stopLoop = false;
   var processingLoop = false;
   var loopErrors = 0;
+  var iupCallback = false;
 
   //show a confirmation warning if leaving page during a bulk action
   $(window).bind('beforeunload', function () {
@@ -77,19 +78,24 @@ jQuery(document).ready(function ($) {
         if (!json.data.is_done) {
           fetchRemoteFilelist(json.data.next_token, json.data.nonce);
         } else {
-          //update values in next modal
-          $('#iup-progress-size').text(json.data.remaining_size);
-          $('#iup-progress-files').text(json.data.remaining_files);
-          if ('0' == json.data.remaining_files) {
-            $('#iup-upload-progress').hide();
-          } else {
-            $('#iup-upload-progress').show();
-          }
-          $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
+          if ($("#enable-modal").length) {
+            //update values in next modal
+            $('#iup-progress-size').text(json.data.remaining_size);
+            $('#iup-progress-files').text(json.data.remaining_files);
+            if ('0' == json.data.remaining_files) {
+              $('#iup-upload-progress').hide();
+            } else {
+              $('#iup-upload-progress').show();
+            }
+            $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
 
-          $('#iup-sync-button').attr('data-target', '#upload-modal');
-          $('.modal').modal('hide');
-          $('#upload-modal').modal('show');
+            $('#iup-sync-button').attr('data-target', '#upload-modal');
+            $('.modal').modal('hide');
+            $('#upload-modal').modal('show');
+          } else {
+            $('.modal').modal('hide');
+            $('#download-modal').modal('show');
+          }
         }
 
       } else {
