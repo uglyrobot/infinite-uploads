@@ -245,11 +245,11 @@ msgstr ""
 msgid "This Site's Cloud Bytes / Files"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:22, inc/templates/settings.php:38
+#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:22, inc/templates/settings.php:40
 msgid "Recalculated every 24 hours"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:27, inc/templates/settings.php:42
+#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:27, inc/templates/settings.php:28, inc/templates/settings.php:44
 msgid "%s / %s"
 msgstr ""
 
@@ -309,7 +309,7 @@ msgstr ""
 msgid "Facebook"
 msgstr ""
 
-#: inc/templates/modal-delete.php:5, inc/templates/settings.php:83
+#: inc/templates/modal-delete.php:5, inc/templates/settings.php:87
 msgid "Free Up Local Storage"
 msgstr ""
 
@@ -349,7 +349,7 @@ msgstr ""
 msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
 msgstr ""
 
-#: inc/templates/modal-download.php:35
+#: inc/templates/modal-download.php:34
 msgid "<span id=\"iup-download-size\">%s</span> / <span id=\"iup-download-files\">%s</span> Files Remaining"
 msgstr ""
 
@@ -382,7 +382,7 @@ msgid "Comparing to Cloud"
 msgstr ""
 
 #: inc/templates/modal-remote-scan.php:18
-msgid "Checking for files already uploaded to the cloud. Please leave this tab open while we complete your scan."
+msgid "Checking for files already existing in the cloud. Please leave this tab open while we complete your scan."
 msgstr ""
 
 #: inc/templates/modal-remote-scan.php:24
@@ -446,7 +446,7 @@ msgstr ""
 msgid "Your current Infinite Uploads plan and storage."
 msgstr ""
 
-#: inc/templates/settings.php:22, inc/templates/settings.php:38
+#: inc/templates/settings.php:22, inc/templates/settings.php:40
 msgid "Used / Available"
 msgstr ""
 
@@ -458,75 +458,75 @@ msgstr ""
 msgid "Switch to a new plan."
 msgstr ""
 
-#: inc/templates/settings.php:33
+#: inc/templates/settings.php:35
 msgid "CDN Bandwidth"
 msgstr ""
 
-#: inc/templates/settings.php:34
+#: inc/templates/settings.php:36
 msgid "Infinite Uploads includes allotted bandwidth for CDN delivery of your files."
 msgstr ""
 
-#: inc/templates/settings.php:49
+#: inc/templates/settings.php:51
 msgid "CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:50
+#: inc/templates/settings.php:52
 msgid "Your uploads are served from this CDN url via 45+ edge locations around the world."
 msgstr ""
 
-#: inc/templates/settings.php:54
+#: inc/templates/settings.php:56
 msgid "Current CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:56
+#: inc/templates/settings.php:58
 msgid "Use your own custom domain!"
 msgstr ""
 
-#: inc/templates/settings.php:67
+#: inc/templates/settings.php:71
 msgid "Storage Region"
 msgstr ""
 
-#: inc/templates/settings.php:68
+#: inc/templates/settings.php:72
 msgid "The location of our servers storing your uploads."
 msgstr ""
 
-#: inc/templates/settings.php:72
+#: inc/templates/settings.php:76
 msgid "Region"
 msgstr ""
 
-#: inc/templates/settings.php:72
+#: inc/templates/settings.php:76
 msgid "Region can only be selected when first connecting your site."
 msgstr ""
 
-#: inc/templates/settings.php:84
+#: inc/templates/settings.php:88
 msgid "There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space."
 msgstr ""
 
-#: inc/templates/settings.php:88
+#: inc/templates/settings.php:92
 msgid "This saves space and improves server performance."
 msgstr ""
 
-#: inc/templates/settings.php:92
+#: inc/templates/settings.php:96
 msgid "Delete"
 msgstr ""
 
-#: inc/templates/settings.php:93
+#: inc/templates/settings.php:101
 msgid "%s / %s deletable files"
 msgstr ""
 
-#: inc/templates/settings.php:101
+#: inc/templates/settings.php:110
 msgid "Import & Disconnect"
 msgstr ""
 
-#: inc/templates/settings.php:102
+#: inc/templates/settings.php:111
 msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href=\"%s\" class=\"text-warning\">account management</a>."
 msgstr ""
 
-#: inc/templates/settings.php:106
+#: inc/templates/settings.php:115
 msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/settings.php:110
+#: inc/templates/settings.php:119
 msgid "Disconnect"
 msgstr ""
 
@@ -571,7 +571,7 @@ msgid "Infinite Uploads Setup"
 msgstr ""
 
 #: inc/templates/welcome.php:7
-msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library for smart recommendations choosing the best plan for your site, create or connect your account, and voilà – you're ready to push to the cloud."
+msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library. Then our smart recommendations will help you chose the best plan, create or connect your account, and voilà – you're ready to push to the cloud."
 msgstr ""
 
 #: inc/templates/welcome.php:12

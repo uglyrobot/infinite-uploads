@@ -21,12 +21,12 @@
 							<div id="iup-delete-local-spinner" class="spinner-border" role="status" style="display: none;">
 								<span class="sr-only">Deleting...</span>
 							</div>
-							<span class="h3"><?php printf( __( '<span id="iup-delete-size">%s</span> / <span id="iup-delete-files">%s</span> Deletable Files', 'infinite-uploads' ), $stats['deletable_size'], $stats['deletable_files'] ); ?></span>
+							<span class="h5"><?php printf( __( '<span id="iup-delete-size">%s</span> / <span id="iup-delete-files">%s</span> Deletable Files', 'infinite-uploads' ), $stats['deletable_size'], $stats['deletable_files'] ); ?></span>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
-						<div class="col-4 text-center">
-							<button class="btn text-nowrap btn-info btn-lg btn-block" id="iup-delete-local-button"><?php esc_html_e( 'Start Delete', 'infinite-uploads' ); ?></button>
+						<div class="col text-center">
+							<button class="btn text-nowrap btn-info btn-lg" id="iup-delete-local-button"><?php esc_html_e( 'Start Delete', 'infinite-uploads' ); ?></button>
 						</div>
 					</div>
 				</div>

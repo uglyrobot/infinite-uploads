@@ -9,7 +9,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="container-fluid">
-					<div class="row justify-content-center mb-5 mt-3">
+					<div class="row justify-content-center mb-4 mt-3">
 						<div class="col text-center">
 							<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/download-from-cloud.svg', dirname( __FILE__ ) ) ); ?>" alt="Download from Cloud" height="76" width="76"/>
 							<h4><?php esc_html_e( 'Downloading Files', 'infinite-uploads' ); ?></h4>
@@ -17,7 +17,7 @@
 							<p><?php esc_html_e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'infinite-uploads' ); ?> <code>wp infinite-uploads download</code></p>
 						</div>
 					</div>
-					<div class="row justify-content-center mb-5">
+					<div class="row justify-content-center mb-4">
 						<div class="col text-center">
 							<div id="iup-download-errors" class="alert alert-warning text-left" role="alert">
 								<ul class="mb-0 mb-lc-0"></ul>

@@ -41,6 +41,10 @@ body {
   background-color: rgba(38, 169, 224, 0.9);
 }
 
+.btn-group-lg > .btn, .btn-lg {
+  padding: .5rem 2rem;
+}
+
 .btn-primary {
   background-color: rgba(38, 169, 224, 1);
   border-radius: 24px;

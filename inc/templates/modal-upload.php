@@ -9,7 +9,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="container-fluid">
-					<div class="row justify-content-center mb-5 mt-3">
+					<div class="row justify-content-center mb-4 mt-3">
 						<div class="col text-center">
 							<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/push-to-cloud.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
 							<h4><?php esc_html_e( 'Sync in Progress', 'infinite-uploads' ); ?></h4>
@@ -17,7 +17,7 @@
 							<p><?php esc_html_e( 'If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:', 'infinite-uploads' ); ?> <code>wp infinite-uploads sync</code></p>
 						</div>
 					</div>
-					<div class="row justify-content-center mb-5">
+					<div class="row justify-content-center mb-4">
 						<div class="col text-center">
 							<div id="iup-sync-errors" class="alert alert-warning text-left" role="alert">
 								<ul class="mb-0 mb-lc-0"></ul>
@@ -36,7 +36,7 @@
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
-						<div class="col-2 text-center">
+						<div class="col text-center">
 							<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-4.svg', dirname( __FILE__ ) ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 						</div>
 					</div>

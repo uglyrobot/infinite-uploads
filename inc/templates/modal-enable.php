@@ -9,7 +9,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="container-fluid">
-					<div class="row justify-content-center mb-5 mt-3">
+					<div class="row justify-content-center mb-4 mt-3">
 						<div class="col text-center">
 							<h4><?php esc_html_e( 'Enable the Infinite Uploads Cloud', 'infinite-uploads' ); ?></h4>
 							<p class="lead"><?php esc_html_e( 'Your media library has finished syncing to the Infinite Uploads cloud. Enable now to serve all media from the cloud and global CDN. All new media uploaded will skip the local filesystem and be synced directly to the Infinite Uploads cloud.', 'infinite-uploads' ); ?></p>
@@ -19,13 +19,13 @@
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
-						<div class="col-4 text-center">
-							<button class="btn text-nowrap btn-info btn-lg btn-block" id="iup-enable-button"><span class="dashicons dashicons-cloud-saved"></span><?php esc_html_e( 'Enable', 'infinite-uploads' ); ?></button>
-							<div class="spinner-border text-muted text-hide" id="iup-enable-spinner" role="status"><span class="sr-only"><?php esc_html_e( 'Enabling...', 'iup' ); ?></span></div>
+						<div class="col text-center">
+							<button class="btn text-nowrap btn-info btn-lg" id="iup-enable-button"><span class="dashicons dashicons-cloud-saved"></span><?php esc_html_e( 'Enable', 'infinite-uploads' ); ?></button>
+							<div class="spinner-border text-muted text-hide d-block mx-auto" id="iup-enable-spinner" role="status"><span class="sr-only"><?php esc_html_e( 'Enabling...', 'iup' ); ?></span></div>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
-						<div class="col-2 text-center">
+						<div class="col text-center">
 							<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-5.svg', dirname( __FILE__ ) ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 						</div>
 					</div>

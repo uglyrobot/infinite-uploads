@@ -18,9 +18,9 @@
 							<p class="lead"><?php esc_html_e( "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan.", 'infinite-uploads' ); ?></p>
 						</div>
 					</div>
-					<div class="row justify-content-center mb-5">
+					<div class="row justify-content-center mb-4">
 						<div class="col text-center text-muted">
-							<span class="h3" id="iup-scan-progress">
+							<span class="h5" id="iup-scan-progress">
 								<?php
 								printf(
 								// translators: %1$s is the opening a tag for storage
@@ -34,7 +34,7 @@
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">
-						<div class="col-2 text-center">
+						<div class="col text-center">
 							<img src="<?php echo esc_url( plugins_url( '/assets/img/progress-bar-1.svg', dirname( __FILE__ ) ) ); ?>" alt="Progress steps bar" height="19" width="110"/>
 						</div>
 					</div>

@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy!
- * Version: 1.0-alpha-6
+ * Version: 1.0-beta-1
  * Author: UglyRobot, LLC
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
@@ -12,12 +12,12 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Network: true
  *
- * Inspired by and borrowed some code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
+ * Inspired by AWS PHP SDK stream wrapper code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
  *
- * Copyright 2020 UglyRobot, LLC.
+ * Copyright 2021 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0-alpha-6' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0-beta-1' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
