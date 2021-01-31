@@ -52,11 +52,13 @@ Not only is Infinite Uploads great for delivering highquality product images and
 
 ### Widely Compatible
 
-Infinite Uploads is built with the latest in cloud technology so it should work flawlessly with the widest variety of your favorite themes and plugins and has been tested with:
+Infinite Uploads is built with the latest in cloud technology to work flawlessly with the widest variety of your favorite free and premium themes and plugins and has been tested with:
 
 - [WooCommerce](https://wordpress.org/plugins/woocommerce/)
 - [Easy Digital Downloads](https://wordpress.org/plugins/easy-digital-downloads/)
 - [Divi Theme and Page Builder](https://www.elegantthemes.com/gallery/divi/)
+- [LearnDash](https://www.learndash.com/)
+- [WordPress Download Manager](https://wordpress.org/plugins/download-manager/)
 - [WP Smush & Smush Pro](https://wordpress.org/plugins/wp-smushit/) (not CDN)
 - [WP Retina 2x](https://wordpress.org/plugins/wp-retina-2x/)
 - [Elementor Page Builder](https://wordpress.org/plugins/elementor/)
