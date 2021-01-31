@@ -9,7 +9,7 @@ use Aws\ResultInterface;
 class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 	/**
-	 * Verifies the API keys entered will work for writing and deleting from S3.
+	 * Verifies the site is connected and uploads and downloads from the Infinite Uploads cloud are working.
 	 *
 	 * @subcommand verify
 	 */
@@ -30,7 +30,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		WP_CLI::print_value( 'Attempting to upload file ' . $s3_path );
 
 		$copy = copy(
-			dirname( dirname( __FILE__ ) ) . '/readme.md',
+			dirname( dirname( __FILE__ ) ) . '/readme.txt',
 			$s3_path
 		);
 
@@ -66,7 +66,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	private function verify_s3_access_constants() {
 		if ( ! Infinite_Uploads::get_instance()->bucket ) {
-			WP_CLI::error( sprintf( 'This site is not yet connected to the Infinite Uploads cloud. Please connect using the settings page in the dashboard.' ), false );
+			WP_CLI::error( sprintf( 'This site is not yet connected to the Infinite Uploads cloud. Please connect using the settings page: %s', Infinite_Uploads_Admin::get_instance()->settings_url() ), false );
 
 			return false;
 		}
@@ -75,11 +75,16 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * List files in the Infinite Uploads cloud
+	 * List the files in the Infinite Uploads cloud. Optionally filter to the provided path.
 	 *
 	 * @synopsis [<path>]
 	 */
 	public function ls( $args ) {
+
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
 
 		$s3 = Infinite_Uploads::get_instance()->s3();
 
@@ -108,11 +113,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Copy files to / from the uploads directory. Use s3://bucket/location for Infinite Uploads cloud
+	 * Copy files to / from the uploads directory. Use iu://bucket/location for Infinite Uploads cloud
 	 *
 	 * @synopsis <from> <to>
 	 */
-	public function cp( $args ) {
+	private function cp( $args ) {
 
 		$from = $args[0];
 		$to   = $args[1];
@@ -148,7 +153,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * @subcommand upload-directory
 	 * @synopsis <from> [<to>] [--concurrency=<concurrency>] [--verbose]
 	 */
-	public function upload_directory( $args, $args_assoc ) {
+	private function upload_directory( $args, $args_assoc ) {
 
 		$from = $args[0];
 		$to   = '';
@@ -195,6 +200,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function sync( $args, $args_assoc ) {
 		global $wpdb;
+
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
+
 		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 20, 'noscan' => false, 'verbose' => false ] );
@@ -398,6 +409,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function delete( $args, $args_assoc ) {
 		global $wpdb;
+
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
+
 		$instance   = Infinite_Uploads::get_instance();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'noscan' => false, 'verbose' => false ] );
 
@@ -445,6 +462,12 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function download( $args, $args_assoc ) {
 		global $wpdb;
+
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
+
 		$instance   = Infinite_Uploads::get_instance();
 		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 20, 'noscan' => false, 'verbose' => false ] );
@@ -554,6 +577,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 */
 	public function rm( $args, $args_assoc ) {
 
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
+
 		$s3 = Infinite_Uploads::get_instance()->s3();
 
 		$prefix = '';
@@ -595,6 +623,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	 * Enable the auto-rewriting of media links to Infinite Uploads cloud
 	 */
 	public function enable( $args, $assoc_args ) {
+		// Verify first that we have the necessary access keys to connect to S3.
+		if ( ! $this->verify_s3_access_constants() ) {
+			return;
+		}
+
 		Infinite_Uploads::get_instance()->toggle_cloud( true );
 
 		WP_CLI::success( 'Media URL rewriting enabled.' );
