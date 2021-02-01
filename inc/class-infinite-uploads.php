@@ -223,7 +223,7 @@ class Infinite_Uploads {
 			return;
 		}
 
-		if ( get_current_screen()->id == 'settings_page_infinite_uploads' || get_current_screen()->id == 'settings_page_infinite_uploads-network' ) {
+		if ( get_current_screen()->id == 'media_page_infinite_uploads' || get_current_screen()->id == 'settings_page_infinite_uploads-network' ) {
 			return;
 		}
 		?>
