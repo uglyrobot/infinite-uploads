@@ -34,7 +34,6 @@ class Infinite_Uploads_Filelist {
 	 * @param string $root_path      The full path of the directory to iterate.
 	 * @param float  $timeout        Timeout in seconds.
 	 * @param array  $paths_left     Provide as returned if continuing the filelist after a timeout.
-	 * @param array  $excluded_files File patterns to exclude from the built filelist.
 	 */
 	public function __construct( $root_path, $timeout = 25.0, $paths_left = [] ) {
 		$this->root_path  = rtrim( $root_path, '/' ); //expected no trailing slash.

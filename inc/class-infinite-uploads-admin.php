@@ -78,10 +78,15 @@ class Infinite_Uploads_Admin {
 		$path = $this->iup_instance->get_original_upload_dir();
 		$path = $path['basedir'];
 
+		$remaining_dirs = [];
+		//validate path is within uploads dir to prevent path traversal
 		if ( isset( $_POST['remaining_dirs'] ) && is_array( $_POST['remaining_dirs'] ) ) {
-			$remaining_dirs = $_POST['remaining_dirs'];
-		} else {
-			$remaining_dirs = [];
+			foreach ( $_POST['remaining_dirs'] as $dir ) {
+				$realpath = realpath( $path . $dir );
+				if ( 0 === strpos( $realpath, $path ) ) { //check that parsed path begins with upload dir
+					$remaining_dirs[] = $dir;
+				}
+			}
 		}
 
 		$filelist = new Infinite_Uploads_Filelist( $path, $this->ajax_timelimit, $remaining_dirs );

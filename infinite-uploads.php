@@ -111,7 +111,7 @@ function infinite_uploads_check_requirements() {
 	global $wp_version;
 	$hook = is_multisite() ? 'network_admin_notices' : 'admin_notices';
 
-	if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '5.5.0', '<' ) ) {
 		add_action( $hook, 'infinite_uploads_outdated_php_version_notice' );
 
 		return false;
