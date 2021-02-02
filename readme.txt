@@ -63,7 +63,7 @@ Infinite Uploads is built with the latest in cloud technology to work flawlessly
 - [WP Retina 2x](https://wordpress.org/plugins/wp-retina-2x/)
 - [Elementor Page Builder](https://wordpress.org/plugins/elementor/)
 - [WPML](https://wpml.org/)
-- [WP Rocket](https://enviragallery.com/)
+- [WP Rocket](https://wp-rocket.me/)
 - [NextGen Gallary](https://wordpress.org/plugins/nextgen-gallery/)
 - [FileBird](https://wordpress.org/plugins/filebird/)
 - [ACF](https://wordpress.org/plugins/advanced-custom-fields/)
