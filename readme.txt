@@ -43,7 +43,7 @@ The Infinite Uploads plugin makes it so anyone can connect to the cloud without 
 
 Install Infinite Uploads, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up.
 
-[youtube https://www.youtube.com/]
+[youtube https://youtu.be/wanINaK0u5M]
 
 Infinite Uploads helps you identify which files are using the most space on your server and allows you to move all your media files to cloud storage.
 
