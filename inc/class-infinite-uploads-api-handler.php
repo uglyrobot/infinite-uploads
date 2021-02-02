@@ -464,11 +464,12 @@ class Infinite_Uploads_Api_Handler {
 		$hash  = $matches[0]; //an SHA256 hash of request
 		$token = hash( 'sha256', $this->get_token() );
 
-		$hash_string = $_POST['req_id'] . $_POST['site_id'];
+		$site_id     = sanitize_key( $_POST['site_id'] );
+		$hash_string = sanitize_key( $_POST['req_id'] ) . $site_id;
 
 		$valid = hash_hmac( 'sha256', $hash_string, $token );
 
-		$is_valid = hash_equals( $this->get_site_id(), $_POST['site_id'] ) && hash_equals( $valid, $hash ); //Timing attack safe string comparison, PHP <5.6 compat added in WP 3.9.2
+		$is_valid = hash_equals( $this->get_site_id(), $site_id ) && hash_equals( $valid, $hash ); //Timing attack safe string comparison, PHP <5.6 compat added in WP 3.9.2
 		if ( ! $is_valid ) {
 			wp_send_json_error(
 				[ 'code' => 'incorrect_auth', 'message' => 'Incorrect authentication' ]

@@ -127,7 +127,7 @@ class Infinite_Uploads_Admin {
 		];
 
 		if ( ! empty( $_POST['next_token'] ) ) {
-			$args['ContinuationToken'] = $_POST['next_token'];
+			$args['ContinuationToken'] = sanitize_text_field( $_POST['next_token'] );
 		} else {
 			$progress                    = get_site_option( 'iup_files_scanned' );
 			$progress['compare_started'] = time();
