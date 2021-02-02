@@ -7,6 +7,11 @@ body {
   z-index: 99999;
 }
 
+/* Fixes conflict with wp core on mobile hidding modal under background fade */
+body.mobile.modal-open #wpwrap {
+  position: relative;
+}
+
 .card {
   margin-top: inherit;
   padding: inherit;
@@ -165,4 +170,9 @@ p.lead {
 
 #iup-scan-progress, #iup-scan-remote-progress, #iup-upload-progress, #iup-download-progress {
   display: none;
+}
+
+#iup-local-pie, #iup-cloud-pie, .iup-pie-wrapper {
+  max-height: 300px;
+  max-width: 600px;
 }

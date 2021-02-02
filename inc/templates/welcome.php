@@ -1,5 +1,5 @@
 <div class="card">
-	<div class="card-body cloud p-5">
+	<div class="card-body cloud p-md-5">
 		<div class="row justify-content-center mb-5 mt-3">
 			<div class="col text-center">
 				<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>

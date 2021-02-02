@@ -5,13 +5,13 @@
 			<?php require_once( dirname( __FILE__ ) . '/status-icon.php' ); ?>
 		</div>
 	</div>
-	<div class="card-body cloud p-5">
-		<div class="row align-items-center justify-content-center">
+	<div class="card-body cloud p-md-5">
+		<div class="row align-items-center justify-content-center mb-5">
 			<div class="col-lg col-xs-12">
 				<p class="lead mb-0"><?php esc_html_e( "Total Bytes / Files", 'infinite-uploads' ); ?></p>
 				<span class="h2 text-nowrap"><?php echo $stats['local_size']; ?><small class="text-muted"> / <?php echo $stats['local_files']; ?></small></span>
 
-				<div class="container">
+				<div class="container p-0 ml-md-3">
 					<?php foreach ( $this->iup_instance->get_filetypes( false ) as $type ) { ?>
 						<div class="row mt-2">
 							<div class="col-1"><span class="badge badge-pill" style="background-color: <?php echo $type->color; ?>">&nbsp;</span></div>
@@ -27,7 +27,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg col-xs-12 mt-5 mt-lg-0">
+			<div class="col-lg col-xs-12 mt-5 mt-lg-0 text-center iup-pie-wrapper">
 				<canvas id="iup-local-pie"></canvas>
 			</div>
 		</div>
