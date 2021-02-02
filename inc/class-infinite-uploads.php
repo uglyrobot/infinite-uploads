@@ -128,6 +128,18 @@ class Infinite_Uploads {
 		} else {
 			update_option( 'iup_enabled', $enabled, true );
 		}
+		if ( $enabled ) {
+			//not ideal but such a dramatic change of replacing upload dirs and urls can break some plugins/themes
+			wp_cache_flush();
+
+			//Hummingbird plugin
+			do_action( 'wphb_clear_page_cache' );
+
+			//WP rocket plugin
+			if ( function_exists( 'rocket_clean_domain' ) ) {
+				rocket_clean_domain();
+			}
+		}
 	}
 
 	/**

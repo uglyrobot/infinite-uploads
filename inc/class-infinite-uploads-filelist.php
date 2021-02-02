@@ -19,7 +19,6 @@ class Infinite_Uploads_Filelist {
 		'/imports/',
 		'/cache/',
 		'/wp-defender/',
-		'/elementor/css/',
 		'.DS_Store',
 	];
 	protected $root_path;
