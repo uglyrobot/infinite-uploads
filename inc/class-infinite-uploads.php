@@ -129,6 +129,13 @@ class Infinite_Uploads {
 			update_option( 'iup_enabled', $enabled, true );
 		}
 		if ( $enabled ) {
+
+			//ping the API to let them know we've enabled the site
+			$this->api->call( "site/" . $this->api->get_site_id() . "/enable", [], 'POST', [
+				'timeout'  => 0.01,
+				'blocking' => false,
+			] );
+
 			//not ideal but such a dramatic change of replacing upload dirs and urls can break some plugins/themes
 			wp_cache_flush();
 

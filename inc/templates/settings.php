@@ -55,7 +55,7 @@
 				<div class="row">
 					<div class="col"><?php esc_html_e( 'Current CDN URL', 'infinite-uploads' ); ?></div>
 					<?php if ( $api_data->site->cname == $api_data->site->cdn_url ) { ?>
-						<div class="col text-right"><a href="<?php echo esc_url( $this->api_url( '/account/sites/?site=' . $this->api->get_site_id() ) ); ?>" class="text-warning"><?php esc_html_e( 'Use your own custom domain!', 'infinite-uploads' ); ?></a></div>
+						<div class="col text-right"><a href="<?php echo esc_url( $this->api_url( '/account/sites/?site=' . $this->api->get_site_id() ) ); ?>#custom-cdn-domain" class="text-warning"><?php esc_html_e( 'Use your own custom domain!', 'infinite-uploads' ); ?></a></div>
 					<?php } ?>
 				</div>
 				<div class="row">
