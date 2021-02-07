@@ -1,11 +1,11 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Release to github
+name: Deploy to WordPress.org
 
 on:
   push:
     tags:
-    - '*'
+      - '*'
 
 jobs:
 
@@ -30,13 +30,19 @@ jobs:
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
 
-    - name: Compile with Gulp
-      uses: elstudio/actions-js-build/build@v2
+    - name: WordPress Plugin Deploy
+      id: deploy
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        generate-zip: true
+      env:
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
 
     - name: Create Github release
       uses: ncipollo/release-action@v1
       with:
-        artifact: "build/infinite-uploads.zip"
+        artifacts: ${{github.workspace}}/${{ github.event.repository.name }}.zip
         body: "Plugin release."
         token: ${{ secrets.GITHUB_TOKEN }}
-
+        artifactContentType: application/zip

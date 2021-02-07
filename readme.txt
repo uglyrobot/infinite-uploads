@@ -1,7 +1,7 @@
 === Infinite Uploads ===
 
 Requires at least: 5.3
-Tested up to: 5.6
+Tested up to: 5.6.1
 Stable tag: trunk
 Requires PHP: 5.5
 Contributors: uglyrobot, jdailey
@@ -82,14 +82,7 @@ Keep managing all your files right from inside the WordPress dashboard just like
 Already being hit with overages or experiencing performance issues because you have a ton of images and huge video or audio files? Use Infinite Uploads to free up space. Connect and move your entire existing library with a click.
 
 ### Compatible Media File Types
-If you can upload it to the WordPress Media Library, you can move it to the cloud. Files that can be stored and served with Infinite Uploads include:
-- Image (.jpg, .jpeg, .png, .gif, .ico, .webp)
-- Video (.mp4, .m4v, .mov, .wmv, .avi, .mpg, .ogv, .3gp, .3g2, webm)
-- Audio (.mp3, .m4a, .ogg, .wav)
-- Documents (.pdf, .doc, .docx, .ppt, .pptx, .pps, .ppsx, .odt, .xls, .xlsx, .psd)
-- Archive (.zip)
-- Other (.svg)
-- and much more
+If you can upload it to the WordPress Media Library, you can move it to the cloud. Infinite Uploads essentially replaces your WordPress uploads directory with cloud storage, so any theme or plugin that writes files there sends them to the cloud instead!
 
 ### Smaller More Efficient Hosting
 Transform WordPress into a stateless application ready for the cloud. Hosting your media files in the cloud makes your site super portable and makes backups and migrations tiny, fast, and efficient. It's the go-to tool to enable usage of advanced hosting architectures like Horizontal Scaling and High Availability.
@@ -103,7 +96,7 @@ Transform WordPress into a stateless application ready for the cloud. Hosting yo
 
 ### What about Multisite?
 
-Use Infinite Uploads to store and manage the media files for your entire Multisite network with one account. You never have to worry about running out of storage as we make your uploads "infinite"!
+Use Infinite Uploads to store and manage the media files for your entire Multisite network with one account. Settings and syncing are network-wide. You never have to worry about running out of storage as we make your uploads "infinite"!
 
 
 ### Privacy
@@ -153,9 +146,9 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
-1.0 - 2-10-2021
+1.0 - 2021-2-7
 ----------------------------------------------------------------------
-- Initial release!
+- Initial release after a year of hard work!
 
 
 == About Us ==
@@ -164,6 +157,8 @@ Infinite Uploads is a premium cloud storage provider and content delivery networ
 
 Learn how to get the most out of your cloud-hosted files on our blog:
 [Infinite Uploads Blog, Tips, Tricks, How-tos, and News](https://infiniteuploads.com/blog/)
+
+[Contribute to the plugin's development on Github!](https://github.com/uglyrobot/infinite-uploads/)
 
 Enjoy!
 

@@ -6,11 +6,11 @@
     "test": "tests"
   },
   "dependencies": {
-    "chart.js": "^2.9.3"
+    "chart.js": "^2.9.4"
   },
   "devDependencies": {
     "gulp": "^4.0.2",
-    "gulp-wp-pot": "^2.4.3",
+    "gulp-wp-pot": "^2.5.0",
     "gulp-zip": "^5.0.2"
   },
   "scripts": {
