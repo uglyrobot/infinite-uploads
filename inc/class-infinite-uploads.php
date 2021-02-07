@@ -443,7 +443,7 @@ class Infinite_Uploads {
 	 *
 	 * @return array
 	 */
-	public function get_files_for_unique_filename_file_list( ?array $files, string $dir, string $filename ): array {
+	public function get_files_for_unique_filename_file_list( $files, $dir, $filename ) {
 		$name = pathinfo( $filename, PATHINFO_FILENAME );
 		// The iu:// streamwrapper support listing by partial prefixes with wildcards.
 		// For example, scandir( iu://bucket/2019/06/my-image* )
