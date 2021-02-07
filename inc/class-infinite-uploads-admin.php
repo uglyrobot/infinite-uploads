@@ -629,8 +629,6 @@ class Infinite_Uploads_Admin {
 
 		$stats    = $this->iup_instance->get_sync_stats();
 		$api_data = $this->api->get_site_data();
-		//var_dump($api_data);
-		//var_dump($stats);
 		?>
 		<div id="container" class="wrap iup-background">
 
@@ -651,11 +649,11 @@ class Infinite_Uploads_Admin {
 
 			<?php if ( isset( $api_data->site ) && ! $api_data->site->cdn_enabled ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } elseif ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } ?>
 
@@ -676,8 +674,10 @@ class Infinite_Uploads_Admin {
 				} else {
 					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
 					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
-					require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
-					require_once( dirname( __FILE__ ) . '/templates/modal-enable.php' );
+					if ( isset( $api_data->site ) && $api_data->site->upload_writeable ) {
+						require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
+						require_once( dirname( __FILE__ ) . '/templates/modal-enable.php' );
+					}
 				}
 
 				require_once( dirname( __FILE__ ) . '/templates/settings.php' );

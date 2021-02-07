@@ -94,6 +94,12 @@ class Infinite_Uploads {
 			add_filter( 'wp_save_image_editor_file', '__return_false' );
 		}
 
+		//block uploads if permissions are only read/delete
+		if ( ! $api_data->site->cdn_enabled ) {
+			add_filter( 'admin_notices', [ $this, 'cdn_disabled_header' ] );
+			add_filter( 'network_admin_notices', [ $this, 'cdn_disabled_header' ] );
+		}
+
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
@@ -538,10 +544,29 @@ class Infinite_Uploads {
 	public function blocked_uploads_header() {
 		if ( current_user_can( $this->capability ) ) {
 			?>
-			<div class="notice notice-error"><p><?php printf( __( "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>.", 'infinite-uploads' ), esc_url( $this->admin->settings_url() ) ); ?></p></div><?php
+			<div class="notice notice-error">
+			<p><?php printf( __( "Files can't be uploaded due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading.", 'infinite-uploads' ), esc_url( $this->admin->api_url( '/account/billing/' ) ) ); ?></p></div><?php
 		} else {
 			?>
-			<div class="notice notice-error"><p><?php esc_html_e( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
+			<div class="notice notice-error"><p><?php esc_html_e( "Files can't be uploaded due to a billing issue with your Infinite Uploads account.", 'infinite-uploads' ); ?></p></div><?php
+		}
+	}
+
+	/**
+	 * Show error on all screens.
+	 */
+	public function cdn_disabled_header() {
+		if ( current_user_can( $this->capability ) ) {
+
+			if ( get_current_screen()->id == 'media_page_infinite_uploads'
+			     || get_current_screen()->id == 'settings_page_infinite_uploads-network'
+			     || ( get_current_screen()->id == 'media' && get_current_screen()->action == 'add' ) ) {
+				return;
+			}
+			?>
+			<div class="notice notice-error">
+			<p><?php printf( __( "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading. <a href='%s'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->admin->api_url( '/account/billing/' ) ), esc_url( $this->admin->settings_url( [ 'refresh' => 1 ] ) ) ); ?></p>
+			</div><?php
 		}
 	}
 
@@ -553,7 +578,7 @@ class Infinite_Uploads {
 	 * @return array
 	 */
 	public function block_uploads( $file ) {
-		$file['error'] = esc_html__( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' );
+		$file['error'] = esc_html__( "Files can't be uploaded due to a billing issue with your Infinite Uploads account.", 'infinite-uploads' );
 
 		return $file;
 	}

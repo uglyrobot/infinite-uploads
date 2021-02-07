@@ -31,24 +31,37 @@
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/arrow.svg', dirname( __FILE__ ) ) ); ?>" alt="Right sync arrow" height="31" width="56"/>
 			</div>
 			<div class="col-lg col-xs-12">
-				<div class="row justify-content-center mb-3 mt-4 mt-lg-0">
-					<div class="col text-center">
-						<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
-						<p class="lead"><?php printf( esc_html__( 'You have %s of premium storage available!', 'infinite-uploads' ), $this->size_format_zero( ( $api_data->plan->storage_limit * GB_IN_BYTES ) - $api_data->stats->cloud->storage, 2 ) ); ?></p>
-						<p class="lead"><?php esc_html_e( 'Move your media library to the Infinite Uploads cloud.', 'infinite-uploads' ); ?></p>
+				<?php if ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
+					<div class="row justify-content-center mb-3 mt-4 mt-lg-0">
+						<div class="col text-center">
+							<p class="lead text-warning"><?php esc_html_e( 'Please fix the billing issue with your account to sync your files to the cloud and enable Infinite Uploads.', 'infinite-uploads' ); ?></p>
+						</div>
 					</div>
-				</div>
-				<div class="row justify-content-center">
-					<div class="col text-center">
-						<?php if ( ! empty( $stats['sync_finished'] ) ) { //if sync is finished show enable button ?>
-							<button class="btn text-nowrap btn-primary btn-lg" data-toggle="modal" data-target="#enable-modal"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
-						<?php } elseif ( ! empty( $stats['compare_finished'] ) ) { ?>
-							<button class="btn text-nowrap btn-primary btn-l" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
-						<?php } else { ?>
-							<button class="btn text-nowrap btn-primary btn-lg" id="iup-sync-button" data-toggle="modal" data-target="#scan-remote-modal"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
-						<?php } ?>
+					<div class="row justify-content-center">
+						<div class="col text-center">
+							<a class="btn text-nowrap btn-info btn-lg" href="<?php echo esc_url( $this->api_url( '/account/billing/' ) ); ?>" role="button"><?php esc_html_e( 'Account Management', 'infinite-uploads' ); ?></a>
+						</div>
 					</div>
-				</div>
+				<?php } else { ?>
+					<div class="row justify-content-center mb-3 mt-4 mt-lg-0">
+						<div class="col text-center">
+							<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
+							<p class="lead"><?php printf( esc_html__( 'You have %s of premium storage available!', 'infinite-uploads' ), $this->size_format_zero( ( $api_data->plan->storage_limit * GB_IN_BYTES ) - $api_data->stats->cloud->storage, 2 ) ); ?></p>
+							<p class="lead"><?php esc_html_e( 'Move your media library to the Infinite Uploads cloud.', 'infinite-uploads' ); ?></p>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col text-center">
+							<?php if ( ! empty( $stats['sync_finished'] ) ) { //if sync is finished show enable button ?>
+								<button class="btn text-nowrap btn-primary btn-lg" data-toggle="modal" data-target="#enable-modal"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<?php } elseif ( ! empty( $stats['compare_finished'] ) ) { ?>
+								<button class="btn text-nowrap btn-primary btn-l" data-toggle="modal" data-target="#upload-modal"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<?php } else { ?>
+								<button class="btn text-nowrap btn-primary btn-lg" id="iup-sync-button" data-toggle="modal" data-target="#scan-remote-modal" data-next="upload"><span class="dashicons dashicons-cloud"></span> <?php esc_html_e( 'Sync Now', 'infinite-uploads' ); ?></button>
+							<?php } ?>
+						</div>
+					</div>
+				<?php } ?>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-1">

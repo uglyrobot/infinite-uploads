@@ -21,7 +21,7 @@
 					<div class="row justify-content-center mb-4">
 						<div class="col text-center">
 							<button class="btn text-nowrap btn-info btn-lg" id="iup-enable-button"><span class="dashicons dashicons-cloud-saved"></span><?php esc_html_e( 'Enable', 'infinite-uploads' ); ?></button>
-							<div class="spinner-border text-muted text-hide d-block mx-auto" id="iup-enable-spinner" role="status"><span class="sr-only"><?php esc_html_e( 'Enabling...', 'iup' ); ?></span></div>
+							<div class="spinner-grow text-muted text-hide d-block mx-auto" id="iup-enable-spinner" role="status"><span class="sr-only"><?php esc_html_e( 'Enabling...', 'iup' ); ?></span></div>
 						</div>
 					</div>
 					<div class="row justify-content-center mb-4">

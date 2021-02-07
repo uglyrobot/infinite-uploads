@@ -21,220 +21,228 @@ msgstr ""
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:60
+#: inc/class-infinite-uploads-admin.php:65
 msgid "When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:63, inc/class-infinite-uploads-admin.php:519, inc/class-infinite-uploads-admin.php:520, inc/class-infinite-uploads-admin.php:508, inc/class-infinite-uploads-admin.php:509
+#: inc/class-infinite-uploads-admin.php:68, inc/class-infinite-uploads-admin.php:529, inc/class-infinite-uploads-admin.php:530, inc/class-infinite-uploads-admin.php:518, inc/class-infinite-uploads-admin.php:519
 msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:70, inc/class-infinite-uploads-admin.php:103, inc/class-infinite-uploads-admin.php:198, inc/class-infinite-uploads-admin.php:303, inc/class-infinite-uploads-admin.php:330, inc/class-infinite-uploads-admin.php:421, inc/class-infinite-uploads-admin.php:586
+#: inc/class-infinite-uploads-admin.php:75, inc/class-infinite-uploads-admin.php:113, inc/class-infinite-uploads-admin.php:208, inc/class-infinite-uploads-admin.php:313, inc/class-infinite-uploads-admin.php:340, inc/class-infinite-uploads-admin.php:431, inc/class-infinite-uploads-admin.php:596
 msgid "Permissions Error: Please refresh the page and try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:277
+#: inc/class-infinite-uploads-admin.php:287
 msgid "Error uploading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:274
+#: inc/class-infinite-uploads-admin.php:284
 msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:272, inc/class-infinite-uploads-wp-cli-command.php:287
+#: inc/class-infinite-uploads-admin.php:282, inc/class-infinite-uploads-wp-cli-command.php:298
 msgid "Error uploading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:394
+#: inc/class-infinite-uploads-admin.php:404
 msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:391, inc/class-infinite-uploads-wp-cli-command.php:523
+#: inc/class-infinite-uploads-admin.php:401, inc/class-infinite-uploads-wp-cli-command.php:546
 msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:389, inc/class-infinite-uploads-wp-cli-command.php:521
+#: inc/class-infinite-uploads-admin.php:399, inc/class-infinite-uploads-wp-cli-command.php:544
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:458, inc/class-infinite-uploads.php:242, inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:468, inc/class-infinite-uploads.php:267, inc/templates/connect.php:49
 msgid "Connect"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:456
+#: inc/class-infinite-uploads-admin.php:466
 msgid "Settings"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:460, inc/templates/footer.php:9
+#: inc/class-infinite-uploads-admin.php:470, inc/templates/footer.php:9
 msgid "Support"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:544
+#: inc/class-infinite-uploads-admin.php:554
 msgid "Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:545
+#: inc/class-infinite-uploads-admin.php:555
 msgid "Too many server errors. Please try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:546
+#: inc/class-infinite-uploads-admin.php:556
 msgid "If you leave this page the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:616
+#: inc/class-infinite-uploads-admin.php:626
 msgid "United States"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:617
+#: inc/class-infinite-uploads-admin.php:627
 msgid "Europe"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:648
-msgid "Files can't be uploaded and your CDN will be disabled soon due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
+#: inc/class-infinite-uploads-admin.php:656
+msgid "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:644
-msgid "Files can't be uploaded and your CDN is disabled due to an issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
+#: inc/class-infinite-uploads-admin.php:652
+msgid "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:207, inc/class-infinite-uploads-wp-cli-command.php:409
+#: inc/class-infinite-uploads-wp-cli-command.php:218, inc/class-infinite-uploads-wp-cli-command.php:426
 msgid "%s files (%s) remaining to be synced."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:215
+#: inc/class-infinite-uploads-wp-cli-command.php:226
 msgid "Copying to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:267
+#: inc/class-infinite-uploads-wp-cli-command.php:278
 msgid "%s - Synced %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:294, inc/class-infinite-uploads-wp-cli-command.php:289
+#: inc/class-infinite-uploads-wp-cli-command.php:305, inc/class-infinite-uploads-wp-cli-command.php:300
 msgid "%s error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:310
+#: inc/class-infinite-uploads-wp-cli-command.php:321
 msgid "Unable to upload %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:312
+#: inc/class-infinite-uploads-wp-cli-command.php:323
 msgid "Sync complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:324
+#: inc/class-infinite-uploads-wp-cli-command.php:335
 msgid "Scanning local filesystem..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:329
+#: inc/class-infinite-uploads-wp-cli-command.php:340
 msgid "%s files (%s) found in uploads."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:331
+#: inc/class-infinite-uploads-wp-cli-command.php:342
 msgid "Comparing to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:417
+#: inc/class-infinite-uploads-wp-cli-command.php:434
 msgid "Deleting local copies of synced files..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:430
+#: inc/class-infinite-uploads-wp-cli-command.php:447
 msgid "Could not delete %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:425
+#: inc/class-infinite-uploads-wp-cli-command.php:442
 msgid "%s - Deleted %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:437
+#: inc/class-infinite-uploads-wp-cli-command.php:454
 msgid "Delete complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:457
+#: inc/class-infinite-uploads-wp-cli-command.php:480
 msgid "%s files (%s) remaining to be downloaded."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:466
+#: inc/class-infinite-uploads-wp-cli-command.php:489
 msgid "Downloading from the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:501
+#: inc/class-infinite-uploads-wp-cli-command.php:524
 msgid "%s - Downloaded %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:527
+#: inc/class-infinite-uploads-wp-cli-command.php:550
 msgid "%s error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:542
+#: inc/class-infinite-uploads-wp-cli-command.php:565
 msgid "Unable to download %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:544
+#: inc/class-infinite-uploads-wp-cli-command.php:567
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:232
+#: inc/class-infinite-uploads.php:257
 msgid "Infinite Uploads is almost ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:237
+#: inc/class-infinite-uploads.php:262
 msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:235
+#: inc/class-infinite-uploads.php:260
 msgid "Finish syncing your images, audio, video, and documents to the cloud to enable."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:242
+#: inc/class-infinite-uploads.php:267
 msgid "Finish Sync"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:322
+#: inc/class-infinite-uploads.php:347
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:327
+#: inc/class-infinite-uploads.php:352
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:337
+#: inc/class-infinite-uploads.php:362
 msgid "Images"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:338
+#: inc/class-infinite-uploads.php:363
 msgid "Audio"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:339
+#: inc/class-infinite-uploads.php:364
 msgid "Video"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:340
+#: inc/class-infinite-uploads.php:365
 msgid "Documents"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:341
+#: inc/class-infinite-uploads.php:366
 msgid "Archives"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:342
+#: inc/class-infinite-uploads.php:367
 msgid "Code"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:343
+#: inc/class-infinite-uploads.php:368
 msgid "Other"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:525, inc/class-infinite-uploads.php:537, inc/class-infinite-uploads.php:556
-msgid "Files can't be uploaded due to an issue with your Infinite Uploads account."
+#: inc/class-infinite-uploads.php:550, inc/class-infinite-uploads.php:578
+msgid "Files can't be uploaded due to a billing issue with your Infinite Uploads account."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:522
-msgid "Files can't be uploaded due to an issue with your <a href='%s'>Infinite Uploads account</a>."
+#: inc/class-infinite-uploads.php:547
+msgid "Files can't be uploaded due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading."
+msgstr ""
+
+#: inc/class-infinite-uploads.php:566
+msgid "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading. <a href='%s'>Already fixed?</a>"
+msgstr ""
+
+#: inc/class-infinite-uploads.php:597
+msgid "Files can't be uploaded due to an issue with your Infinite Uploads account."
 msgstr ""
 
 #: inc/templates/cloud-overview.php:4
@@ -257,7 +265,7 @@ msgstr ""
 msgid "Visit the Infinite Uploads site to view, manage, or change your plan."
 msgstr ""
 
-#: inc/templates/cloud-overview.php:32
+#: inc/templates/cloud-overview.php:32, inc/templates/sync.php:42
 msgid "Account Management"
 msgstr ""
 
@@ -514,19 +522,19 @@ msgstr ""
 msgid "%s / %s deletable files"
 msgstr ""
 
-#: inc/templates/settings.php:110
+#: inc/templates/settings.php:109
 msgid "Import & Disconnect"
 msgstr ""
 
-#: inc/templates/settings.php:111
+#: inc/templates/settings.php:110
 msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href=\"%s\" class=\"text-warning\">account management</a>."
 msgstr ""
 
-#: inc/templates/settings.php:115
+#: inc/templates/settings.php:114
 msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/settings.php:119
+#: inc/templates/settings.php:118
 msgid "Disconnect"
 msgstr ""
 
@@ -534,16 +542,20 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: inc/templates/status-icon.php:8
+#: inc/templates/status-icon.php:10
 msgid "Disabled - waiting to connect"
 msgstr ""
 
-#: inc/templates/status-icon.php:6
+#: inc/templates/status-icon.php:8
 msgid "Disabled - waiting to sync media to the cloud"
 msgstr ""
 
-#: inc/templates/status-icon.php:4
+#: inc/templates/status-icon.php:6
 msgid "Enabled - new uploads are moved to the cloud"
+msgstr ""
+
+#: inc/templates/status-icon.php:4
+msgid "There is a problem with your Infinite Uploads account"
 msgstr ""
 
 #: inc/templates/sync.php:4
@@ -554,16 +566,20 @@ msgstr ""
 msgid "Total Local Bytes / Files"
 msgstr ""
 
-#: inc/templates/sync.php:37
+#: inc/templates/sync.php:49
 msgid "You have %s of premium storage available!"
 msgstr ""
 
-#: inc/templates/sync.php:38
+#: inc/templates/sync.php:50
 msgid "Move your media library to the Infinite Uploads cloud."
 msgstr ""
 
-#: inc/templates/sync.php:48, inc/templates/sync.php:46, inc/templates/sync.php:44
+#: inc/templates/sync.php:60, inc/templates/sync.php:58, inc/templates/sync.php:56
 msgid "Sync Now"
+msgstr ""
+
+#: inc/templates/sync.php:37
+msgid "Please fix the billing issue with your account to sync your files to the cloud and enable Infinite Uploads."
 msgstr ""
 
 #: inc/templates/welcome.php:6

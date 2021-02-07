@@ -104,23 +104,21 @@
 				</div>
 			</div>
 		<?php } ?>
-		<?php if ( infinite_uploads_enabled() ) { ?>
-			<div class="row justify-content-center">
-				<div class="col-md-6 col-sm-12">
-					<h5><?php esc_html_e( 'Import & Disconnect', 'infinite-uploads' ); ?></h5>
-					<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s" class="text-warning">account management</a>.', 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ) ); ?></p>
+		<div class="row justify-content-center">
+			<div class="col-md-6 col-sm-12">
+				<h5><?php esc_html_e( 'Import & Disconnect', 'infinite-uploads' ); ?></h5>
+				<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s" class="text-warning">account management</a>.', 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ) ); ?></p>
+			</div>
+			<div class="col-md-6 col-sm-12 mt-4">
+				<div class="row text-center mb-3">
+					<div class="col"><?php esc_html_e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'infinite-uploads' ); ?></div>
 				</div>
-				<div class="col-md-6 col-sm-12 mt-4">
-					<div class="row text-center mb-3">
-						<div class="col"><?php esc_html_e( 'We will download your files back to the uploads directory before disconnecting to prevent broken media on your site.', 'infinite-uploads' ); ?></div>
-					</div>
-					<div class="row justify-content-center">
-						<div class="col-xl-5 col-lg-6 col-md-7 text-center">
-							<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#scan-remote-modal"><?php esc_html_e( 'Disconnect', 'infinite-uploads' ); ?></button>
-						</div>
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-7 text-center">
+						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#scan-remote-modal" data-next="download"><?php esc_html_e( 'Disconnect', 'infinite-uploads' ); ?></button>
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+		</div>
 	</div>
 </div>
