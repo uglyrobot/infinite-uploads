@@ -614,6 +614,11 @@ class Infinite_Uploads_Admin {
 			$this->api->get_site_data( true );
 			wp_safe_redirect( $this->settings_url() );
 		}
+
+		if ( isset( $_GET['reinstall'] ) ) {
+			infinite_uploads_install();
+			wp_safe_redirect( $this->settings_url() );
+		}
 	}
 
 	/**
@@ -691,7 +696,17 @@ class Infinite_Uploads_Admin {
 					$to_sync = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
 					require_once( dirname( __FILE__ ) . '/templates/connect.php' );
 				} else {
-					require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
+					//Make sure table is installed so we can show an error if not.
+					if ( ! $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->base_prefix}infinite_uploads_files'" ) ) {
+						infinite_uploads_install();
+						if ( ! $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->base_prefix}infinite_uploads_files'" ) ) {
+							require_once( dirname( __FILE__ ) . '/templates/install-error.php' );
+						} else {
+							require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
+						}
+					} else {
+						require_once( dirname( __FILE__ ) . '/templates/welcome.php' );
+					}
 				}
 				require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 			}

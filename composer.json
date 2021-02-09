@@ -19,11 +19,15 @@
   "support": {
     "issues": "https://github.com/uglyrobot/infinite-uploads/issues",
     "source": "https://github.com/uglyrobot/infinite-uploads"
-	},
-	"type": "wordpress-plugin",
-	"require": {
+  },
+  "type": "wordpress-plugin",
+  "require": {
     "composer/installers": "~1.0",
-    "aws/aws-sdk-php": "~3.18",
-    "symfony/polyfill-mbstring": "1.20"
+    "aws/aws-sdk-php": "~3.18"
+  },
+  "config": {
+    "platform": {
+      "php": "5.6"
+    }
   }
 }

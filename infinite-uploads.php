@@ -2,12 +2,12 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 1.0
+ * Version: 1.0.1-beta-1
  * Author: UglyRobot, LLC
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
  * Requires at least: 5.3
- * Requires PHP: 5.5
+ * Requires PHP: 5.6
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Network: true
@@ -17,7 +17,7 @@
  * Copyright 2021 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0.1' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -80,6 +80,7 @@ function infinite_uploads_install() {
 
 	$charset_collate = $wpdb->get_charset_collate();
 
+	//191 is the maximum innodb default key length on utf8mb4
 	$sql = "CREATE TABLE {$wpdb->base_prefix}infinite_uploads_files (
             `file` VARCHAR(255) NOT NULL,
             `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
@@ -89,10 +90,10 @@ function infinite_uploads_install() {
             `deleted` BOOLEAN NOT NULL DEFAULT '0',
             `errors` INT UNSIGNED NOT NULL DEFAULT '0',
             `transfer_status` TEXT NULL DEFAULT NULL,
-            PRIMARY KEY (`file`(200)),
-            INDEX `type` (`type`),
-            INDEX `synced` (`synced`),
-            INDEX `deleted` (`deleted`)
+            PRIMARY KEY  (`file`(191)),
+            KEY `type` (`type`),
+            KEY `synced` (`synced`),
+            KEY `deleted` (`deleted`)
         ) {$charset_collate};";
 
 	if ( ! function_exists( 'dbDelta' ) ) {
