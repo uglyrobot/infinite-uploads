@@ -150,6 +150,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 ----------------------------------------------------------------------
 - Initial release after a year of hard work!
 
+1.0.1 - 2021-2-8
+----------------------------------------------------------------------
+- Fix db installation routine that broke on some older MySQL configurations
+
 
 == About Us ==
 Infinite Uploads is a premium cloud storage provider and content delivery network (CDN) for all your WordPress media files. Learn more here:
