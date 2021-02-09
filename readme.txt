@@ -5,6 +5,7 @@ Tested up to: 5.6.1
 Stable tag: trunk
 Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
+Tags: cloud storage, cdn bandwidth, media cloud, media library managment, image offload, media offload
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
