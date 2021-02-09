@@ -32,6 +32,8 @@ Now everyone can take full advantage of both the cost-savings and performance be
 - Simple restore - no contract and easy to restore all your files to your media library
 - Universal compatibility - Works with all well-coded plugins and themes including eCommerce and performance optimization
 
+[youtube https://youtu.be/wanINaK0u5M]
+
 ### Better Performance, Less Time, Lower-cost
 If you upload a lot of images, publish video content, share motion graphics, want to add big beautiful video backgrounds, have a podcast, or stream large audio files for sermons or lectures, you will save time, resources, and improve performance by moving your files to Infinite Uploads. Keep your site moving at top-speed with dedicated media delivery that seamlessly integrates with WordPress.
 
@@ -42,8 +44,6 @@ The Infinite Uploads plugin makes it so anyone can connect to the cloud without 
 ### Media File Storage Calculator
 
 Install Infinite Uploads, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up.
-
-[youtube https://youtu.be/wanINaK0u5M]
 
 Infinite Uploads helps you identify which files are using the most space on your server and allows you to move all your media files to cloud storage.
 
