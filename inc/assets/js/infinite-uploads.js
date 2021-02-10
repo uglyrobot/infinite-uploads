@@ -3,8 +3,7 @@ jQuery(document).ready(function ($) {
 
   var iupStopLoop = false;
   var iupProcessingLoop = false;
-  var loopErrors = 0;
-  var iupCallback = false;
+  var iupLoopErrors = 0;
 
   //show a confirmation warning if leaving page during a bulk action
   $(window).bind('beforeunload', function () {
@@ -126,7 +125,7 @@ jQuery(document).ready(function ($) {
       data.nonce = iup_data.nonce.sync;
     }
     $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
-      loopErrors = 0;
+      iupLoopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-progress-size').text(json.data.remaining_size);
@@ -162,14 +161,18 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        //if we get an error like 504 try up to 6 times before giving up.
-        loopErrors++;
-        if (loopErrors > 6) {
+        //if we get an error like 504 try up to 6 times with an exponential backoff to let the server cool down before giving up.
+        iupLoopErrors++;
+        if (iupLoopErrors > 6) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
-          loopErrors = 0;
+          iupLoopErrors = 0;
         } else {
-          syncFilelist(data.nonce);
+          var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
+          console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
+          setTimeout(function () {
+            syncFilelist(data.nonce);
+          }, exponentialBackoff);
         }
       });
   };
@@ -218,7 +221,7 @@ jQuery(document).ready(function ($) {
       data.nonce = iup_data.nonce.download;
     }
     $.post(ajaxurl + '?action=infinite-uploads-download', data, function (json) {
-      loopErrors = 0;
+      iupLoopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-download-size').text(json.data.deleted_size);
@@ -249,13 +252,17 @@ jQuery(document).ready(function ($) {
     }, 'json')
       .fail(function () {
         //if we get an error like 504 try up to 6 times before giving up.
-        loopErrors++;
-        if (loopErrors > 6) {
+        iupLoopErrors++;
+        if (iupLoopErrors > 6) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
-          loopErrors = 0;
+          iupLoopErrors = 0;
         } else {
-          downloadFiles(data.nonce);
+          var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
+          console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
+          setTimeout(function () {
+            downloadFiles(data.nonce);
+          }, exponentialBackoff);
         }
       });
   };
