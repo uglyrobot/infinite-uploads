@@ -5,7 +5,7 @@ Tested up to: 5.6.1
 Stable tag: trunk
 Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
-Tags: cloud storage, cdn bandwidth, media cloud, media library managment, image offload, media offload
+Tags: cloud storage, media cloud, media library management, image offload, media offload, s3, azure, google cloud, storage, cdn, bandwidth
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,8 @@ Move and serve all your images, video, audio, and other media files from the clo
 Upload directly to cloud storage and manage your files right from the WordPress Media Library. Eliminate FTP file managers and skip confusing Amazon S3, Google Cloud, Azure, or other cloud provider account setup, API integration, or expensive 3rd-party tools.
 
 Now everyone can take full advantage of both the cost-savings and performance benefits of the cloud! The Infinite Uploads plugin includes unlimited file uploads and can be used to connect an unlimited number of websites for free. Just create and sync to your Infinite Uploads storage account with auto-connect and only ever pay one simple price for storage and bandwidth.
+
+[youtube https://youtu.be/wanINaK0u5M]
 
 ### Infinite Uploads - Smart Cloud Plugin Features
 
@@ -32,8 +34,6 @@ Now everyone can take full advantage of both the cost-savings and performance be
 - Bulk transfer - move existing media files to or from the cloud with a click or WP CLI command
 - Simple restore - no contract and easy to restore all your files to your media library
 - Universal compatibility - Works with all well-coded plugins and themes including eCommerce and performance optimization
-
-[youtube https://youtu.be/wanINaK0u5M]
 
 ### Better Performance, Less Time, Lower-cost
 If you upload a lot of images, publish video content, share motion graphics, want to add big beautiful video backgrounds, have a podcast, or stream large audio files for sermons or lectures, you will save time, resources, and improve performance by moving your files to Infinite Uploads. Keep your site moving at top-speed with dedicated media delivery that seamlessly integrates with WordPress.
