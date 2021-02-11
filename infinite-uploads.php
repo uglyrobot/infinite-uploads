@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 1.0.1
+ * Version: 1.0.2-beta-1
  * Author: UglyRobot, LLC
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
@@ -17,7 +17,7 @@
  * Copyright 2021 UglyRobot, LLC.
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.0.1' );
+define( 'INFINITE_UPLOADS_VERSION', '1.0.2-beta-1' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -33,8 +33,12 @@ function infinite_uploads_init() {
 	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MAX_BYTES' ) ) {
 		define( 'INFINITE_UPLOADS_SYNC_MAX_BYTES', MB_IN_BYTES * 5 );
 	}
+	//This is the maximum to transfer in parallel within the INFINITE_UPLOADS_SYNC_MAX_BYTES size.
 	if ( ! defined( 'INFINITE_UPLOADS_SYNC_CONCURRENCY' ) ) {
-		define( 'INFINITE_UPLOADS_SYNC_CONCURRENCY', 10 );
+		define( 'INFINITE_UPLOADS_SYNC_CONCURRENCY', 15 );
+	}
+	if ( ! defined( 'INFINITE_UPLOADS_SYNC_MULTIPART_CONCURRENCY' ) ) {
+		define( 'INFINITE_UPLOADS_SYNC_MULTIPART_CONCURRENCY', 5 );
 	}
 	if ( ! defined( 'INFINITE_UPLOADS_SYNC_PER_LOOP' ) ) {
 		define( 'INFINITE_UPLOADS_SYNC_PER_LOOP', 1000 );
@@ -86,6 +90,7 @@ function infinite_uploads_install() {
             `size` BIGINT UNSIGNED NOT NULL DEFAULT '0',
             `modified` INT UNSIGNED NOT NULL,
             `type` VARCHAR(20) NOT NULL,
+            `transferred` BIGINT UNSIGNED NOT NULL DEFAULT '0',
             `synced` BOOLEAN NOT NULL DEFAULT '0',
             `deleted` BOOLEAN NOT NULL DEFAULT '0',
             `errors` INT UNSIGNED NOT NULL DEFAULT '0',

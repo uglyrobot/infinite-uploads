@@ -4,6 +4,7 @@ jQuery(document).ready(function ($) {
   var iupStopLoop = false;
   var iupProcessingLoop = false;
   var iupLoopErrors = 0;
+  var iupAjaxCall = false;
 
   //show a confirmation warning if leaving page during a bulk action
   $(window).bind('beforeunload', function () {
@@ -124,7 +125,7 @@ jQuery(document).ready(function ($) {
     } else {
       data.nonce = iup_data.nonce.sync;
     }
-    $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
+    iupAjaxCall = $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
       iupLoopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
@@ -136,6 +137,7 @@ jQuery(document).ready(function ($) {
           data.nonce = json.data.nonce; //save for future errors
           syncFilelist(json.data.nonce);
         } else {
+          iupStopLoop = true;
           $('#iup-upload-progress').hide();
           //update values in next modal
           $('#iup-enable-errors span').text(json.data.permanent_errors);
@@ -167,6 +169,7 @@ jQuery(document).ready(function ($) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
           iupLoopErrors = 0;
+          iupProcessingLoop = false;
         } else {
           var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
           console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
@@ -174,6 +177,31 @@ jQuery(document).ready(function ($) {
             syncFilelist(data.nonce);
           }, exponentialBackoff);
         }
+      });
+  };
+
+  var getSyncStatus = function () {
+    if (!iupProcessingLoop) {
+      return false;
+    }
+
+    $.get(ajaxurl + '?action=infinite-uploads-status', function (json) {
+      if (json.success) {
+        $('#iup-progress-size').text(json.data.remaining_size);
+        $('#iup-progress-files').text(json.data.remaining_files);
+        $('#iup-upload-progress').show();
+        $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
+      } else {
+        showError(json.data);
+      }
+    }, 'json')
+      .fail(function () {
+        showError(iup_data.strings.ajax_error);
+      })
+      .always(function () {
+        setTimeout(function () {
+          getSyncStatus();
+        }, 15000);
       });
   };
 
@@ -257,6 +285,7 @@ jQuery(document).ready(function ($) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
           iupLoopErrors = 0;
+          iupProcessingLoop = false;
         } else {
           var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
           console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
@@ -296,11 +325,15 @@ jQuery(document).ready(function ($) {
     $('#iup-sync-errors ul').empty();
     iupStopLoop = false;
     syncFilelist();
+    setTimeout(function () {
+      getSyncStatus();
+    }, 15000);
   }).on('shown.bs.modal', function () {
     $('#scan-remote-modal').modal('hide');
   }).on('hide.bs.modal', function () {
     iupStopLoop = true;
     iupProcessingLoop = false;
+    iupAjaxCall.abort();
   })
 
   //Make sure upload modal closes

@@ -1,10 +1,14 @@
 <?php
 
+use Aws\S3\S3Client;
+use Aws\Multipart\UploadState;
+use Aws\ResultInterface;
+
 class Infinite_Uploads {
 
 	private static $instance;
 	public $original_upload_dir;
-	public $bucket;
+	public $bucket; //includes customer prefix
 	public $bucket_url;
 	public $capability;
 	private $key;
@@ -38,6 +42,44 @@ class Infinite_Uploads {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Creates an UploadState object for a multipart upload by querying
+	 * for the specified uploads' information. This allows us to continue a
+	 * multipart upload across multiple requests if we store the UploadId.
+	 *
+	 * @param string $key       Object key for the multipart upload.
+	 * @param string $upload_id Upload ID for the multipart upload.
+	 *
+	 * @return UploadState
+	 */
+	public function get_multipart_upload_state( $key, $upload_id ) {
+		$state = new UploadState( [ 'Bucket' => $this->get_s3_bucket(), 'Key' => $key, 'UploadId' => $upload_id ] );
+		foreach ( $this->s3()->getPaginator( 'ListParts', $state->getId() ) as $result ) {
+			// Get the part size from the first part in the first result.
+			if ( ! $state->getPartSize() ) {
+				$state->setPartSize( $result->search( 'Parts[0].Size' ) );
+			}
+			// Mark all the parts returned by ListParts as uploaded.
+			foreach ( $result['Parts'] as $part ) {
+				$state->markPartAsUploaded( $part['PartNumber'], [ 'PartNumber' => $part['PartNumber'], 'ETag' => $part['ETag'] ] );
+			}
+		}
+		$state->setStatus( UploadState::INITIATED );
+
+		return $state;
+	}
+
+	/**
+	 * Parses filename for the filelist db table from an AWS upload result.
+	 *
+	 * @param ResultInterface $result AWS result object.
+	 *
+	 * @return string
+	 */
+	public function get_file_from_result( ResultInterface $result ) {
+		return '/' . urldecode( strstr( substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->bucket ) + strlen( $this->bucket ) ) ), '?', true ) ?: substr( $result['@metadata']["effectiveUri"], ( strrpos( $result['@metadata']["effectiveUri"], $this->bucket ) + strlen( $this->bucket ) ) ) );
 	}
 
 	/**
@@ -284,18 +326,13 @@ class Infinite_Uploads {
 	public function get_sync_stats() {
 		global $wpdb;
 
-		$total     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
-		$local     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
-		$synced    = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
-		$deletable = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0" );
-		$deleted   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
+		$total     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size, SUM(`transferred`) as transferred FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE 1" );
+		$local     = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size, SUM(`transferred`) as transferred FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
+		$synced    = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size, SUM(`transferred`) as transferred FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
+		$deletable = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size, SUM(`transferred`) as transferred FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0" );
+		$deleted   = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size, SUM(`transferred`) as transferred FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1" );
 
 		$progress = (array) get_site_option( 'iup_files_scanned' );
-
-		/*$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-		foreach ( $progress as $key => $timestamp ) {
-			$progress[ $key ] = $timestamp ? date_i18n( $date_format, $progress[ $key ] ) : $timestamp;
-		}*/
 
 		return array_merge( $progress, [
 			'is_data'         => (bool) $total->files,
@@ -310,9 +347,9 @@ class Infinite_Uploads {
 			'deleted_files'   => number_format_i18n( (int) $deleted->files ),
 			'deleted_size'    => size_format( (int) $deleted->size, 2 ),
 			'remaining_files' => number_format_i18n( max( $total->files - $synced->files, 0 ) ),
-			'remaining_size'  => size_format( max( $total->size - $synced->size, 0 ), 2 ),
-			'pcnt_complete'   => ( $local->files ? round( ( $synced->files / $total->files ) * 100, 2 ) : 0 ),
-			'pcnt_downloaded' => ( $synced->files ? round( 100 - ( ( $deleted->files / $synced->files ) * 100 ), 2 ) : 0 ),
+			'remaining_size'  => size_format( max( $total->size - $total->transferred, 0 ), 2 ),
+			'pcnt_complete'   => ( $local->size ? round( ( $total->transferred / $total->size ) * 100, 2 ) : 0 ),
+			'pcnt_downloaded' => ( $synced->size ? round( 100 - ( ( $deleted->size / $synced->size ) * 100 ), 2 ) : 0 ),
 		] );
 	}
 
@@ -527,6 +564,15 @@ class Infinite_Uploads {
 	 */
 	public function get_s3_bucket() {
 		return $bucket = strtok( $this->bucket, '/' );
+	}
+
+	/**
+	 * Get the S3 bucket name
+	 *
+	 * @return string
+	 */
+	public function get_s3_prefix() {
+		return untrailingslashit( str_replace( $this->get_s3_bucket() . '/', '', $this->bucket ) );
 	}
 
 	/**
