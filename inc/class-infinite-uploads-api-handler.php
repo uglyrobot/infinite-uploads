@@ -270,7 +270,9 @@ class Infinite_Uploads_Api_Handler {
 		}
 
 		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
-			$this->parse_api_error( $response );
+			if ( empty( $options['blocking'] ) ) {
+				$this->parse_api_error( $response );
+			}
 
 			return false;
 		}
