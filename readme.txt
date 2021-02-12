@@ -13,11 +13,9 @@ Move and serve all your images, video, audio, and other media files from the clo
 
 == Description ==
 
-**Infinite Uploads is a free Media Library file analyzer and simple cloud tool for connecting, offloading and serving all your media files from the cloud**
+**Infinite Uploads is a cloud storage and CDN delivery provider for your WordPress media library other uploaded files. The Infinite Uploads plugin allows you to simply connect an unlimited number of sites to your Infinite Uploads cloud account for offloading your files, improving site performance, lowering hosting cost, and serving files faster to your visitors.**
 
-Upload directly to cloud storage and manage your files right from the WordPress Media Library. Eliminate FTP file managers and skip confusing Amazon S3, Google Cloud, Azure, or other cloud provider account setup, API integration, or expensive 3rd-party tools.
-
-Now everyone can take full advantage of both the cost-savings and performance benefits of the cloud! The Infinite Uploads plugin includes unlimited file uploads and can be used to connect an unlimited number of websites for free. Just create and sync to your Infinite Uploads storage account with auto-connect and only ever pay one simple price for storage and bandwidth.
+Upload directly to your Infinite Uploads cloud storage and manage your files right from the WordPress Media Library. Eliminate the need for an FTP file manager and skip confusing Amazon S3, Google Cloud, Azure, or other account setup, API integration, or expensive 3rd-party tools. Use the Infinite Uploads plugin to connect all your sites and only pay for your stroage and bandwidth.
 
 [youtube https://youtu.be/wanINaK0u5M]
 
@@ -44,7 +42,7 @@ The Infinite Uploads plugin makes it so anyone can connect to the cloud without 
 
 ### Media File Storage Calculator
 
-Install Infinite Uploads, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up.
+Install the Infinite Uploads plugin, scan your Media Library for a breakdown of your media files by type and size. See how many images, videos, archives, documents, code, and other files (like audio) there are and how much space they're taking up.
 
 Infinite Uploads helps you identify which files are using the most space on your server and allows you to move all your media files to cloud storage.
 
@@ -53,7 +51,7 @@ Not only is Infinite Uploads great for delivering highquality product images and
 
 ### Widely Compatible
 
-Infinite Uploads is built with the latest in cloud technology to work flawlessly with the widest variety of your favorite free and premium themes and plugins and has been tested with:
+Infinite Uploads is built with the latest in cloud technology to work flawlessly with the widest variety of your favorite themes and plugins and has been tested with:
 
 - [WooCommerce](https://wordpress.org/plugins/woocommerce/)
 - [Easy Digital Downloads](https://wordpress.org/plugins/easy-digital-downloads/)
@@ -92,7 +90,7 @@ Transform WordPress into a stateless application ready for the cloud. Hosting yo
 > “Infinite Uploads changes the game. Thousands of files stored safely without slowing down my site. If that’s not a win…I don’t know what is.” - Micah, Podcast Host
 
 ★★★★★
-> “From their free smart media file scanner to their simple pricing and one-click connect, The cloud for WordPress and Divi users could’nt be easier! Now anyone that can add an image to WordPress can move to the cloud and manage media files without client software, third-party plugins, or the need to become a cloud architect. It’s just awesome.” - [David Blackmon](https://profiles.wordpress.org/davidblackmon/)
+> “From their smart media file scanner to their simple pricing and one-click connect, The cloud for WordPress and Divi users could’nt be easier! Now anyone that can add an image to WordPress can move to the cloud and manage media files without client software, third-party plugins, or the need to become a cloud architect. It’s just awesome.” - [David Blackmon](https://profiles.wordpress.org/davidblackmon/)
 
 
 ### What about Multisite?
@@ -112,7 +110,7 @@ Images, videos, and audio files are the biggest performance drain on a website. 
 
 = Is the Infinite Uploads plugin free? =
 
-Yes. The Infinite Uploads plugin is completely free and can be used on an unlimited number of sites without per-site licensing costs. There is no "Pro" version of the plugin you must buy to access commonly needed features. Pay only for your cloud storage usage.
+Yes the Infinite Uploads plugin is completely free but it does require an Infinite Uploads account to be useful in storing serving your files. It can be used on an unlimited number of sites without per-site licensing costs.
 
 = Will the Infinite Uploads plugin work without connecting to Cloud Storage? =
 
