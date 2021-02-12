@@ -142,7 +142,7 @@ jQuery(document).ready(function ($) {
           //update values in next modal
           $('#iup-enable-errors span').text(json.data.permanent_errors);
           if (json.data.permanent_errors) {
-            $('#iup-enable-errors').show();
+            $('.iup-enable-errors').show();
           }
           $('#iup-sync-button').attr('data-target', '#enable-modal');
           $('.modal').modal('hide');
@@ -320,6 +320,8 @@ jQuery(document).ready(function ($) {
 
   //Sync
   $('#upload-modal').on('show.bs.modal', function () {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
     $('#iup-error').hide();
     $('#iup-sync-errors').hide();
     $('#iup-sync-errors ul').empty();
@@ -339,6 +341,36 @@ jQuery(document).ready(function ($) {
   //Make sure upload modal closes
   $('#enable-modal').on('shown.bs.modal', function () {
     $('#upload-modal').modal('hide');
+  }).on('hidden.bs.modal', function () {
+    $('#iup-enable-spinner').addClass('text-hide');
+    $('#iup-enable-button').show();
+  })
+
+  $('#iup-collapse-errors').on('show.bs.collapse', function () {
+    // load up list of errors via ajax
+    $.get(ajaxurl + '?action=infinite-uploads-sync-errors', function (json) {
+      if (json.success) {
+        $('#iup-collapse-errors .list-group').html(json.data);
+      }
+    }, 'json');
+  })
+
+  $('#iup-resync-button').on('click', function (e) {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
+    $('#iup-enable-button').hide();
+    $('#iup-enable-spinner').removeClass('text-hide');
+    $.post(ajaxurl + '?action=infinite-uploads-reset-errors', {foo: "bar"}, function (json) {
+      if (json.success) {
+        $('.modal').modal('hide');
+        $('#upload-modal').modal('show');
+        return true;
+      }
+    }, 'json')
+      .fail(function () {
+        showError(iup_data.strings.ajax_error);
+        $('.modal').modal('hide');
+      });
   })
 
   //Download
@@ -372,6 +404,8 @@ jQuery(document).ready(function ($) {
 
   //Enable infinite uploads
   $('#iup-enable-button').on('click', function () {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
     $('#iup-enable-button').hide();
     $('#iup-enable-spinner').removeClass('text-hide');
     $.post(ajaxurl + '?action=infinite-uploads-toggle', {'enabled': true, 'nonce': iup_data.nonce.toggle}, function (json) {

@@ -14,15 +14,14 @@ use Aws\MockHandler;
 class Infinite_Uploads_Admin {
 
 	private static $instance;
-	public $ajax_timelimit;
+	public $ajax_timelimit = 20;
 	private $iup_instance;
 	private $api;
 	private $auth_error;
 
 	public function __construct() {
-		$this->iup_instance   = Infinite_Uploads::get_instance();
-		$this->api            = Infinite_Uploads_Api_Handler::get_instance();
-		$this->ajax_timelimit = max( 20, floor( ini_get( 'max_execution_time' ) * .6666 ) );
+		$this->iup_instance = Infinite_Uploads::get_instance();
+		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		//single site
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
@@ -40,6 +39,8 @@ class Infinite_Uploads_Admin {
 			add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
 			add_action( 'wp_ajax_infinite-uploads-remote-filelist', [ &$this, 'ajax_remote_filelist' ] );
 			add_action( 'wp_ajax_infinite-uploads-sync', [ &$this, 'ajax_sync' ] );
+			add_action( 'wp_ajax_infinite-uploads-sync-errors', [ &$this, 'ajax_sync_errors' ] );
+			add_action( 'wp_ajax_infinite-uploads-reset-errors', [ &$this, 'ajax_reset_errors' ] );
 			add_action( 'wp_ajax_infinite-uploads-delete', [ &$this, 'ajax_delete' ] );
 			add_action( 'wp_ajax_infinite-uploads-download', [ &$this, 'ajax_download' ] );
 			add_action( 'wp_ajax_infinite-uploads-toggle', [ &$this, 'ajax_toggle' ] );
@@ -98,6 +99,35 @@ class Infinite_Uploads_Admin {
 		}
 
 		wp_send_json_success( $this->iup_instance->get_sync_stats() );
+	}
+
+	public function ajax_sync_errors() {
+		global $wpdb;
+
+		// check caps
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+		}
+
+		$html       = '';
+		$error_list = $wpdb->get_results( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors >= 3" );
+		foreach ( $error_list as $error ) {
+			$html .= sprintf( '<li class="list-group-item list-group-item-warning">%s - %s</li>', esc_html( $error->file ), size_format( $error->size, 2 ) ) . PHP_EOL;
+		}
+		wp_send_json_success( $html );
+	}
+
+	public function ajax_reset_errors() {
+		global $wpdb;
+
+		// check caps
+		if ( ! current_user_can( $this->iup_instance->capability ) ) {
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+		}
+
+		$result = $wpdb->query( "UPDATE `{$wpdb->base_prefix}infinite_uploads_files` SET errors = 0, transferred = 0 WHERE synced = 0 AND errors >= 3" );
+
+		wp_send_json_success( $result );
 	}
 
 
@@ -278,6 +308,8 @@ class Infinite_Uploads_Admin {
 			update_site_option( 'iup_files_scanned', $progress );
 		}
 
+		//this loop has a parallel status check, so we make the timeout 2/3 of max execution time.
+		$this->ajax_timelimit = max( 20, floor( ini_get( 'max_execution_time' ) * .6666 ) );
 		$this->sync_debug_log( "Ajax time limit: " . $this->ajax_timelimit );
 		$uploaded = 0;
 		$errors   = [];
@@ -339,7 +371,7 @@ class Infinite_Uploads_Admin {
 									$this->sync_debug_log( "Finished uploading file: " . $command['Key'] );
 									$uploaded ++;
 									$file = $this->iup_instance->get_file_from_result( $result );
-									$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'synced' => 1, 'errors' => 0, 'transfer_status' => null ], [ 'file' => $file ], [ '%d', '%d', null ] );
+									$wpdb->query( $wpdb->prepare( "UPDATE `{$wpdb->base_prefix}infinite_uploads_files` SET transferred = size, synced = 1, errors = 0, transfer_status = null WHERE file = %s", $file ) );
 
 									return $result;
 								} )

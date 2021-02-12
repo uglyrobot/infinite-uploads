@@ -159,7 +159,7 @@ p.lead {
   font-size: 25px;
 }
 
-.text-warning {
+.text-warning, .text-warning a {
   color: #EE7C1E !important;
   font-weight: 500;
 }
@@ -175,4 +175,26 @@ p.lead {
 #iup-local-pie, #iup-cloud-pie, .iup-pie-wrapper {
   max-height: 300px;
   max-width: 600px;
+}
+
+#iup-enable-errors .alert-link {
+  float: right;
+}
+
+#iup-enable-errors .alert-link:hover {
+  text-decoration: none;
+}
+
+#iup-enable-errors .dashicons {
+  line-height: 1.2;
+}
+
+#iup-collapse-errors {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+#iup-collapse-errors .list-group-item {
+  padding: 0.25rem 1.25rem;
+  margin: 0;
 }
