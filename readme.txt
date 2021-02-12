@@ -112,11 +112,11 @@ Images, videos, and audio files are the biggest performance drain on a website. 
 
 = Is the Infinite Uploads plugin free? =
 
-Yes the Infinite Uploads plugin is completely free but it does require an Infinite Uploads account to be useful in storing serving your files. It can be used on an unlimited number of sites without per-site licensing costs.
+Yes the Infinite Uploads plugin is free but it does require an Infinite Uploads account to be useful in storing and serving your files from the cloud. It can be used on an unlimited number of sites without per-site or per file licensing costs like competitors.
 
 = Will the Infinite Uploads plugin work without connecting to Cloud Storage? =
 
-Yes. Use the Infinite Uploads storage scanner to analyze the files in your media library. See what files are causing overages with a graphic breakdown of the files size and type and learn what content is causing overages. You will have to connect to our cloud to use the cloud storage and CDN features.
+Yes. Use the Infinite Uploads storage scanner to analyze the files in your media library. See what files are causing overages with a graphic breakdown of the files size and type and learn what content is taking up your hosting storage. You will have to connect to our cloud to use the cloud storage and CDN features.
 
 = How many websites can I connect to one cloud account? =
 
