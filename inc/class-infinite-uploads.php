@@ -348,8 +348,8 @@ class Infinite_Uploads {
 			'deleted_size'    => size_format( (int) $deleted->size, 2 ),
 			'remaining_files' => number_format_i18n( max( $total->files - $synced->files, 0 ) ),
 			'remaining_size'  => size_format( max( $total->size - $total->transferred, 0 ), 2 ),
-			'pcnt_complete'   => ( $local->size ? round( ( $total->transferred / $total->size ) * 100, 2 ) : 0 ),
-			'pcnt_downloaded' => ( $synced->size ? round( 100 - ( ( $deleted->size / $synced->size ) * 100 ), 2 ) : 0 ),
+			'pcnt_complete'   => ( $local->size ? min( 100, round( ( $total->transferred / $total->size ) * 100, 2 ) ) : 0 ),
+			'pcnt_downloaded' => ( $synced->size ? min( 100, round( 100 - ( ( $deleted->size / $synced->size ) * 100 ), 2 ) ) : 0 ),
 		] );
 	}
 
