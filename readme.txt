@@ -156,7 +156,7 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 1.0.1 - 2021-2-8
 ----------------------------------------------------------------------
-- Fix db installation routine that broke on some older MySQL configurations
+- Fix table installation routine that broke on some older MySQL configurations
 
 1.0 - 2021-2-7
 ----------------------------------------------------------------------
