@@ -9,15 +9,15 @@ Tags: cloud storage, media cloud, media library management, image offload, media
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Move and serve all your images, video, audio, and other media files from the cloud to boost performance and save huge on storage and bandwidth.
+Move and serve all your images, video, audio, and other media files from the cloud to boost performance and save big on storage and bandwidth.
 
 == Description ==
 
-**Infinite Uploads is a cloud storage and CDN delivery provider for your WordPress media library and other file uploads. The Infinite Uploads plugin allows you to simply connect an unlimited number of sites to your Infinite Uploads cloud account for offloading your files, improving site performance, lowering hosting cost, and serving files faster to your visitors.**
+**Infinite Uploads is a cloud storage and CDN delivery provider for your WordPress media library and other uploads. The Infinite Uploads plugin allows you to easily connect an unlimited number of sites to your Infinite Uploads cloud account for offloading your files, improving site performance, lowering hosting costs, and serving files faster to your visitors.**
 
-Paying high overage fees or running out of storage and bandwidth with your hosting provider? Upgrading to a new plan can be expensive. Moving your media uploads and other large files to the cloud is more affordable and eaily scales as your site grows.
+Paying high overage fees or running out of storage or bandwidth with your hosting provider? Upgrading to a new plan just for more storage can be expensive. Moving your media uploads and other large files to the cloud is more affordable and scales infinitely as your site grows.
 
-Upload directly to your Infinite Uploads cloud storage and manage your files right from the WordPress Media Library. Eliminate the need for an FTP file manager and skip confusing Amazon S3, Google Cloud, Azure, or other account setup, API integration, or expensive 3rd-party tools. Use the Infinite Uploads plugin to connect all your sites and only pay for your storage and bandwidth.
+Upload directly to your Infinite Uploads cloud storage and manage your files right from the WordPress Media Library. Eliminate the need for an FTP file manager and skip confusing Amazon S3, Google Cloud, Azure, or other account setup, API integration, or expensive 3rd-party connect plugins. Use the Infinite Uploads plugin to connect all your sites and only pay for your total storage and bandwidth.
 
 [youtube https://youtu.be/wanINaK0u5M]
 
