@@ -120,7 +120,12 @@ class Infinite_Uploads_Filelist {
 				if ( is_link( $item ) || $this->is_excluded( $item ) ) {
 					continue;
 				} elseif ( is_file( $item ) ) {
-					$file = ( is_readable( $item ) ) ? $this->get_file_info( $item ) : null;
+					if ( is_readable( $item ) ) {
+						$file = $this->get_file_info( $item );
+					} else {
+						$file = null;
+						error_log( sprintf( '[INFINITE_UPLOADS Filelist Error] %s could not be read for syncing', $item ) );
+					}
 
 					$file['name'] = $this->relative_path( $item );
 
