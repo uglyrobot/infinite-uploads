@@ -280,7 +280,7 @@ class Infinite_Uploads_Stream_Wrapper {
 	 */
 	private function debug( $action, $key ) {
 		if ( defined( 'INFINITE_UPLOADS_SW_DEBUG' ) && INFINITE_UPLOADS_SW_DEBUG ) {
-			$log = "InfUpl Debug: $action $key";
+			$log = "[INFINITE_UPLOADS Stream Debug]: $action $key";
 			if ( defined( 'INFINITE_UPLOADS_SW_DEBUG_BACKTRACE' ) && INFINITE_UPLOADS_SW_DEBUG_BACKTRACE ) {
 				$error = new Error;
 				$log   .= PHP_EOL . $error->getTraceAsString();
