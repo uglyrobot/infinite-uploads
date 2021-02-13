@@ -3,8 +3,8 @@ jQuery(document).ready(function ($) {
 
   var iupStopLoop = false;
   var iupProcessingLoop = false;
-  var loopErrors = 0;
-  var iupCallback = false;
+  var iupLoopErrors = 0;
+  var iupAjaxCall = false;
 
   //show a confirmation warning if leaving page during a bulk action
   $(window).bind('beforeunload', function () {
@@ -125,8 +125,8 @@ jQuery(document).ready(function ($) {
     } else {
       data.nonce = iup_data.nonce.sync;
     }
-    $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
-      loopErrors = 0;
+    iupAjaxCall = $.post(ajaxurl + '?action=infinite-uploads-sync', data, function (json) {
+      iupLoopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-progress-size').text(json.data.remaining_size);
@@ -137,11 +137,12 @@ jQuery(document).ready(function ($) {
           data.nonce = json.data.nonce; //save for future errors
           syncFilelist(json.data.nonce);
         } else {
+          iupStopLoop = true;
           $('#iup-upload-progress').hide();
           //update values in next modal
           $('#iup-enable-errors span').text(json.data.permanent_errors);
           if (json.data.permanent_errors) {
-            $('#iup-enable-errors').show();
+            $('.iup-enable-errors').show();
           }
           $('#iup-sync-button').attr('data-target', '#enable-modal');
           $('.modal').modal('hide');
@@ -162,15 +163,45 @@ jQuery(document).ready(function ($) {
       }
     }, 'json')
       .fail(function () {
-        //if we get an error like 504 try up to 6 times before giving up.
-        loopErrors++;
-        if (loopErrors > 6) {
+        //if we get an error like 504 try up to 6 times with an exponential backoff to let the server cool down before giving up.
+        iupLoopErrors++;
+        if (iupLoopErrors > 6) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
-          loopErrors = 0;
+          iupLoopErrors = 0;
+          iupProcessingLoop = false;
         } else {
-          syncFilelist(data.nonce);
+          var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
+          console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
+          setTimeout(function () {
+            syncFilelist(data.nonce);
+          }, exponentialBackoff);
         }
+      });
+  };
+
+  var getSyncStatus = function () {
+    if (!iupProcessingLoop) {
+      return false;
+    }
+
+    $.get(ajaxurl + '?action=infinite-uploads-status', function (json) {
+      if (json.success) {
+        $('#iup-progress-size').text(json.data.remaining_size);
+        $('#iup-progress-files').text(json.data.remaining_files);
+        $('#iup-upload-progress').show();
+        $('#iup-sync-progress-bar').css('width', json.data.pcnt_complete + "%").attr('aria-valuenow', json.data.pcnt_complete).text(json.data.pcnt_complete + "%");
+      } else {
+        showError(json.data);
+      }
+    }, 'json')
+      .fail(function () {
+        showError(iup_data.strings.ajax_error);
+      })
+      .always(function () {
+        setTimeout(function () {
+          getSyncStatus();
+        }, 15000);
       });
   };
 
@@ -218,7 +249,7 @@ jQuery(document).ready(function ($) {
       data.nonce = iup_data.nonce.download;
     }
     $.post(ajaxurl + '?action=infinite-uploads-download', data, function (json) {
-      loopErrors = 0;
+      iupLoopErrors = 0;
       if (json.success) {
         //$('.iup-progress-pcnt').text(json.data.pcnt_complete);
         $('#iup-download-size').text(json.data.deleted_size);
@@ -249,13 +280,18 @@ jQuery(document).ready(function ($) {
     }, 'json')
       .fail(function () {
         //if we get an error like 504 try up to 6 times before giving up.
-        loopErrors++;
-        if (loopErrors > 6) {
+        iupLoopErrors++;
+        if (iupLoopErrors > 6) {
           showError(iup_data.strings.ajax_error);
           $('.modal').modal('hide');
-          loopErrors = 0;
+          iupLoopErrors = 0;
+          iupProcessingLoop = false;
         } else {
-          downloadFiles(data.nonce);
+          var exponentialBackoff = Math.floor(Math.pow(iupLoopErrors, 2.5) * 1000); //max 90s
+          console.log("Server error. Waiting " + exponentialBackoff + "ms before retrying");
+          setTimeout(function () {
+            downloadFiles(data.nonce);
+          }, exponentialBackoff);
         }
       });
   };
@@ -284,21 +320,57 @@ jQuery(document).ready(function ($) {
 
   //Sync
   $('#upload-modal').on('show.bs.modal', function () {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
     $('#iup-error').hide();
     $('#iup-sync-errors').hide();
     $('#iup-sync-errors ul').empty();
     iupStopLoop = false;
     syncFilelist();
+    setTimeout(function () {
+      getSyncStatus();
+    }, 15000);
   }).on('shown.bs.modal', function () {
     $('#scan-remote-modal').modal('hide');
   }).on('hide.bs.modal', function () {
     iupStopLoop = true;
     iupProcessingLoop = false;
+    iupAjaxCall.abort();
   })
 
   //Make sure upload modal closes
   $('#enable-modal').on('shown.bs.modal', function () {
     $('#upload-modal').modal('hide');
+  }).on('hidden.bs.modal', function () {
+    $('#iup-enable-spinner').addClass('text-hide');
+    $('#iup-enable-button').show();
+  })
+
+  $('#iup-collapse-errors').on('show.bs.collapse', function () {
+    // load up list of errors via ajax
+    $.get(ajaxurl + '?action=infinite-uploads-sync-errors', function (json) {
+      if (json.success) {
+        $('#iup-collapse-errors .list-group').html(json.data);
+      }
+    }, 'json');
+  })
+
+  $('#iup-resync-button').on('click', function (e) {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
+    $('#iup-enable-button').hide();
+    $('#iup-enable-spinner').removeClass('text-hide');
+    $.post(ajaxurl + '?action=infinite-uploads-reset-errors', {foo: "bar"}, function (json) {
+      if (json.success) {
+        $('.modal').modal('hide');
+        $('#upload-modal').modal('show');
+        return true;
+      }
+    }, 'json')
+      .fail(function () {
+        showError(iup_data.strings.ajax_error);
+        $('.modal').modal('hide');
+      });
   })
 
   //Download
@@ -332,6 +404,8 @@ jQuery(document).ready(function ($) {
 
   //Enable infinite uploads
   $('#iup-enable-button').on('click', function () {
+    $('.iup-enable-errors').hide(); //hide errors on enable modal
+    $('#iup-collapse-errors').collapse('hide');
     $('#iup-enable-button').hide();
     $('#iup-enable-spinner').removeClass('text-hide');
     $.post(ajaxurl + '?action=infinite-uploads-toggle', {'enabled': true, 'nonce': iup_data.nonce.toggle}, function (json) {

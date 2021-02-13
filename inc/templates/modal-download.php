@@ -31,7 +31,7 @@
 								<div class=" spinner-border spinner-border-sm" role="status">
 									<span class="sr-only">Downloading...</span>
 								</div>
-								<span class="h6" id="iup-download-progress"><?php printf( __( '<span id="iup-download-size">%s</span> / <span id="iup-download-files">%s</span> Files Remaining', 'infinite-uploads' ), $stats['deleted_size'], $stats['deleted_files'] ); ?></span>
+								<span class="h6" id="iup-download-progress"><?php printf( __( '<span id="iup-download-size">%s</span> / <span id="iup-download-files">%s</span> File(s) Remaining', 'infinite-uploads' ), $stats['deleted_size'], $stats['deleted_files'] ); ?></span>
 							</div>
 						</div>
 					</div>

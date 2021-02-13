@@ -147,6 +147,13 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
+1.0.2 - 2021-2-12
+----------------------------------------------------------------------
+- Resumable large file uploads. If the sync times out, server errors, or is stopped midway, it will continue the large file where it left off. This should support syncing multi-GB files.
+- Progress bar percent is now tracked by bytes not file count, this makes it much more accurate when you have some big files.
+- Progress bar is now updated every 15s minimum, and shows the progress of big files as they are uploaded.
+- Added a new error log display and retry sync button in enable modal.
+
 1.0.1 - 2021-2-8
 ----------------------------------------------------------------------
 - Fix table installation routine that broke on some older MySQL configurations
