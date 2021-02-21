@@ -210,7 +210,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 20, 'noscan' => false, 'verbose' => false ] );
 
-		$path = $instance->get_original_upload_dir();
+		$path = $instance->get_original_upload_dir_root();
 
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();
@@ -330,7 +330,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		global $wpdb;
 		$instance = Infinite_Uploads::get_instance();
 		$s3       = $instance->s3();
-		$path     = $instance->get_original_upload_dir();
+		$path     = $instance->get_original_upload_dir_root();
 
 		WP_CLI::line( esc_html__( 'Scanning local filesystem...', 'infinite-uploads' ) );
 		$filelist = new Infinite_Uploads_Filelist( $path['basedir'], 9999, [] );
@@ -418,7 +418,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$instance   = Infinite_Uploads::get_instance();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'noscan' => false, 'verbose' => false ] );
 
-		$path = $instance->get_original_upload_dir();
+		$path = $instance->get_original_upload_dir_root();
 
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();
@@ -472,7 +472,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 20, 'noscan' => false, 'verbose' => false ] );
 
-		$path = $instance->get_original_upload_dir();
+		$path = $instance->get_original_upload_dir_root();
 
 		if ( ! $args_assoc['noscan'] ) {
 			$this->build_scan();

@@ -147,6 +147,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
+1.0.3 - 2021-2-22
+----------------------------------------------------------------------
+- WordPress Multisite support (subdir, subdomain, and pre-WP3.5 networks)
+
 1.0.2 - 2021-2-12
 ----------------------------------------------------------------------
 - Resumable large file uploads. If the sync times out, server errors, or is stopped midway, it will continue the large file where it left off. This should support syncing multi-GB files.

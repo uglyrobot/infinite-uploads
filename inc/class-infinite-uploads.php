@@ -161,7 +161,11 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
 		if ( ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) && $api_data->site->cdn_enabled ) {
-			new Infinite_Uploads_Rewriter( $uploads_url['baseurl'], $this->bucket_url, $api_data->site->cname );
+			//makes this work with pre 3.5 MU ms_files rewriting (ie domain.com/files/filename.jpg)
+			$original_root_dirs = $this->get_original_upload_dir_root();
+			$new_dirs           = wp_get_upload_dir();
+			$cname              = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $api_data->site->cname, $new_dirs['basedir'] );
+			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $new_dirs['baseurl'], $cname );
 		}
 	}
 
@@ -276,13 +280,80 @@ class Infinite_Uploads {
 	/*
 	 *
 	 */
-
 	public function get_original_upload_dir() {
 		if ( empty( $this->original_upload_dir ) ) {
 			$this->original_upload_dir = wp_get_upload_dir();
 		}
 
 		return $this->original_upload_dir;
+	}
+
+	/**
+	 * Get root upload dir for multisite. Based on _wp_upload_dir().
+	 *
+	 * @return array See wp_upload_dir()
+	 */
+	public function get_original_upload_dir_root() {
+		$siteurl     = get_option( 'siteurl' );
+		$upload_path = trim( get_option( 'upload_path' ) );
+
+		if ( empty( $upload_path ) || 'wp-content/uploads' === $upload_path ) {
+			$dir = WP_CONTENT_DIR . '/uploads';
+		} elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
+			// $dir is absolute, $upload_path is (maybe) relative to ABSPATH.
+			$dir = path_join( ABSPATH, $upload_path );
+		} else {
+			$dir = $upload_path;
+		}
+
+		$url = get_option( 'upload_url_path' );
+		if ( ! $url ) {
+			if ( empty( $upload_path ) || ( 'wp-content/uploads' === $upload_path ) || ( $upload_path == $dir ) ) {
+				$url = WP_CONTENT_URL . '/uploads';
+			} else {
+				$url = trailingslashit( $siteurl ) . $upload_path;
+			}
+		}
+
+		/*
+		 * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
+		 * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
+		 */
+		if ( defined( 'UPLOADS' ) && ! ( is_multisite() && get_site_option( 'ms_files_rewriting' ) ) ) {
+			$dir = ABSPATH . UPLOADS;
+			$url = trailingslashit( $siteurl ) . UPLOADS;
+		}
+
+		// If multisite (and if not the main site in a post-MU network).
+		if ( is_multisite() && ! ( is_main_network() && is_main_site() && defined( 'MULTISITE' ) ) ) {
+
+			if ( get_site_option( 'ms_files_rewriting' ) && defined( 'UPLOADS' ) && ! ms_is_switched() ) {
+				/*
+				 * Handle the old-form ms-files.php rewriting if the network still has that enabled.
+				 * When ms-files rewriting is enabled, then we only listen to UPLOADS when:
+				 * 1) We are not on the main site in a post-MU network, as wp-content/uploads is used
+				 *    there, and
+				 * 2) We are not switched, as ms_upload_constants() hardcodes these constants to reflect
+				 *    the original blog ID.
+				 *
+				 * Rather than UPLOADS, we actually use BLOGUPLOADDIR if it is set, as it is absolute.
+				 * (And it will be set, see ms_upload_constants().) Otherwise, UPLOADS can be used, as
+				 * as it is relative to ABSPATH. For the final piece: when UPLOADS is used with ms-files
+				 * rewriting in multisite, the resulting URL is /files. (#WP22702 for background.)
+				 */
+
+				$dir = ABSPATH . untrailingslashit( UPLOADBLOGSDIR );
+				$url = trailingslashit( $siteurl ) . 'files';
+			}
+		}
+
+		$basedir = $dir;
+		$baseurl = $url;
+
+		return array(
+			'basedir' => $basedir,
+			'baseurl' => $baseurl,
+		);
 	}
 
 	public function setup_notice() {
@@ -488,16 +559,16 @@ class Infinite_Uploads {
 	}
 
 	public function filter_upload_dir( $dirs ) {
+		$root_dirs = $this->get_original_upload_dir_root();
 
-		$dirs['path']    = str_replace( $dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['path'] );
-		$dirs['basedir'] = str_replace( $dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['basedir'] );
+		$dirs['path']    = str_replace( $root_dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['path'] );
+		$dirs['basedir'] = str_replace( $root_dirs['basedir'], 'iu://' . untrailingslashit( $this->bucket ), $dirs['basedir'] );
 
 		if ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) {
 
 			if ( defined( 'INFINITE_UPLOADS_USE_LOCAL' ) && INFINITE_UPLOADS_USE_LOCAL ) {
 				$dirs['url']     = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['path'] );
 				$dirs['baseurl'] = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $dirs['baseurl'] . '/iu/' . $this->bucket, $dirs['basedir'] );
-
 			} else {
 				$dirs['url']     = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $this->get_s3_url(), $dirs['path'] );
 				$dirs['baseurl'] = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $this->get_s3_url(), $dirs['basedir'] );

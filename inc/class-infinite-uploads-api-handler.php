@@ -508,7 +508,7 @@ class Infinite_Uploads_Api_Handler {
 		] );
 
 		//Do a find replace on the posts table. For multisite or other tables would really need a big find-replace plugin or WP CLI.
-		$uploads_url = $this->iup_instance->get_original_upload_dir();
+		$uploads_url = $this->iup_instance->get_original_upload_dir_root();
 		$api_data    = $this->get_site_data();
 
 		if ( $api_data ) {

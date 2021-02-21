@@ -141,7 +141,7 @@ class Infinite_Uploads_Admin {
 
 		$this->sync_debug_log( "Ajax time limit: " . $this->ajax_timelimit );
 
-		$path = $this->iup_instance->get_original_upload_dir();
+		$path = $this->iup_instance->get_original_upload_dir_root();
 		$path = $path['basedir'];
 
 		$remaining_dirs = [];
@@ -315,7 +315,7 @@ class Infinite_Uploads_Admin {
 		$errors   = [];
 		$break    = false;
 		$is_done  = false;
-		$path     = $this->iup_instance->get_original_upload_dir();
+		$path     = $this->iup_instance->get_original_upload_dir_root();
 		$s3       = $this->iup_instance->s3();
 		while ( ! $break ) {
 			$to_sync = $wpdb->get_results( $wpdb->prepare( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 0 AND errors < 3 AND transfer_status IS NULL ORDER BY errors ASC, file ASC LIMIT %d", INFINITE_UPLOADS_SYNC_PER_LOOP ) );
@@ -550,7 +550,7 @@ class Infinite_Uploads_Admin {
 
 		$deleted = 0;
 		$errors  = [];
-		$path    = $this->iup_instance->get_original_upload_dir();
+		$path    = $this->iup_instance->get_original_upload_dir_root();
 		$break   = false;
 		while ( ! $break ) {
 			$to_delete = $wpdb->get_col( "SELECT file FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 0 LIMIT 500" );
@@ -584,7 +584,7 @@ class Infinite_Uploads_Admin {
 		$downloaded = 0;
 		$errors     = [];
 		$break      = false;
-		$path       = $this->iup_instance->get_original_upload_dir();
+		$path       = $this->iup_instance->get_original_upload_dir_root();
 		$s3         = $this->iup_instance->s3();
 		while ( ! $break ) {
 			$to_sync = $wpdb->get_results( $wpdb->prepare( "SELECT file, size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1 AND deleted = 1 AND errors < 3 ORDER BY errors ASC, file ASC LIMIT %d", INFINITE_UPLOADS_SYNC_PER_LOOP ) );
