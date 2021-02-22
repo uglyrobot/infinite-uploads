@@ -1,7 +1,7 @@
 === Infinite Uploads ===
 
 Requires at least: 5.3
-Tested up to: 5.6.1
+Tested up to: 5.6.2
 Stable tag: trunk
 Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
@@ -147,7 +147,7 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
-1.0.3 - 2021-2-22
+1.1 - 2021-2-22
 ----------------------------------------------------------------------
 - WordPress Multisite support (subdir, subdomain, and pre-WP3.5 networks)
 
