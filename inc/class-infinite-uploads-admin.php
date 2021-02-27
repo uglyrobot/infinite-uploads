@@ -1,15 +1,13 @@
 <?php
 
-use Aws\S3\Transfer;
-use Aws\Middleware;
-use Aws\ResultInterface;
-use Aws\CommandPool;
-use Aws\Exception\AwsException;
-use Aws\Exception\S3Exception;
-use Aws\S3\MultipartUploader;
-use Aws\Exception\MultipartUploadException;
-use Aws\Result;
-use Aws\MockHandler;
+use UglyRobot\Infinite_Uploads\Aws\S3\Transfer;
+use UglyRobot\Infinite_Uploads\Aws\Middleware;
+use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
+use UglyRobot\Infinite_Uploads\Aws\CommandPool;
+use UglyRobot\Infinite_Uploads\Aws\Exception\AwsException;
+use UglyRobot\Infinite_Uploads\Aws\Exception\S3Exception;
+use UglyRobot\Infinite_Uploads\Aws\S3\MultipartUploader;
+use UglyRobot\Infinite_Uploads\Aws\Exception\MultipartUploadException;
 
 class Infinite_Uploads_Admin {
 
@@ -343,7 +341,7 @@ class Infinite_Uploads_Admin {
 				$transfer_args = [
 					'concurrency' => $concurrency,
 					'base_dir'    => $path['basedir'],
-					'before'      => function ( AWS\Command $command ) use ( $wpdb, &$uploaded, &$errors, &$part_sizes ) {
+					'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $wpdb, &$uploaded, &$errors, &$part_sizes ) {
 						//add middleware to modify object headers
 						if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
 							/// Expires:
@@ -448,7 +446,7 @@ class Infinite_Uploads_Admin {
 						$uploader      = new MultipartUploader( $s3, $source, [
 							'concurrency'   => INFINITE_UPLOADS_SYNC_MULTIPART_CONCURRENCY,
 							'state'         => $upload_state,
-							'before_upload' => function ( AWS\Command $command ) use ( &$parts_started, $uploaded, $errors ) {
+							'before_upload' => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( &$parts_started, $uploaded, $errors ) {
 
 								$this->sync_debug_log( "Uploading key {$command['Key']} part {$command['PartNumber']}" );
 
@@ -473,7 +471,7 @@ class Infinite_Uploads_Admin {
 							} catch ( MultipartUploadException $e ) {
 								$uploader = new MultipartUploader( $s3, $source, [
 									'state'         => $e->getState(),
-									'before_upload' => function ( AWS\Command $command ) use ( $wpdb ) {
+									'before_upload' => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $wpdb ) {
 										$this->sync_debug_log( "Uploading key {$command['Key']} part {$command['PartNumber']}" );
 										$command->getHandlerList()->appendSign(
 											Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, $command ) {
@@ -609,7 +607,7 @@ class Infinite_Uploads_Admin {
 			$transfer_args = [
 				'concurrency' => INFINITE_UPLOADS_SYNC_CONCURRENCY,
 				'base_dir'    => 's3://' . $this->iup_instance->bucket,
-				'before'      => function ( AWS\Command $command ) use ( $wpdb, &$downloaded ) {//add middleware to intercept result of each file upload
+				'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $wpdb, &$downloaded ) {//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
 						$command->getHandlerList()->appendSign(
 							Middleware::mapResult( function ( ResultInterface $result ) use ( $wpdb, &$downloaded ) {

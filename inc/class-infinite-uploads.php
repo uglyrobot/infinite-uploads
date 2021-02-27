@@ -1,8 +1,8 @@
 <?php
 
-use Aws\S3\S3Client;
-use Aws\Multipart\UploadState;
-use Aws\ResultInterface;
+use UglyRobot\Infinite_Uploads\Aws\S3\S3Client;
+use UglyRobot\Infinite_Uploads\Aws\Multipart\UploadState;
+use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
 
 class Infinite_Uploads {
 
@@ -229,7 +229,7 @@ class Infinite_Uploads {
 	}
 
 	/**
-	 * @return Aws\S3\S3Client
+	 * @return UglyRobot\Infinite_Uploads\Aws\S3\S3Client
 	 */
 	public function s3() {
 
@@ -272,7 +272,7 @@ class Infinite_Uploads {
 		 *
 		 */
 		$params   = apply_filters( 'infinite_uploads_s3_client_params', $params );
-		$this->s3 = new Aws\S3\S3Client( $params );
+		$this->s3 = new S3Client( $params );
 
 		return $this->s3;
 	}

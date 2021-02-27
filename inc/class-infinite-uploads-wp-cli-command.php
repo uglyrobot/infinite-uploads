@@ -1,10 +1,10 @@
 <?php
 
-use Aws\S3\Transfer;
-use Aws\Exception\AwsException;
-use Aws\Exception\S3Exception;
-use Aws\Middleware;
-use Aws\ResultInterface;
+use UglyRobot\Infinite_Uploads\Aws\S3\Transfer;
+use UglyRobot\Infinite_Uploads\Aws\Exception\AwsException;
+use UglyRobot\Infinite_Uploads\Aws\Exception\S3Exception;
+use UglyRobot\Infinite_Uploads\Aws\Middleware;
+use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
 
 class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
@@ -167,7 +167,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$transfer_args = [
 			'concurrency' => $args_assoc['concurrency'],
 			'debug'       => (bool) $args_assoc['verbose'],
-			'before'      => function ( AWS\Command $command ) {
+			'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) {
 				if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
 					/// Expires:
 					if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
@@ -251,7 +251,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$transfer_args = [
 				'concurrency' => $args_assoc['concurrency'],
 				'base_dir'    => $path['basedir'],
-				'before'      => function ( AWS\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$uploaded ) {
+				'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$uploaded ) {
 					if ( in_array( $command->getName(), [ 'PutObject', 'CreateMultipartUpload' ], true ) ) {
 						/// Expires:
 						if ( defined( 'INFINITE_UPLOADS_HTTP_EXPIRES' ) ) {
@@ -511,7 +511,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			$transfer_args = [
 				'concurrency' => $args_assoc['concurrency'],
 				'base_dir'    => 's3://' . Infinite_Uploads::get_instance()->bucket,
-				'before'      => function ( AWS\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$downloaded ) {
+				'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$downloaded ) {
 					//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
 						$command->getHandlerList()->appendSign(

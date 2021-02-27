@@ -6,6 +6,8 @@
     "wordpress",
     "cloud",
     "storage",
+    "s3",
+    "cdn",
     "plugin"
   ],
   "license": "GPL-2.0",
@@ -22,8 +24,7 @@
   },
   "type": "wordpress-plugin",
   "require": {
-    "composer/installers": "~1.0",
-    "aws/aws-sdk-php": "~3.18"
+    "composer/installers": "~1.0"
   },
   "config": {
     "platform": {

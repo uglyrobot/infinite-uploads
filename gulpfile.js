@@ -22,6 +22,7 @@ gulp.task('zip', function () {
       '!./package.json',
       '!./package-lock.json',
       '!./phpunit.xml.dist',
+      '!./build-aws3.sh',
       '!./README.md',
       '!./.*'
     ],

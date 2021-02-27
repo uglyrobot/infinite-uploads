@@ -2,22 +2,22 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 1.1
+ * Version: 1.1.1
  * Author: UglyRobot
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
  * Requires at least: 5.3
- * Requires PHP: 5.6
+ * Requires PHP: 5.5
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Network: true
  *
  * Inspired by AWS PHP SDK stream wrapper code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
  *
- * Copyright 2021 UglyRobot, LLC.
+ * Copyright 2021 UglyRobot, LLC
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.1' );
+define( 'INFINITE_UPLOADS_VERSION', '1.1.1' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -47,11 +47,8 @@ function infinite_uploads_init() {
 		define( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL', YEAR_IN_SECONDS );
 	}
 
-	// Ensure the AWS SDK can be loaded.
-	if ( ! class_exists( '\\Aws\\S3\\S3Client' ) ) {
-		// Require AWS Autoloader file.
-		require_once dirname( __FILE__ ) . '/vendor/autoload.php';
-	}
+	// Require Our custom AWS Autoloader file.
+	require_once dirname( __FILE__ ) . '/vendor/Aws3/aws-autoloader.php';
 
 	if ( ! infinite_uploads_check_requirements() ) {
 		return;

@@ -1,11 +1,11 @@
-=== Infinite Uploads ===
+=== Infinite Uploads - Offload Your Media to Cloud Storage ===
 
 Requires at least: 5.3
 Tested up to: 5.6.2
 Stable tag: trunk
-Requires PHP: 5.6
+Requires PHP: 5.5
 Contributors: uglyrobot, jdailey
-Tags: cloud storage, media cloud, media library management, image offload, media offload, s3, azure, google cloud, storage, cdn, bandwidth
+Tags: cloud storage, media cloud, media library, offload, stateless, s3, google cloud storage, spaces, storage, cdn, bandwidth
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,7 +74,7 @@ Infinite Uploads is built with the latest in cloud technology to work flawlessly
 ### Fast and Incredibly Secure
 Infinite Uploads uses encrypted SSL to transfer files, is stored in highly resilient and available storage with 99.999999999% (11 x 9s) of durability, and our API was designed from the ground up with with bulletproof security. All API tokens and credentials are hashed, encrypted, segmented per customer and site, and rotated without you having to do a thing. We support multiple 2-factor login methods including phish-proof U2F security keys to protect access to your account and data.
 
-For low latency and legal compliance with laws like GDPR you can choose a USA or Europe (Germany) cloud storage location for each site you connect. And for lightning fast download speeds all files are served from the location closest to your visitors via our world-wide enterprise-class Content Delivery Network (CDN) with 45+ points of presence!
+For low latency and legal compliance with laws like GDPR you can choose a USA or Europe (Germany) cloud storage location for each site you connect. And for lightning fast download speeds all files are served from the location closest to your visitors via our world-wide enterprise-class Content Delivery Network (CDN) with 50+ points of presence!
 
 ### FTP/SFTP Client-free File Manager
 Keep managing all your files right from inside the WordPress dashboard just like before. Skip the protocol settings, server names, port numbers, usernames, long passwords, private keys, and API credentials. Manage access to the Media Library with the built-in user roles to streamline customer, visitor, and team member training.
@@ -146,6 +146,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 5. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
+
+1.1.1 - 2021-2-26
+----------------------------------------------------------------------
+- Prefix and filter the AWS SDK and dependencies to prevent code conflicts with other plugins and shrink plugin package size.
 
 1.1 - 2021-2-22
 ----------------------------------------------------------------------

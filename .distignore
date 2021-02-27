@@ -17,3 +17,4 @@ package.json
 package-lock.json
 phpunit.xml.dist
 README.md
+build-aws3.sh
