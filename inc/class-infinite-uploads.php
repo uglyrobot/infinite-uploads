@@ -3,6 +3,7 @@
 use UglyRobot\Infinite_Uploads\Aws\S3\S3Client;
 use UglyRobot\Infinite_Uploads\Aws\Multipart\UploadState;
 use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
+use UglyRobot\Infinite_Uploads\Aws\LruArrayCache;
 
 class Infinite_Uploads {
 
@@ -16,6 +17,9 @@ class Infinite_Uploads {
 	private $region;
 	private $admin;
 	private $api;
+	public $stream_api_call_count = [];
+	public $stream_plugin_api_call_count = [];
+	public $stream_file_cache = [];
 
 	public function __construct() {
 		/**
@@ -29,6 +33,8 @@ class Infinite_Uploads {
 		 *
 		 */
 		$this->capability = apply_filters( 'infinite_uploads_settings_capability', ( is_multisite() ? 'manage_network_options' : 'manage_options' ) );
+
+		$this->stream_api_call_count = [ 'total' => 0, 'commands' => [] ];
 	}
 
 	/**
@@ -124,6 +130,7 @@ class Infinite_Uploads {
 		}
 
 		$this->register_stream_wrapper();
+		add_action( 'shutdown', [ $this, 'stream_wrapper_debug' ] );
 
 		$uploads_url = $this->get_original_upload_dir(); //prime the cached value before filtering
 		add_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
@@ -223,9 +230,23 @@ class Infinite_Uploads {
 			 */
 			$objectAcl = defined( 'INFINITE_UPLOADS_OBJECT_ACL' ) ? INFINITE_UPLOADS_OBJECT_ACL : 'public-read';
 			stream_context_set_option( stream_context_get_default(), 'iu', 'ACL', $objectAcl );
+
+			stream_context_set_option( stream_context_get_default(), 'iu', 'iup_instance', $this );
 		}
 
 		stream_context_set_option( stream_context_get_default(), 'iu', 'seekable', true );
+	}
+
+	/**
+	 * Writes total info to debug log if feature is defined.
+	 */
+	public function stream_wrapper_debug() {
+		if ( $this->stream_api_call_count['total'] ) {
+			error_log( sprintf( "[INFINITE_UPLOADS Stream Debug] Stream wrapper API calls in %ss: %s", timer_stop(), json_encode( $this->stream_api_call_count, JSON_PRETTY_PRINT ) ) );
+		}
+		if ( count( $this->stream_plugin_api_call_count ) ) {
+			error_log( sprintf( "[INFINITE_UPLOADS Stream Debug] Stream wrapper API calls by plugin: %s", json_encode( $this->stream_plugin_api_call_count, JSON_PRETTY_PRINT ) ) );
+		}
 	}
 
 	/**
@@ -616,7 +637,7 @@ class Infinite_Uploads {
 			}
 		}
 
-		//wp_delete_file( $file );
+		wp_delete_file( $file );
 		$to_purge[] = $file;
 
 		$dirs = wp_get_upload_dir();
@@ -714,7 +735,7 @@ class Infinite_Uploads {
 		if ( preg_match( '%/wp/v2/media/\d+/edit%', $request->get_route() ) ) {
 			$result = new WP_Error(
 				'rest_cant_upload',
-				__( "Files can't be uploaded due to an issue with your Infinite Uploads account.", 'infinite-uploads' ),
+				__( "Files can't be uploaded due to a billing issue with your Infinite Uploads account.", 'infinite-uploads' ),
 				[ 'status' => 403 ]
 			);
 		}

@@ -1,11 +1,11 @@
 === Infinite Uploads - Offload Your Media to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 5.6.2
-Stable tag: trunk
+Tested up to: 5.7
+Stable tag: 1.1.2
 Requires PHP: 5.5
 Contributors: uglyrobot, jdailey
-Tags: cloud storage, media cloud, media library, offload, stateless, s3, google cloud storage, spaces, storage, cdn, bandwidth
+Tags: cloud storage, media cloud, media library, offload, stateless, s3, google cloud storage, spaces, storage, cdn, cloud sync
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -146,6 +146,12 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 5. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
+
+1.1.2 - 2021-3-xx
+----------------------------------------------------------------------
+- 2x speed increase when uploading and processing new media items.
+- Fix files not deleting from cloud storage when deleting attachment.
+- Improved debug logging for identifying plugins causing unnecessary disk access.
 
 1.1.1 - 2021-2-26
 ----------------------------------------------------------------------

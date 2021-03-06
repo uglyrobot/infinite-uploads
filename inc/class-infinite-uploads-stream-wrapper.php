@@ -95,6 +95,9 @@ class Infinite_Uploads_Stream_Wrapper {
 	/** @var string The opened protocol (e.g., "s3") */
 	private $protocol = 'iu';
 
+	/** @var cache for last file, so it doesn't need to be fetched again for immediate edits */
+	private $last_file = [];
+
 	/**
 	 * Register the 'iu://' stream wrapper
 	 *
@@ -146,26 +149,6 @@ class Infinite_Uploads_Stream_Wrapper {
 				case 'a':
 					return $this->openAppendStream( $path );
 				default:
-					/**
-					 * As we open a temp stream, we don't actually know if we have writing ability yet.
-					 * This means functions like copy() will not fail correctly, as the write to s3
-					 * is only attemped on stream_flush() which is too late to report to copy()
-					 * et al that the write has failed.
-					 *
-					 * As a work around, we attempt to write an empty object.
-					 *
-					 * Added by Joe Hoyle
-					 */
-					/**
-					 * try {
-					 * $p = $this->params;
-					 * $p['Body'] = '';
-					 * $p = apply_filters( 'infinite_uploads_putObject_params', $p );
-					 * $this->getClient()->putObject($p);
-					 * } catch (Exception $e) {
-					 * return $this->triggerError($e->getMessage());
-					 * }
-					 */
 					return $this->openWriteStream( $path );
 			}
 		} );
@@ -281,10 +264,42 @@ class Infinite_Uploads_Stream_Wrapper {
 	 */
 	private function debug( $action, $key ) {
 		if ( defined( 'INFINITE_UPLOADS_SW_DEBUG' ) && INFINITE_UPLOADS_SW_DEBUG ) {
-			$log = "[INFINITE_UPLOADS Stream Debug]: $action $key";
+			$instance = $this->getOption( 'iup_instance' );
+			$instance->stream_api_call_count['total'] ++;
+			if ( isset( $instance->stream_api_call_count['commands'][ $action ] ) ) {
+				$instance->stream_api_call_count['commands'][ $action ] ++;
+			} else {
+				$instance->stream_api_call_count['commands'][ $action ] = 1;
+			}
+
+			$error   = new Error;
+			$trace   = $error->getTraceAsString();
+			$pattern = '/' . preg_quote( WP_PLUGIN_DIR, '/' ) . '\/(?:(?!infinite\-uploads)([^\/]+))\//';
+			preg_match( $pattern, $trace, $matches );
+			if ( isset( $matches[1] ) ) {
+				if ( isset( $instance->stream_plugin_api_call_count[ $matches[1] ] ) ) {
+					$instance->stream_plugin_api_call_count[ $matches[1] ]['total'] ++;
+					if ( isset( $instance->stream_plugin_api_call_count[ $matches[1] ]['commands'][ $action ] ) ) {
+						$instance->stream_plugin_api_call_count[ $matches[1] ]['commands'][ $action ] ++;
+					} else {
+						$instance->stream_plugin_api_call_count[ $matches[1] ]['commands'][ $action ] = 1;
+					}
+				} else {
+					$instance->stream_plugin_api_call_count[ $matches[1] ] = [ 'total' => 1, 'commands' => [ $action => 1 ] ];
+				}
+			}
+
+			$log = "[INFINITE_UPLOADS Stream Debug] $action $key";
 			if ( defined( 'INFINITE_UPLOADS_SW_DEBUG_BACKTRACE' ) && INFINITE_UPLOADS_SW_DEBUG_BACKTRACE ) {
-				$error = new Error;
-				$log   .= PHP_EOL . $error->getTraceAsString();
+				// Remove first item from backtrace as it's this function which is redundant.
+				$trace = preg_replace( "/^#0\s+[^\n]*\n/", '', $trace, 1 );
+
+				// Renumber backtrace items.
+				$trace = preg_replace_callback( '/^#(\d+)(.*)$/', function ( $matches ) {
+					return "#" . max( absint( $matches[1] ) - 1, 1 ) . $matches[2] . PHP_EOL;
+				}, $trace );
+
+				$log .= PHP_EOL . $trace;
 			}
 			error_log( $log );
 		}
@@ -416,14 +431,21 @@ class Infinite_Uploads_Stream_Wrapper {
 		}
 	}
 
-	private function openReadStream() {
-		$this->debug( 'getobject (stream)', $this->getOption( 'Key' ) );
-		$client                     = $this->getClient();
-		$command                    = $client->getCommand( 'GetObject', $this->getOptions( true ) );
-		$command['@http']['stream'] = true;
-		$result                     = $client->execute( $command );
-		$this->size                 = $result['ContentLength'];
-		$this->body                 = $result['Body'];
+	private function openReadStream( $path ) {
+		//check cache
+		if ( null !== ( $object = $this->cacheObjectGet( $path ) ) ) {
+			$this->body = Psr7\Utils::streamFor( $object ); //make it a stream
+			$this->size = $this->body->getSize();
+		} else {
+			$this->debug( 'GetObject (stream)', $this->getOption( 'Key' ) );
+			$client                     = $this->getClient();
+			$command                    = $client->getCommand( 'GetObject', $this->getOptions( true ) );
+			$command['@http']['stream'] = true;
+			$result                     = $client->execute( $command );
+			$this->size                 = $result['ContentLength'];
+			$this->body                 = $result['Body'];
+			//$this->cacheObjectSet( $path, $this->body ); //need to figure out how to wait for this to finish downloading
+		}
 
 		// Wrap the body in a caching entity body if seeking is allowed
 		if ( $this->getOption( 'seekable' ) && ! $this->body->isSeekable() ) {
@@ -433,22 +455,81 @@ class Infinite_Uploads_Stream_Wrapper {
 		return true;
 	}
 
-	private function openAppendStream() {
+	/**
+	 * Get cached put/get object
+	 *
+	 * @param string $key Cache key
+	 *
+	 * @return mixed|null
+	 */
+	private function cacheObjectGet( $key ) {
+		$instance = $this->getOption( 'iup_instance' );
+		if ( isset( $instance->stream_file_cache[ $key ] ) ) {
+			$this->debug_cache( 'Object HIT', $key );
+
+			return $instance->stream_file_cache[ $key ];
+		}
+
+		$this->debug_cache( 'Object MISS', $key );
+
+		return null;
+	}
+
+	/**
+	 * Writes info to debug log if feature is defined.
+	 *
+	 * @param string $action Hit, Miss, Set, Delete.
+	 * @param string $key    S3 path or prefix (key).
+	 */
+	private function debug_cache( $action, $key ) {
+		if ( defined( 'INFINITE_UPLOADS_SW_DEBUG_CACHE' ) && INFINITE_UPLOADS_SW_DEBUG_CACHE ) {
+			$log = "[INFINITE_UPLOADS Stream Cache] $action $key";
+			error_log( $log );
+		}
+	}
+
+	private function openAppendStream( $path ) {
 		try {
-			// Get the body of the object and seek to the end of the stream
-			$this->debug( 'getobject (append stream)', $this->getOption( 'Key' ) );
-			$client     = $this->getClient();
-			$this->body = $client->getObject( $this->getOptions( true ) )['Body'];
+			//check cache
+			if ( null !== ( $object = $this->cacheObjectGet( $path ) ) ) {
+				$this->body = Psr7\Utils::streamFor( $object ); //make it a stream
+			} else {
+				// Get the body of the object and seek to the end of the stream
+				$this->debug( 'GetObject (append stream)', $this->getOption( 'Key' ) );
+				$client     = $this->getClient();
+				$this->body = $client->getObject( $this->getOptions( true ) )['Body'];
+				$this->cacheObjectSet( $path, Psr7\Utils::copyToString( $this->body ) ); //this is untested
+			}
 			$this->body->seek( 0, SEEK_END );
 
 			return true;
 		} catch ( S3Exception $e ) {
 			// The object does not exist, so use a simple write stream
-			return $this->openWriteStream();
+			return $this->openWriteStream( $path );
 		}
 	}
 
-	private function openWriteStream() {
+	/**
+	 * Cache last put/get object till the end of the request. This prevents multiple GetObject requests for the same object.
+	 *
+	 * @param string $key  Cache key
+	 * @param string $body Convert any streams to string before caching
+	 */
+	private function cacheObjectSet( $key, $body ) {
+		//don't cache files that are too big in memory
+		if ( strlen( $body ) > INFINITE_UPLOADS_STREAM_CACHE_MAX_BYTES ) {
+			unset( $body );
+
+			return;
+		}
+
+		$instance                            = $this->getOption( 'iup_instance' );
+		$instance->stream_file_cache         = []; //only keep most recent file for now
+		$instance->stream_file_cache[ $key ] = $body;
+		$this->debug_cache( 'Object SET', $key );
+	}
+
+	private function openWriteStream( $path ) {
 		$this->body = new Stream( fopen( 'php://temp', 'r+' ) );
 
 		return true;
@@ -472,7 +553,7 @@ class Infinite_Uploads_Stream_Wrapper {
 		// Attempt to guess the ContentType of the upload based on the
 		// file extension of the key. Added by Joe Hoyle
 		if ( ! isset( $params['ContentType'] ) &&
-		     ( $type = Psr7\mimetype_from_filename( $params['Key'] ) )
+		     ( $type = Psr7\MimeType::fromFilename( $params['Key'] ) )
 		) {
 			$params['ContentType'] = $type;
 		}
@@ -504,12 +585,20 @@ class Infinite_Uploads_Stream_Wrapper {
 		 */
 		$params = apply_filters( 'infinite_uploads_putObject_params', $params );
 
-		$this->clearCacheKey( "iu://{$params['Bucket']}/{$params['Key']}" );
-
 		return $this->boolCall( function () use ( $params ) {
 			$this->debug( 'PutObject', $params['Key'] );
+			$file = Psr7\Utils::copyToString( $params['Body'] );
 			$bool = (bool) $this->getClient()->putObject( $params );
-			$this->debug( 'PutObject', $params['Key'] );
+
+			//Cache the stat for this file so we don't have to do another HeadObject in the same request
+			$cache_key = "iu://{$params['Bucket']}/{$params['Key']}";
+			if ( $bool ) {
+				$this->getCacheStorage()->set( $cache_key, $this->formatUrlStat( [ 'ContentLength' => $params['Body']->getSize(), 'LastModified' => time() ] ) );
+				$this->debug_cache( 'SET', $cache_key );
+				$this->cacheObjectSet( $cache_key, $file );
+			}
+			unset( $file );
+
 			/**
 			 * Action when a new object has been uploaded to cloud storage.
 			 *
@@ -524,16 +613,6 @@ class Infinite_Uploads_Stream_Wrapper {
 
 			return $bool;
 		} );
-	}
-
-	/**
-	 * Clears a specific stat cache value from the stat cache and LRU cache.
-	 *
-	 * @param string $key S3 path (iu://bucket/key).
-	 */
-	private function clearCacheKey( $key ) {
-		clearstatcache( true, $key );
-		$this->getCacheStorage()->remove( $key );
 	}
 
 	/**
@@ -648,15 +727,18 @@ class Infinite_Uploads_Stream_Wrapper {
 		$path  = strtolower( $split[0] ) . '://' . $split[1];
 
 		// Check if this path is in the url_stat cache
-		if ( $value = $this->getCacheStorage()->get( $path ) ) {
+		if ( null !== ( $value = $this->getCacheStorage()->get( $path ) ) ) {
+			$this->debug_cache( 'HIT', $path );
+
 			return $value;
 		}
 
+		$this->debug_cache( 'MISS', $path );
 		$stat = $this->createStat( $path, $flags );
 
-		if ( is_array( $stat ) ) {
-			$this->getCacheStorage()->set( $path, $stat );
-		}
+		//cache missing objects as well
+		$this->getCacheStorage()->set( $path, $stat );
+		$this->debug_cache( 'SET', $path );
 
 		return $stat;
 	}
@@ -684,22 +766,41 @@ class Infinite_Uploads_Stream_Wrapper {
 					return $this->formatUrlStat( $result->toArray() );
 				}
 			} catch ( S3Exception $e ) {
-				// Maybe this isn't an actual key, but a prefix. Do a prefix
-				// listing of objects to determine.
-				$prefix = rtrim( $parts['Key'], '/' ) . '/';
-				$this->debug( 'ListObjects (max 1)', $prefix );
-				$result = $this->getClient()->listObjects( [
-					'Bucket'  => $parts['Bucket'],
-					'Prefix'  => $prefix,
-					'MaxKeys' => 1,
-				] );
-				if ( ! $result['Contents'] && ! $result['CommonPrefixes'] ) {
+				//only check if it's a prefix if no file extension for performance reasons.
+				$extension = pathinfo( $path, PATHINFO_EXTENSION );
+				if ( ! $extension ) {
+					// Maybe this isn't an actual key, but a prefix. Do a prefix
+					// listing of objects to determine.
+					$prefix = rtrim( $parts['Key'], '/' ) . '/';
+					$this->debug( 'ListObjects', $prefix );
+					$result = $this->getClient()->listObjects( [
+						'Bucket'  => $parts['Bucket'],
+						'Prefix'  => $prefix,
+						'MaxKeys' => 1,
+					] );
+					if ( ! $result['Contents'] && ! $result['CommonPrefixes'] ) {
+						throw new \Exception( "File or directory not found: $path" );
+					}
+				} else {
 					throw new \Exception( "File or directory not found: $path" );
 				}
 
 				return $this->formatUrlStat( $path );
 			}
 		}, $flags );
+	}
+
+	/**
+	 * Get the bucket and key from the passed path (e.g. iu://bucket/key)
+	 *
+	 * @param string $path Path passed to the stream wrapper
+	 *
+	 * @return array Hash of 'Bucket', 'Key', and custom params from the context
+	 */
+	private function withPath( $path ) {
+		$params = $this->getOptions( true );
+
+		return $this->getBucketKey( $path ) + $params;
 	}
 
 	private function statDirectory( $parts, $path, $flags ) {
@@ -746,6 +847,17 @@ class Infinite_Uploads_Stream_Wrapper {
 		return empty( $params['Key'] )
 			? $this->createBucket( $path, $params )
 			: $this->createSubfolder( $path, $params );
+	}
+
+	/**
+	 * Clears a specific stat cache value from the stat cache and LRU cache.
+	 *
+	 * @param string $key S3 path (iu://bucket/key).
+	 */
+	private function clearCacheKey( $key ) {
+		clearstatcache( true, $key );
+		$this->getCacheStorage()->remove( $key );
+		$this->debug_cache( 'DELETE', $key );
 	}
 
 	/**
@@ -813,8 +925,15 @@ class Infinite_Uploads_Stream_Wrapper {
 
 		return $this->boolCall( function () use ( $params, $path ) {
 			$this->debug( 'PutObject', $params['Key'] );
-			$this->getClient()->putObject( $params );
-			$this->clearCacheKey( $path );
+			$bool = (bool) $this->getClient()->putObject( $params );
+
+			//Cache the stat for this file so we don't have to do another HeadObject in the same request
+			$cache_key = "iu://{$params['Bucket']}/{$params['Key']}";
+			if ( $bool ) {
+				$this->getCacheStorage()->set( $cache_key, $this->formatUrlStat( [ 'ContentLength' => $params['Body']->getSize(), 'LastModified' => time() ] ) );
+				$this->debug_cache( 'SET', $cache_key );
+				//purposely don't cache this 0-length fake file
+			}
 
 			return true;
 		} );
@@ -878,25 +997,26 @@ class Infinite_Uploads_Stream_Wrapper {
 
 		return $this->boolCall( function () use ( $path ) {
 			$this->clearCacheKey( $path );
-			$this->debug( 'deleteObject', $path );
+			$this->debug( 'DeleteObject', $path );
 
 			$this->getClient()->deleteObject( $this->withPath( $path ) );
+			$this->getCacheStorage()->set( $path, false );
+			$this->debug_cache( 'SET', $path );
+			$this->cacheObjectDelete( $path );
 
 			return true;
 		} );
 	}
 
 	/**
-	 * Get the bucket and key from the passed path (e.g. iu://bucket/key)
+	 * Cache last put/get object
 	 *
-	 * @param string $path Path passed to the stream wrapper
-	 *
-	 * @return array Hash of 'Bucket', 'Key', and custom params from the context
+	 * @param $key
 	 */
-	private function withPath( $path ) {
-		$params = $this->getOptions( true );
-
-		return $this->getBucketKey( $path ) + $params;
+	private function cacheObjectDelete( $key ) {
+		$instance = $this->getOption( 'iup_instance' );
+		unset( $instance->stream_file_cache[ $key ] );
+		$this->debug_cache( 'Object DELETE', $key );
 	}
 
 	/**
@@ -1034,6 +1154,7 @@ class Infinite_Uploads_Stream_Wrapper {
 		// Cache the object data for quick url_stat lookups used with
 		// RecursiveDirectoryIterator.
 		$this->getCacheStorage()->set( $key, $stat );
+		$this->debug_cache( 'SET', $key );
 		$this->objectIterator->next();
 
 		// Remove the prefix from the result to emulate other stream wrappers.
@@ -1064,8 +1185,8 @@ class Infinite_Uploads_Stream_Wrapper {
 		$this->initProtocol( $path_from );
 		$partsFrom = $this->withPath( $path_from );
 		$partsTo   = $this->withPath( $path_to );
-		$this->clearCacheKey( $path_from );
-		$this->clearCacheKey( $path_to );
+		//$this->clearCacheKey( $path_from );
+		//$this->clearCacheKey( $path_to );
 
 		if ( ! $partsFrom['Key'] || ! $partsTo['Key'] ) {
 			return $this->triggerError( 'The Infinite Uploads stream wrapper only '
@@ -1076,7 +1197,7 @@ class Infinite_Uploads_Stream_Wrapper {
 			$options = $this->getOptions( true );
 			// Copy the object and allow overriding default parameters if
 			// desired, but by default copy metadata
-			$this->debug( 'copy', $partsFrom['Key'] . ' to ' . $partsTo['Key'] );
+			$this->debug( 'CopyObject', $partsFrom['Key'] . ' to ' . $partsTo['Key'] );
 			$this->getClient()->copy(
 				$partsFrom['Bucket'],
 				$partsFrom['Key'],
@@ -1086,12 +1207,25 @@ class Infinite_Uploads_Stream_Wrapper {
 				$options
 			);
 
+			//Copy the stat cache for this file so we don't have to do another HeadObject in the same request
+			$from_key  = "iu://{$partsFrom['Bucket']}/{$partsFrom['Key']}";
+			$from_stat = $this->getCacheStorage()->get( $from_key );
+			if ( ! is_null( $from_stat ) ) {
+				$to_key = "iu://{$partsTo['Bucket']}/{$partsTo['Key']}";
+				$this->getCacheStorage()->set( $to_key, $from_stat );
+				$this->debug_cache( 'SET', $to_key );
+			}
+
 			// Delete the original object
-			$this->debug( 'deleteObject', $partsFrom['Key'] );
+			$this->debug( 'DeleteObject', $partsFrom['Key'] );
 			$this->getClient()->deleteObject( [
 				                                  'Bucket' => $partsFrom['Bucket'],
 				                                  'Key'    => $partsFrom['Key'],
 			                                  ] + $options );
+			//cache source file as deleted so file_exists will not trigger a HeadObject later
+			$this->getCacheStorage()->set( $from_key, false );
+			$this->debug_cache( 'SET', $from_key );
+			$this->cacheObjectDelete( $from_key );
 
 			return true;
 		} );

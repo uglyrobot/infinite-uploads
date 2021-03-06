@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: UglyRobot
  * Author URI: https://infiniteuploads.com/
  * Text Domain: infinite-uploads
@@ -17,7 +17,7 @@
  * Copyright 2021 UglyRobot, LLC
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.1.1' );
+define( 'INFINITE_UPLOADS_VERSION', '1.1.2' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
@@ -45,6 +45,10 @@ function infinite_uploads_init() {
 	}
 	if ( ! defined( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL' ) ) {
 		define( 'INFINITE_UPLOADS_HTTP_CACHE_CONTROL', YEAR_IN_SECONDS );
+	}
+	//we cache the last object uploaded to cloud in memory so it can be processed without downloading again.
+	if ( ! defined( 'INFINITE_UPLOADS_STREAM_CACHE_MAX_BYTES' ) ) {
+		define( 'INFINITE_UPLOADS_STREAM_CACHE_MAX_BYTES', MB_IN_BYTES * 32 );
 	}
 
 	// Require Our custom AWS Autoloader file.
