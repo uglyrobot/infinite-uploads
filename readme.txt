@@ -147,10 +147,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
-1.1.2 - 2021-3-xx
+1.1.2 - 2021-3-15
 ----------------------------------------------------------------------
 - 2x speed increase when uploading and processing new media items.
-- Fix files not deleting from cloud storage when deleting attachment.
+- Fix files not deleting from cloud storage when deleting attachments.
 - Improved debug logging for identifying plugins causing unnecessary disk access.
 
 1.1.1 - 2021-2-26
