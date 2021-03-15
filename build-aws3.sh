@@ -61,7 +61,14 @@ mkdir sdk
       ! -name Retry \
       ! -name Signature \
       ! -name ClientSideMonitoring \
-      -exec rm -rf {} +
+      -exec rm -rvf '{}' +
+
+    # Delete everything from the SDK except for S3 and Common files.
+    find Aws/data -type d -mindepth 1 -maxdepth 1 \
+      ! -name s3 \
+      ! -name s3control \
+      ! -name s3outposts \
+      -exec rm -rvf '{}' +
 
     # Remove tests & docs
     find . -type d -iname tests -exec rm -rf {} +
