@@ -3,7 +3,6 @@
 use UglyRobot\Infinite_Uploads\Aws\S3\S3Client;
 use UglyRobot\Infinite_Uploads\Aws\Multipart\UploadState;
 use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
-use UglyRobot\Infinite_Uploads\Aws\LruArrayCache;
 
 class Infinite_Uploads {
 
@@ -152,6 +151,13 @@ class Infinite_Uploads {
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
+		/*add_filter( 'wp_get_attachment_metadata', function($data) {
+			if ( ! isset( $data['filesize'] ) ) {
+				$data['filesize'] = 123;
+			}
+
+			return $data;
+		} );*/
 		add_filter( 'wp_resource_hints', [ $this, 'wp_filter_resource_hints' ], 10, 2 );
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
