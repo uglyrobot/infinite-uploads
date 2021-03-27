@@ -2,7 +2,7 @@
 
 use UglyRobot\Infinite_Uploads\Aws\S3\S3Client;
 use UglyRobot\Infinite_Uploads\Aws\Multipart\UploadState;
-use UglyRobot\Infinite_Uploads\Aws\ResultInterface
+use UglyRobot\Infinite_Uploads\Aws\ResultInterface;
 
 class Infinite_Uploads {
 

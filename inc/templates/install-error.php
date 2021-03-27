@@ -8,7 +8,7 @@
 		</div>
 		<div class="row justify-content-center mb-5">
 			<div class="col text-center">
-				<a class="btn text-nowrap btn-info btn-lg" href="<?php echo esc_url( $this->api_url( '/support/' ) ); ?>" role="button"><?php esc_html_e( 'Contact Support', 'infinite-uploads' ); ?></a>
+				<a class="btn text-nowrap btn-info btn-lg" href="<?php echo esc_url( $this->api_url( '/support/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin&utm_content=error&utm_term=support' ) ); ?>" role="button"><?php esc_html_e( 'Contact Support', 'infinite-uploads' ); ?></a>
 			</div>
 		</div>
 	</div>
