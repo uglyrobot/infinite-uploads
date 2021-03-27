@@ -69,7 +69,7 @@ class Infinite_Uploads_Admin {
 		$content = '<p>'
 		           . sprintf(
 			           esc_html__( 'When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s.', 'infinite-uploads' ),
-			           '<a href="https://infiniteuploads.com/privacy/" target="_blank">', '</a>'
+			           '<a href="https://infiniteuploads.com/privacy/?utm_source=iup_plugin&utm_medium=privacy_policy&utm_campaign=iup_plugin" target="_blank">', '</a>'
 		           ) . '</p>';
 		wp_add_privacy_policy_content( esc_html__( 'Infinite Uploads', 'infinite-uploads' ), wp_kses_post( wpautop( $content, false ) ) );
 	}
@@ -700,7 +700,7 @@ class Infinite_Uploads_Admin {
 		} else {
 			$custom_links['connect'] = "<a href='$url' style='color: #EE7C1E;'>" . esc_html__( 'Connect', 'infinite-uploads' ) . '</a>';
 		}
-		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/' ) ) . '">' . esc_html__( 'Support', 'infinite-uploads' ) . '</a>';
+		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin&utm_term=support&utm_content=meta' ) ) . '">' . esc_html__( 'Support', 'infinite-uploads' ) . '</a>';
 
 
 		// Adds the links to the beginning of the array.
@@ -887,11 +887,11 @@ class Infinite_Uploads_Admin {
 
 			<?php if ( isset( $api_data->site ) && ! $api_data->site->cdn_enabled ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } elseif ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
 				</div>
 			<?php } ?>
 

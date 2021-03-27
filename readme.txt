@@ -102,7 +102,7 @@ Use Infinite Uploads to store and manage the media files for your entire Multisi
 
 ### Privacy
 
-This plugin does not collect or share data other than your uploaded files to your public cloud storage location. Read our [Privacy Policy](https://infiniteuploads.com/privacy/) for more information.
+This plugin does not collect or share data other than your uploaded files to your public cloud storage location. Read our [Privacy Policy](https://infiniteuploads.com/privacy/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iup_readme&utm_term=privacy) for more information.
 
 == Frequently Asked Questions ==
 
@@ -179,10 +179,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == About Us ==
 Infinite Uploads is a premium cloud storage provider and content delivery network (CDN) for all your WordPress media files. Learn more here:
-[infiniteuploads.com](https://infiniteuploads.com/)
+[infiniteuploads.com](https://infiniteuploads.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iup_readme&utm_term=about_us)
 
 Learn how to get the most out of your cloud-hosted files on our blog:
-[Infinite Uploads Blog, Tips, Tricks, How-tos, and News](https://infiniteuploads.com/blog/)
+[Infinite Uploads Blog, Tips, Tricks, How-tos, and News](https://infiniteuploads.com/blog/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iup_readme&utm_term=blog)
 
 [Contribute to the plugin's development on Github!](https://github.com/uglyrobot/infinite-uploads/)
 
@@ -190,4 +190,4 @@ Enjoy!
 
 == Contact and Credits ==
 
-Built by the cloud architects and WordPress engineers at [Infinite Uploads](https://infiniteuploads.com/).
+Built by the cloud architects and WordPress engineers at [Infinite Uploads](https://infiniteuploads.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iup_readme&utm_term=credits).
