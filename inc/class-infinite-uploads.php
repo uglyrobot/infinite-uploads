@@ -148,6 +148,11 @@ class Infinite_Uploads {
 			add_filter( 'network_admin_notices', [ $this, 'cdn_disabled_header' ] );
 		}
 
+		add_filter( 'plupload_init', [ $this, 'filter_plupload_settings' ] );
+		add_filter( 'upload_post_params', [ $this, 'filter_plupload_params' ] );
+		add_filter( 'plupload_default_settings', [ $this, 'filter_plupload_settings' ] );
+		add_filter( 'plupload_default_params', [ $this, 'filter_plupload_params' ] );
+
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
@@ -180,6 +185,70 @@ class Infinite_Uploads {
 			$cname              = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $api_data->site->cname, $new_dirs['basedir'] );
 			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $new_dirs['baseurl'], $cname );
 		}
+	}
+
+	/**
+	 * Filter plupload params.
+	 *
+	 * @since 1.2.0
+	 */
+	public function filter_plupload_params( $plupload_params ) {
+
+		//$plupload_params['action'] = 'tux_big_file_uploads';
+		return $plupload_params;
+
+	}
+
+	/**
+	 * Filter plupload settings.
+	 *
+	 * @since 1.0.0
+	 */
+	public function filter_plupload_settings( $plupload_settings ) {
+
+		$client = $this->s3();
+
+		// Construct an array of conditions for policy
+		$options = [
+			[ 'acl' => 'public-read' ],
+			[ 'bucket' => $this->get_s3_bucket() ],
+			[ 'starts-with', '$key', trailingslashit( $this->get_s3_prefix() ) ],
+		];
+
+// Optional: configure expiration time string
+		$expires = '+2 hours';
+// Set some defaults for form input fields
+		$formInputs = [
+			'acl' => 'public-read',
+			'key' => trailingslashit( $this->get_s3_prefix() ) . '${filename}',
+		];
+		$postObject = new UglyRobot\Infinite_Uploads\Aws\S3\PostObjectV4(
+			$client,
+			$this->get_s3_bucket(),
+			$formInputs,
+			$options,
+			$expires
+		);
+
+// Get attributes to set on an HTML form, e.g., action, method, enctype
+		$formAttributes = $postObject->getFormAttributes();
+
+// Get form input fields. This will include anything set as a form input in
+// the constructor, the provided JSON policy, your AWS access key ID, and an
+// auth signature.
+		$formInputs = $postObject->getFormInputs();
+
+		//var_dump( $formAttributes, $formInputs );die;
+
+		$plupload_settings['url']                      = $formAttributes['action'];
+		$plupload_settings['file_data_name']           = 'file';
+		$plupload_settings['filters']['max_file_size'] = GB_IN_BYTES * 5 . 'b';
+		//$plupload_settings['chunk_size'] = $tuxbfu_chunk_size . 'kb';
+		//$plupload_settings['max_retries'] = 3;
+		$plupload_settings['multipart_params'] = $formInputs;
+
+		return $plupload_settings;
+
 	}
 
 	/**
