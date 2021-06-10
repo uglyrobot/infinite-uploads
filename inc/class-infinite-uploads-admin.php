@@ -32,6 +32,7 @@ class Infinite_Uploads_Admin {
 		add_filter( 'network_admin_plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
 
 		add_action( 'admin_init', [ &$this, 'privacy_policy' ] );
+		add_action( 'deactivate_plugin', [ &$this, 'block_bulk_deactivate' ] );
 
 		if ( is_main_site() ) {
 			add_action( 'wp_ajax_infinite-uploads-filelist', [ &$this, 'ajax_filelist' ] );
@@ -702,6 +703,18 @@ class Infinite_Uploads_Admin {
 		}
 		$custom_links['support'] = '<a href="' . esc_url( $this->api_url( '/support/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin&utm_term=support&utm_content=meta' ) ) . '">' . esc_html__( 'Support', 'infinite-uploads' ) . '</a>';
 
+		// Replace deactivate link if they haven't disconnected yet.
+		if ( array_key_exists( 'deactivate', $actions ) ) {
+			if ( $this->api->has_token() && $this->api->get_site_data() ) {
+				$actions['deactivate'] = sprintf(
+					'<a href="%s" aria-label="%s">%s</a>',
+					$url . "&deactivate-notice=1",
+					/* translators: %s: Plugin name. */
+					esc_attr( sprintf( _x( 'Deactivate %s', 'plugin' ), __( 'Infinite Uploads', 'infinite-uploads' ) ) ),
+					__( 'Deactivate' )
+				);
+			}
+		}
 
 		// Adds the links to the beginning of the array.
 		return array_merge( $custom_links, $actions );
@@ -808,6 +821,18 @@ class Infinite_Uploads_Admin {
 	}
 
 	/**
+	 * Disable the bulk Deactivate button from Plugins list.
+	 */
+	function block_bulk_deactivate( $plugin ) {
+		if ( ( ( isset( $_POST['action'] ) && 'deactivate-selected' === $_POST['action'] ) || ( isset( $_POST['action2'] ) && 'deactivate-selected' === $_POST['action2'] ) ) && 'infinite-uploads/infinite-uploads.php' === $plugin ) {
+			if ( $this->api->has_token() && $this->api->get_site_data() ) {
+				wp_redirect( $this->settings_url( [ 'deactivate-notice' => 1 ] ) );
+				exit;
+			}
+		}
+	}
+
+	/**
 	 *
 	 */
 	function admin_styles() {
@@ -892,6 +917,13 @@ class Infinite_Uploads_Admin {
 			<?php } elseif ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
 					<?php printf( __( "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>", 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin' ) ), esc_url( $this->settings_url( [ 'refresh' => 1 ] ) ) ); ?>
+				</div>
+			<?php } ?>
+
+			<?php if ( isset( $_GET['deactivate-notice'] ) && $this->api->has_token() && $api_data ) { ?>
+				<div class="alert alert-warning mt-1" role="alert">
+					<p class="lead"><?php _e( "There is uploaded media from your site that may only exist in the Infinite Uploads cloud. <strong>You MUST download your media files before deactivating this plugin to prevent data loss!</strong>", 'infinite-uploads' ); ?></p>
+					<button class="btn text-nowrap btn-info btn-lg" data-toggle="modal" data-target="#scan-remote-modal" data-next="download"><?php esc_html_e( 'Download & Disconnect', 'infinite-uploads' ); ?></button>
 				</div>
 			<?php } ?>
 

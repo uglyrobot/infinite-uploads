@@ -104,9 +104,9 @@
 				</div>
 			</div>
 		<?php } ?>
-		<div class="row justify-content-center">
+		<div class="row justify-content-center" id="iup-disconnect">
 			<div class="col-md-6 col-sm-12">
-				<h5><?php esc_html_e( 'Import & Disconnect', 'infinite-uploads' ); ?></h5>
+				<h5><?php esc_html_e( 'Download & Disconnect', 'infinite-uploads' ); ?></h5>
 				<p class="lead"><?php printf( __( 'Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href="%s" class="text-warning">account management</a>.', 'infinite-uploads' ), esc_url( $this->api_url( '/account/billing/' ) ) ); ?></p>
 			</div>
 			<div class="col-md-6 col-sm-12 mt-4">
