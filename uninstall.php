@@ -19,6 +19,9 @@ if ( is_multisite() ) {
 	delete_option( 'iup_api_data' );
 }
 
+//remove cronjob
+wp_unschedule_hook( 'infinite_uploads_sync' );
+
 // drop a custom database table
 global $wpdb;
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->base_prefix}infinite_uploads_files" );
