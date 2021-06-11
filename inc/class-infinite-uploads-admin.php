@@ -922,8 +922,14 @@ class Infinite_Uploads_Admin {
 
 			<?php if ( isset( $_GET['deactivate-notice'] ) && $this->api->has_token() && $api_data ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
-					<p class="lead"><?php _e( "There is uploaded media from your site that may only exist in the Infinite Uploads cloud. <strong>You MUST download your media files before deactivating this plugin to prevent data loss!</strong>", 'infinite-uploads' ); ?></p>
-					<button class="btn text-nowrap btn-info btn-lg" data-toggle="modal" data-target="#scan-remote-modal" data-next="download"><?php esc_html_e( 'Download & Disconnect', 'infinite-uploads' ); ?></button>
+					<div class="row align-items-center">
+						<div class="col-md col-12 mb-md-0 mb-2">
+							<?php _e( "There is uploaded media from your site that may only exist in the Infinite Uploads cloud. <strong>You MUST download your media files before deactivating this plugin to prevent data loss!</strong>", 'infinite-uploads' ); ?>
+						</div>
+						<div class="col-sm-4 col-lg-3 text-md-right">
+							<button class="btn text-nowrap btn-info" data-toggle="modal" data-target="#scan-remote-modal" data-next="download"><?php esc_html_e( 'Download & Disconnect', 'infinite-uploads' ); ?></button>
+						</div>
+					</div>
 				</div>
 			<?php } ?>
 
