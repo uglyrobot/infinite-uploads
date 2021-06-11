@@ -147,6 +147,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
+1.1.3 - 2021-6-12
+----------------------------------------------------------------------
+- Improve error handling for transient API outages to avoid breaking site images.
+- Prevent deactivation of plugin until download & disconnect is completed to avoid data loss.
+
 1.1.2 - 2021-3-15
 ----------------------------------------------------------------------
 - 2x speed increase when uploading and processing new media items.

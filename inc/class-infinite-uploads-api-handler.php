@@ -265,8 +265,11 @@ class Infinite_Uploads_Api_Handler {
 		}
 
 		//if there is an auth problem
-		if ( $this->has_token() && in_array( wp_remote_retrieve_response_code( $response ), [ 401, 402, 403, 404 ] ) ) {
-			$this->set_token( '' );
+		if ( $this->has_token() && in_array( wp_remote_retrieve_response_code( $response ), [ 401, 403, 404 ] ) ) {
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+			if ( isset( $body->code ) && in_array( $body->code, [ 'missing_api_token', 'invalid_site', 'invalid_api_key' ] ) ) {
+				$this->set_token( '' );
+			}
 		}
 
 		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
@@ -431,7 +434,7 @@ class Infinite_Uploads_Api_Handler {
 			return $result;
 		}
 
-		return false;
+		return $data; //if a temp API issue default to using cached data
 	}
 
 	/**
