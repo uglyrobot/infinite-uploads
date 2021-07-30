@@ -1,7 +1,7 @@
 === Infinite Uploads - Offload Your Media to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 5.7
+Tested up to: 5.8
 Stable tag: 1.1.3
 Requires PHP: 5.5
 Contributors: uglyrobot, jdailey
