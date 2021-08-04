@@ -173,6 +173,8 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file', [ $this, 'after_export_personal_data', 11 ] );
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
+		$this->plugin_compatibility();
+
 		if ( ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) && $api_data->site->cdn_enabled ) {
 			//makes this work with pre 3.5 MU ms_files rewriting (ie domain.com/files/filename.jpg)
 			$original_root_dirs = $this->get_original_upload_dir_root();
@@ -888,5 +890,29 @@ class Infinite_Uploads {
 		$destination = $exports_dir . pathinfo( $archive_pathname, PATHINFO_FILENAME ) . '.' . pathinfo( $archive_pathname, PATHINFO_EXTENSION );
 		copy( $archive_pathname, $destination );
 		unlink( $archive_pathname );
+	}
+
+	/**
+	 * Handle compatibility for various third party plugins
+	 */
+	function plugin_compatibility() {
+		//WPCF7 form file uploads
+		if ( ! defined( 'WPCF7_UPLOADS_TMP_DIR' ) ) {
+			define( 'WPCF7_UPLOADS_TMP_DIR', WP_CONTENT_DIR . '/wpcf7_uploads' );
+		}
+
+		//WP Migrate DB
+		add_filter( 'wpmdb_upload_info', array( $this, 'wpmdb_upload_info' ) );
+	}
+
+	/**
+	 * If using the "Export" or "Backup" features in WP Migrate DB Pro we will need to write files to the local filesystem.
+	 * Defines a custom folder to write to.
+	 */
+	function wpmdb_upload_info() {
+		return array(
+			'path' => WP_CONTENT_DIR . '/wp-migrate-db', // note missing end trailing slash
+			'url'  => WP_CONTENT_URL . '/wp-migrate-db' // note missing end trailing slash
+		);
 	}
 }
