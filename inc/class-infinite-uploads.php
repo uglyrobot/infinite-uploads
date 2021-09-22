@@ -161,8 +161,6 @@ class Infinite_Uploads {
 		add_filter( 'wp_resource_hints', [ $this, 'wp_filter_resource_hints' ], 10, 2 );
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
-		add_action( 'wp_handle_sideload_prefilter', [ $this, 'filter_sideload_move_temp_file_to_s3' ] );
-
 		add_filter( 'pre_wp_unique_filename_file_list', [ $this, 'get_files_for_unique_filename_file_list' ], 10, 3 );
 
 		// Add filters to "wrap" the wp_privacy_personal_data_export_file function call as we need to
@@ -420,7 +418,6 @@ class Infinite_Uploads {
 		stream_wrapper_unregister( 'iu' );
 		remove_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
 		remove_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
-		remove_filter( 'wp_handle_sideload_prefilter', [ $this, 'filter_sideload_move_temp_file_to_s3' ] );
 	}
 
 	public function get_sync_stats() {
@@ -760,26 +757,6 @@ class Infinite_Uploads {
 		array_unshift( $editors, 'Infinite_Uploads_Image_Editor_Imagick' );
 
 		return $editors;
-	}
-
-	/**
-	 * Copy the file from /tmp to an s3 dir so handle_sideload doesn't fail due to
-	 * trying to do a rename() on the file cross streams. This is somewhat of a hack
-	 * to work around the core issue https://core.trac.wordpress.org/ticket/29257
-	 *
-	 * @param array File array
-	 *
-	 * @return array
-	 */
-	public function filter_sideload_move_temp_file_to_s3( array $file ) {
-		$upload_dir = wp_upload_dir();
-		$new_path   = $upload_dir['basedir'] . '/tmp/' . basename( $file['tmp_name'] );
-
-		copy( $file['tmp_name'], $new_path );
-		unlink( $file['tmp_name'] );
-		$file['tmp_name'] = $new_path;
-
-		return $file;
 	}
 
 	/**

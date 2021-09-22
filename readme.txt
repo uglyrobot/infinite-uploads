@@ -147,6 +147,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
+1.1.4 - 2021-9-22
+----------------------------------------------------------------------
+- Fix compatibility issues with some plugins that used media_handle_sideload() function.
+- Add compatibility overrides for WP Contact Form 7 and WP Migrate DB Pro.
+
 1.1.3 - 2021-6-12
 ----------------------------------------------------------------------
 - Improve error handling for transient API outages to avoid breaking site images.
