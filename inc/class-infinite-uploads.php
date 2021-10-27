@@ -181,7 +181,15 @@ class Infinite_Uploads {
 			if ( $this->get_s3_url() !== 'https://' . $api_data->site->cname ) {
 				$replacements[] = 'https://' . $api_data->site->cname;
 			}
-			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $replacements, $this->get_s3_url() );
+
+			//makes this work with pre 3.5 MU ms_files rewriting (ie domain.com/files/filename.jpg)
+			if ( is_multisite() && substr_compare( $original_root_dirs['baseurl'], '/files', - strlen( '/files' ) ) === 0 ) {
+				$new_dirs = wp_get_upload_dir();
+				$cdn_url  = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $api_data->site->cname, $new_dirs['basedir'] );
+			} else {
+				$cdn_url = $this->get_s3_url();
+			}
+			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $replacements, $cdn_url );
 		}
 	}
 

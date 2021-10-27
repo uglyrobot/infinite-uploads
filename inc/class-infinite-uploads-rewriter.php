@@ -94,7 +94,7 @@ class Infinite_Uploads_Rewriter {
 
 		// check for relative paths
 		$regex_rule .= ')|(?<=[(\"\'=\s])' . quotemeta( $this->uploads_path ) . ')#';
-		var_dump( $regex_rule );
+
 		// call the cdn rewriter callback
 		$cdn_html = preg_replace_callback( $regex_rule, [ $this, 'rewrite_url' ], $html );
 
