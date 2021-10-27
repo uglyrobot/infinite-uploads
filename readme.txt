@@ -147,6 +147,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 == Changelog ==
 
+1.1.5 - 2021-10-26
+----------------------------------------------------------------------
+- Fix problems replacing urls in some multisite subsites
+- Add an 'infinite_uploads_replacement_urls' filter to customize url replacements
+
 1.1.4 - 2021-9-22
 ----------------------------------------------------------------------
 - Fix compatibility issues with some plugins that used media_handle_sideload() function.

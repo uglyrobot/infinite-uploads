@@ -176,9 +176,12 @@ class Infinite_Uploads {
 		if ( ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) && $api_data->site->cdn_enabled ) {
 			//makes this work with pre 3.5 MU ms_files rewriting (ie domain.com/files/filename.jpg)
 			$original_root_dirs = $this->get_original_upload_dir_root();
-			$new_dirs           = wp_get_upload_dir();
-			$cname              = str_replace( 'iu://' . untrailingslashit( $this->bucket ), $api_data->site->cname, $new_dirs['basedir'] );
-			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $new_dirs['baseurl'], $cname );
+			$replacements       = [ $original_root_dirs['baseurl'] ];
+			//if we have a custom domain add original cdn url for replacement
+			if ( $this->get_s3_url() !== 'https://' . $api_data->site->cname ) {
+				$replacements[] = 'https://' . $api_data->site->cname;
+			}
+			new Infinite_Uploads_Rewriter( $original_root_dirs['baseurl'], $replacements, $this->get_s3_url() );
 		}
 	}
 

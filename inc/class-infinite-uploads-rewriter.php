@@ -7,28 +7,30 @@
  */
 
 class Infinite_Uploads_Rewriter {
-	var $uploads_url = null;    // origin URL
-	var $uploads_path = null;    // origin PATH
-	var $default_cdn_url = null;    // other origin URL
+	var $uploads_path = null;    // uploads PATH
+	var $replacements = [];    // urls to be searched for and replaced with CDN URL
 	var $cdn_url = null;    // CDN URL
 
 	/**
 	 * constructor
 	 *
-	 * @param string $uploads_url     Original upload url
-	 * @param string $cdn_url         Destination CDN url
-	 * @param string $default_cdn_url Optional second url to filter
+	 * @param string $uploads_url  Original upload url
+	 * @param array  $replacements Urls to filter
+	 * @param string $cdn_url      Destination CDN url
 	 *
 	 * @since 1.0
 	 */
-	function __construct( $uploads_url, $cdn_url, $default_cdn_url = null ) {
-		$this->uploads_url  = trailingslashit( $uploads_url );
-		$this->uploads_path = trailingslashit( parse_url( $uploads_url, PHP_URL_PATH ) );
-		if ( $default_cdn_url && $default_cdn_url != $cdn_url ) {
-			$this->default_cdn_url = $this->protocolize_url( trailingslashit( $default_cdn_url ) );
-		}
+	function __construct( $uploads_url, $replacements, $cdn_url ) {
 
-		$this->cdn_url = $this->protocolize_url( trailingslashit( $cdn_url ) );
+		$this->uploads_path = trailingslashit( parse_url( $uploads_url, PHP_URL_PATH ) );
+
+		$this->replacements = array_unique(
+			array_map( [ $this, 'protocolize_url' ],
+				apply_filters( 'infinite_uploads_replacement_urls', $replacements )
+			)
+		);
+
+		$this->cdn_url = $this->protocolize_url( $cdn_url );
 
 		add_action( 'template_redirect', [ &$this, 'handle_rewrite_hook' ] );
 
@@ -47,7 +49,7 @@ class Infinite_Uploads_Rewriter {
 			$url = 'https://' . $url;
 		}
 
-		return $url;
+		return trailingslashit( $url );
 	}
 
 	/**
@@ -80,17 +82,19 @@ class Infinite_Uploads_Rewriter {
 	 */
 	public function rewrite( $html ) {
 
-		// Check for full url
-		$regex_rule = '#((?:https?:)?(?:' . $this->relative_url( quotemeta( $this->uploads_url ) );
+		// start regex
+		$regex_rule = '#((?:https?:)?(?:';
 
-		//if too replacement is not default, we may have default cdn already hardcoded in html so replace that too
-		if ( $this->default_cdn_url ) {
-			$regex_rule .= '|' . $this->relative_url( quotemeta( $this->default_cdn_url ) );
-		}
+		//add all the domains to replace
+		$regex_rule .= implode( '|',
+			array_map( [ $this, 'relative_url' ],
+				array_map( 'quotemeta', $this->replacements )
+			)
+		);
 
 		// check for relative paths
 		$regex_rule .= ')|(?<=[(\"\'=\s])' . quotemeta( $this->uploads_path ) . ')#';
-
+		var_dump( $regex_rule );
 		// call the cdn rewriter callback
 		$cdn_html = preg_replace_callback( $regex_rule, [ $this, 'rewrite_url' ], $html );
 
