@@ -151,6 +151,7 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 ----------------------------------------------------------------------
 - Fix problems replacing urls in some multisite subsites
 - Add an 'infinite_uploads_replacement_urls' filter to customize url replacements
+- Cache attachment size to improve performance of media grid and some frontend editing themes
 
 1.1.4 - 2021-9-22
 ----------------------------------------------------------------------

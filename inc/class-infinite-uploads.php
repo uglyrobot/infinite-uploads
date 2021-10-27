@@ -151,13 +151,8 @@ class Infinite_Uploads {
 		add_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
 		add_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 		add_filter( 'wp_read_image_metadata', [ $this, 'wp_filter_read_image_metadata' ], 10, 2 );
-		/*add_filter( 'wp_get_attachment_metadata', function($data) {
-			if ( ! isset( $data['filesize'] ) ) {
-				$data['filesize'] = 123;
-			}
-
-			return $data;
-		} );*/
+		add_filter( 'wp_update_attachment_metadata', [ $this, 'update_attachment_metadata' ], 10, 2 );
+		add_filter( 'wp_get_attachment_metadata', [ $this, 'get_attachment_metadata' ] );
 		add_filter( 'wp_resource_hints', [ $this, 'wp_filter_resource_hints' ], 10, 2 );
 		remove_filter( 'admin_notices', 'wpthumb_errors' );
 
@@ -805,6 +800,40 @@ class Infinite_Uploads {
 		copy( $file, $temp_filename );
 
 		return $temp_filename;
+	}
+
+	/**
+	 * Filters the attachment meta data. wp_prepare_attachment_for_js triggers a HeadObject to get filesize, usually uncached
+	 * on media grid and sometimes on frontend with some things, increasing TTFB a lot. Instead cache it when attachment is updated or created.
+	 *
+	 * @param array $data          Array of updated attachment meta data.
+	 * @param int   $attachment_id Attachment post ID.
+	 *
+	 * @return array
+	 */
+	function update_attachment_metadata( $data, $attachment_id ) {
+		$attached_file = get_attached_file( $attachment_id );
+		if ( file_exists( $attached_file ) ) {
+			$data['filesize'] = filesize( $attached_file );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Filters the attachment meta data. wp_prepare_attachment_for_js triggers a HeadObject to get filesize, usually uncached
+	 * on media grid and sometimes on frontend with some things, increasing TTFB a lot.
+	 *
+	 * @param array $data Array of meta data for the given attachment.
+	 *
+	 * @return array
+	 */
+	function get_attachment_metadata( $data ) {
+		if ( ! isset( $data['filesize'] ) ) {
+			$data['filesize'] = '';
+		}
+
+		return $data;
 	}
 
 	/**
