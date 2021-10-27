@@ -17,7 +17,7 @@
  * Copyright 2021 UglyRobot, LLC
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.1.4' );
+define( 'INFINITE_UPLOADS_VERSION', '1.1.5' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';

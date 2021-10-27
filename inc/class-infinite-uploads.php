@@ -920,6 +920,9 @@ class Infinite_Uploads {
 
 		//WP Migrate DB
 		add_filter( 'wpmdb_upload_info', array( $this, 'wpmdb_upload_info' ) );
+
+		//Handle WooCommerce CSV imports
+		add_filter( 'woocommerce_product_csv_importer_check_import_file_path', '__return_false' );
 	}
 
 	/**
