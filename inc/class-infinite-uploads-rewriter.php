@@ -7,9 +7,10 @@
  */
 
 class Infinite_Uploads_Rewriter {
-	var $uploads_path = null;    // uploads PATH
-	var $replacements = [];    // urls to be searched for and replaced with CDN URL
-	var $cdn_url = null;    // CDN URL
+	protected $uploads_path = null;    // uploads PATH
+	protected $replacements = [];    // urls to be searched for and replaced with CDN URL
+	protected $cdn_url = null;    // CDN URL
+	protected $exclusions = [];
 
 	/**
 	 * constructor
@@ -31,6 +32,15 @@ class Infinite_Uploads_Rewriter {
 		);
 
 		$this->cdn_url = $this->protocolize_url( $cdn_url );
+
+		//generate upload url paths that should be excluded from url replacement
+		$filelist   = new Infinite_Uploads_Filelist( '/' ); //path doesn't matter
+		$exclusions = apply_filters( 'infinite_uploads_sync_exclusions', $filelist->exclusions );
+		foreach ( $exclusions as $exclusion ) {
+			if ( 0 === strpos( $exclusion, '/' ) ) {
+				$this->exclusions[ $exclusion ] = untrailingslashit( $uploads_url ) . $exclusion;
+			}
+		}
 
 		add_action( 'template_redirect', [ &$this, 'handle_rewrite_hook' ] );
 
@@ -93,7 +103,7 @@ class Infinite_Uploads_Rewriter {
 		);
 
 		// check for relative paths
-		$regex_rule .= ')|(?<=[(\"\'=\s])' . quotemeta( $this->uploads_path ) . ')#';
+		$regex_rule .= ')|(?<=[(\"\'=\s])' . quotemeta( $this->uploads_path ) . ')([^\#\"\'\s]*)#';
 
 		// call the cdn rewriter callback
 		$cdn_html = preg_replace_callback( $regex_rule, [ $this, 'rewrite_url' ], $html );
@@ -124,17 +134,27 @@ class Infinite_Uploads_Rewriter {
 	 *
 	 */
 	protected function rewrite_url( $matches ) {
+
+		//don't filter excluded dirs
+		foreach ( $this->exclusions as $exclusion ) {
+			if ( 0 === strpos( $matches[0], $exclusion ) ) {
+				return $matches[0];
+			}
+		}
+
+		$replace = str_replace( $matches[1], $this->cdn_url, $matches[0] );
+
 		/**
 		 * Filters the find/replace url rewriter that replaces matches in HTML output with CDN url.
 		 *
-		 * @param  {string}  $cdn_url  The base url to replace the match with, like `https://xxxxx.infiniteuploads.cloud/`.
-		 * @param  {string}  $match  The base url of the match found in HTML, like `https://mysite.com/wp-content/uploads/`.
+		 * @param  {string}  $replace  The url to replace the match with, like `https://xxxxx.infiniteuploads.cloud/somefile.png`.
+		 * @param  {array}   $matches  The the matches found in HTML, like `[0 => 'https://mysite.com/wp-content/uploads/somefile.png', 1 => 'https://mysite.com/wp-content/uploads/', 2 => 'somefile.png']`.
 		 *
 		 * @return {string} The base url to replace the match with.
 		 * @since  1.0
 		 * @hook   infinite_uploads_rewrite_url
 		 *
 		 */
-		return apply_filters( 'infinite_uploads_rewrite_url', $this->cdn_url, $matches[0] );
+		return apply_filters( 'infinite_uploads_rewrite_url', $replace, $matches );
 	}
 }
