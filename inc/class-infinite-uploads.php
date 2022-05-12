@@ -97,7 +97,7 @@ class Infinite_Uploads {
 
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
-		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
+		if ( $api_data && isset( $api_data->site ) && ! empty( $api_data->site->upload_key ) && ! empty( $api_data->site->upload_secret ) ) {
 			$this->bucket     = $api_data->site->upload_bucket;
 			$this->key        = $api_data->site->upload_key;
 			$this->secret     = $api_data->site->upload_secret;
@@ -114,7 +114,7 @@ class Infinite_Uploads {
 				return $params;
 			} );
 		} else { //if we don't have cloud data we have to disable everything to avoid errors
-			//turn of enabled flag
+			//turn off enabled flag
 			if ( infinite_uploads_enabled() ) {
 				$this->toggle_cloud( false );
 			}
