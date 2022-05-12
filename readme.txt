@@ -1,9 +1,9 @@
 === Infinite Uploads - Offload Your Media to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 5.9
+Tested up to: 6.0
 Stable tag: 1.1.5
-Requires PHP: 5.5
+Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
 Tags: cloud storage, media cloud, media library, offload, stateless, s3, google cloud storage, spaces, storage, cdn, cloud sync
 License: GPLv2
