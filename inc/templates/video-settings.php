@@ -1,7 +1,7 @@
 <div class="card">
 	<div class="card-header h5">
 		<div class="d-flex align-items-center">
-			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Stream Settings', 'infinite-uploads' ); ?></h5>
+			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Stream Video Settings', 'infinite-uploads' ); ?></h5>
 		</div>
 	</div>
 	<div class="card-body p-md-5">
