@@ -962,6 +962,8 @@ class Infinite_Uploads_Admin {
 				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
 
+				require_once( dirname( __FILE__ ) . '/templates/video-settings.php' );
+
 			} else {
 				if ( ! empty( $stats['files_finished'] ) && $stats['files_finished'] >= ( time() - DAY_IN_SECONDS ) ) {
 					$to_sync = $wpdb->get_row( "SELECT count(*) AS files, SUM(`size`) as size FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE deleted = 0" );
