@@ -198,3 +198,8 @@ p.lead {
   padding: 0.25rem 1.25rem;
   margin: 0;
 }
+
+/* --------- Stream Settings--------- */
+#stream-nav-tab {
+  margin-bottom: -0.8rem;
+}
