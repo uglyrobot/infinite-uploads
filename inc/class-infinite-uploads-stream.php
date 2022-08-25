@@ -8,8 +8,6 @@ class Infinite_Uploads_Stream {
 	private $iup_instance;
 	private $api;
 
-	private $video_creds;
-
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
@@ -32,25 +30,34 @@ class Infinite_Uploads_Stream {
 	}
 
 	/*
-	 * Check if Stream is enabled.
+	 * Check if Stream is created/active for this site.
+	 *
+	 * @return bool
+	 */
+	public function is_stream_active() {
+		return (bool) $this->get_config( 'library_id' );
+	}
+
+	/*
+	 * Check if Stream uploading/viewing is enabled. (When user has billing issues,
+	 * we will disable embeds and return only the read_key for viewing the library but no editing)
 	 *
 	 * @return bool
 	 */
 	public function is_stream_enabled() {
-		$creds = $this->get_creds();
-
-		return (bool) $creds->api_key;
+		return (bool) $this->get_config( 'enabled' );
 	}
 
 	/**
-	 * Enable Stream.
+	 * Activates Stream service for this site.
 	 *
 	 * @return object|false
 	 */
-	public function enable_stream() {
+	public function activate_stream() {
 		$result = $this->api->call( "site/" . $this->api->get_site_id() . "/stream", [], 'POST' );
 		if ( $result ) {
-			return $this->get_creds( true );
+			//cache the new creds/settings once we enable stream
+			return $this->get_library_settings( true );
 		}
 
 		return false;
@@ -62,44 +69,109 @@ class Infinite_Uploads_Stream {
 	 * @return object|false
 	 */
 	public function update_library_settings( $args = [] ) {
-		$result = $this->api->call( "site/" . $this->api->get_site_id() . "/stream", $args, 'POST' );
-		if ( $result ) {
-			return json_decode( $result );
-		}
-
-		return false;
+		return $this->api->call( "site/" . $this->api->get_site_id() . "/stream", $args, 'POST' );
 	}
 
 	/**
-	 * Returns the video API credentials.
+	 * Get the stream library settings. They are cached 12hrs in the options table from the regular get_site_data call by default.
 	 *
-	 * @param bool $force Force a refresh of the credentials.
+	 * @param bool $force_refresh Force a refresh of the settings from api.
 	 *
-	 * @return object
+	 * @return object|null
 	 */
-	public function get_creds( $force = false ) {
-		if ( ! $force && isset( $this->video_creds ) ) {
-			return $this->video_creds;
+	public function get_library_settings( $force_refresh = false ) {
+		$data = $this->api->get_site_data( $force_refresh );
+
+		if ( isset( $data->video->settings ) ) {
+			return $data->video->settings;
 		}
 
-		$this->video_creds = (object) [
-			'api_key'    => false,
-			'library_id' => false,
-		];
-
-		$data = $this->api->get_site_data( $force );
-
-		if ( isset( $data->video_api_key ) ) {
-			$this->video_creds->api_key = $data->video_api_key;
-		}
-		if ( isset( $data->video_library_id ) ) {
-			$this->video_creds->library_id = $data->video_library_id;
-		}
-
-		return $this->video_creds;
+		return null;
 	}
 
+	/**
+	 * Get the stream configuration value for a given key. They are cached 12hrs in the options table from the regular get_site_data call by default.
+	 *
+	 * @param string $key           The key to get (enabled, library_id, key_write, key_read, url).
+	 * @param bool   $force_refresh Force a refresh of the credentials.
+	 *
+	 * @return mixed
+	 */
+	public function get_config( $key, $force_refresh = false ) {
+		$data = $this->api->get_site_data( $force_refresh );
+		if ( isset( $data->video->{$key} ) ) {
+			return $data->video->{$key};
+		} else {
+			return null;
+		}
+	}
 
+	/**
+	 * Perform an API request to Bunny Video API.
+	 *
+	 * @param string $path   API path.
+	 * @param array  $data   Data array.
+	 * @param string $method Method. Default: POST.
+	 *
+	 * @return object|WP_Error
+	 */
+	private function api_call( $path, $data = [], $method = 'POST' ) {
+		$library_id = $this->get_config( 'library_id' );
+
+		$url = "https://video.bunnycdn.com/library/{$library_id}/" . $path;
+
+		$headers = array(
+			'Accept'       => 'application/json',
+			'AccessKey'    => $this->get_config( 'key_write' ),
+			'Content-Type' => 'application/json',
+		);
+
+		$args = array(
+			'headers'   => $headers,
+			'sslverify' => true,
+			'method'    => strtoupper( $method ),
+			'timeout'   => 30,
+		);
+
+		switch ( strtolower( $method ) ) {
+			case 'post':
+				$args['body'] = wp_json_encode( $data );
+
+				$response = wp_remote_post( $url, $args );
+				break;
+			case 'get':
+				if ( ! empty( $data ) ) {
+					$url = add_query_arg( $data, $url );
+				}
+
+				$response = wp_remote_get( $url, $args );
+				break;
+			default:
+				if ( ! empty( $data ) ) {
+					$args['body'] = wp_json_encode( $data );
+				}
+				$response = wp_remote_request( $url, $args );
+				break;
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 201, 202, 204, 204 ], true ) ) {
+			return new WP_Error( $body->ErrorKey, $body->Message, [ 'status' => wp_remote_retrieve_response_code( $response ) ] );
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Create a video in the stream library, and returns the params for executing the tus upload.
+	 *
+	 * @return void
+	 */
 	public function ajax_create_video() {
 		global $wpdb;
 
@@ -108,23 +180,21 @@ class Infinite_Uploads_Stream {
 			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
 		}
 
-		$library_id = '';
-		$api_key    = '';
+		$result = $this->api_call( 'videos', [ 'title' => sanitize_text_field( $_REQUEST['title'] ) ] );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result );
+		}
 
+		//generate the signature params for a tus upload.
+		$expiration = time() + ( 6 * HOUR_IN_SECONDS );
+		$response   = [
+			'AuthorizationSignature' => hash( 'sha256', $result->videoLibraryId . $this->get_config( 'key_write' ) . $expiration . $result->guid ), // SHA256 signature (library_id + api_key + expiration_time + video_id)
+			'AuthorizationExpire'    => $expiration, // Expiration time as in the signature,
+			'VideoId'                => $result->guid, // The guid of a previously created video object through the Create Video API call
+			'LibraryId'              => $result->videoLibraryId,
+		];
 
-		$client = new GuzzleHttp\Client();
-
-		$response = $client->request( 'POST', 'https://video.bunnycdn.com/library/libraryId/videos', [
-			'headers' => [
-				'Accept'       => 'application/json',
-				'AccessKey'    => 'fdsfsfsdfsdfsdf',
-				'Content-Type' => 'application/*+json',
-			],
-		] );
-
-		echo $response->getBody();
-
-		wp_send_json_success( $data );
+		wp_send_json_success( $response );
 	}
 
 
