@@ -343,14 +343,24 @@ class Infinite_Uploads_Stream {
 
 			<div class="container-fluid">
 				<div class="row justify-content-between mb-4">
-					<div class="input-group input-group-lg mb-3 col-12 col-sm-6 col-lg-4 col-xl-3">
-						<div class="input-group-prepend">
-							<span class="input-group-text" id="basic-addon1"><span class="dashicons dashicons-search"></span></span>
+					<div class="form-row mb-3 col-12 col-sm-10 col-lg-8 col-xl-6">
+						<div class="col input-group input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="basic-addon1"><span class="dashicons dashicons-search"></span></span>
+							</div>
+							<input type="text" class="form-control" placeholder="<?php esc_attr_e( 'Search', 'infinite-uploads' ); ?>" aria-label="<?php esc_attr_e( 'Search', 'infinite-uploads' ); ?>" aria-describedby="basic-addon1">
 						</div>
-						<input type="text" class="form-control" placeholder="<?php esc_attr_e( 'Search', 'infinite-uploads' ); ?>" aria-label="<?php esc_attr_e( 'Search', 'infinite-uploads' ); ?>" aria-describedby="basic-addon1">
+						<div class="col input-group input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="basic-addon1">Sort</span>
+							</div>
+							<select class="custom-select custom-select-lg" aria-describedby="basic-addon1">
+								<option value="1">Name</option>
+								<option value="2">Date</option>
+							</select>
+						</div>
 					</div>
-
-					<div class="col-12 col-sm-6 col-lg-4 col-xl-3 text-center">
+					<div class="col-12 col-sm-10 col-lg-4 col-xl-3 text-center">
 						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#upload-modal" type="button"><?php esc_html_e( 'New Video', 'infinite-uploads' ); ?></button>
 					</div>
 				</div>
