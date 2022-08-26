@@ -315,6 +315,8 @@ class Infinite_Uploads_Stream {
 
 	/**
 	 * Video library page display callback.
+	 *
+	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
 	 */
 	function video_library_page() {
 		global $wpdb;
@@ -355,22 +357,7 @@ class Infinite_Uploads_Stream {
 				<div class="row justify-content-start d-flex">
 
 
-					<div class="card col m-3 h-100 p-0 shadow-sm">
-						<a class="" data-toggle="modal" data-target="#video-modal">
-							<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
-							     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
-						</a>
-						<div class="card-body">
-							<h6 class="card-title text-truncate">I Will Survive Coronavirus.mp4</h6>
-							<small class="row justify-content-between text-muted text-center">
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
-							</small>
-						</div>
-					</div>
-
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -381,8 +368,22 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
+						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">I Will Survive Coronavirus.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<!-- TODO force 16:9 aspect ratio of thumbnails -->
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/c67eb0ed-ceec-408f-8b24-15437fde12ab/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/c67eb0ed-ceec-408f-8b24-15437fde12ab/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/c67eb0ed-ceec-408f-8b24-15437fde12ab/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -393,8 +394,8 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -405,8 +406,8 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -417,8 +418,8 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -429,8 +430,8 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -441,8 +442,8 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
-					<div class="card col m-3 h-100 p-0 shadow-sm">
+					</a>
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
@@ -453,7 +454,7 @@ class Infinite_Uploads_Stream {
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 							</small>
 						</div>
-					</div>
+					</a>
 
 				</div>
 			</div>
@@ -491,7 +492,7 @@ class Infinite_Uploads_Stream {
 			<div class="modal-dialog modal-dialog-centered modal-xl">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="video-modal-label"><?php esc_html_e( 'Edit Video', 'infinite-uploads' ); ?></h5>
+						<h5 class="modal-title" id="video-modal-label"><?php esc_html_e( 'Edit Video:', 'infinite-uploads' ); ?> I Will Survive Coronavirus.mp4</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -515,14 +516,8 @@ class Infinite_Uploads_Stream {
 									</div>
 								</div>
 								<div class="col">
-									<div class="row justify-content-between mb-3">
-										<div class="col">
-										</div>
-										<div class="col">
-											<button type="button" class="btn btn-info w-100">Delete Video</button>
-										</div>
-									</div>
-									<div class="row">
+
+									<div class="row mb-2">
 										<div class="col">
 											<label for="video-title">Video Title</label>
 											<div class="input-group mb-3">
@@ -534,10 +529,75 @@ class Infinite_Uploads_Stream {
 										</div>
 									</div>
 
-									<div class="row">
+									<div class="row mb-4">
+										<div class="col-4">
+											<h6><?php esc_html_e( 'Current Thumbnail', 'infinite-uploads' ); ?></h6>
+											<div class="card bg-dark text-white w-100 p-0 mb-2" role="button">
+												<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" class="card-img" alt="...">
+											</div>
+										</div>
+										<div class="col-8">
+
+											<p><?php esc_html_e( 'Choose a new thumbnail to be displayed in the video player:', 'infinite-uploads' ); ?></p>
+											<div class="row justify-content-start d-flex row-cols-2 row-cols-md-3">
+												<div class="col mb-2">
+													<a class="card bg-dark text-white h-100 p-0" role="button">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_1.jpg" class="card-img" alt="...">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"></div>
+														</div>
+													</a>
+												</div>
+												<div class="col mb-2">
+													<a class="card bg-dark text-white p-0" role="button">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_2.jpg" class="card-img" alt="...">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"></div>
+														</div>
+													</a>
+												</div>
+												<div class="col mb-2">
+													<a class="card bg-dark text-white p-0" role="button">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_3.jpg" class="card-img" alt="...">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"></div>
+														</div>
+													</a>
+												</div>
+												<div class="col mb-2">
+													<a class="card bg-dark text-white p-0" role="button">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_4.jpg" class="card-img" alt="...">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"></div>
+														</div>
+													</a>
+												</div>
+												<div class="col mb-2">
+													<a class="card bg-dark text-white p-0" role="button">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_5.jpg" class="card-img" alt="...">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"></div>
+														</div>
+													</a>
+												</div>
+												<div class="col mb-2">
+													<div class="card bg-light text-white p-0" role="button">
+														<div class="card-img-overlay">
+															<div class="card-title align-middle text-center text-white"><span class="dashicons dashicons-cloud-upload"></span></div>
+														</div>
+													</div>
+												</div>
+
+											</div>
+										</div>
+
+									</div>
+
+									<div class="row justify-content-between mb-3">
 										<div class="col">
-											<h5><?php esc_html_e( 'Thumbnail', 'infinite-uploads' ); ?></h5>
-											<p><?php esc_html_e( 'Choose the thumbnail that will be displayed in the video player.', 'infinite-uploads' ); ?></p>
+										</div>
+										<div class="col-4">
+											<button type="button" class="btn btn-info w-100">Delete Video</button>
 										</div>
 									</div>
 
@@ -549,11 +609,11 @@ class Infinite_Uploads_Stream {
 								<div class="col">
 									<nav id="stream-nav-tab">
 										<div class="nav nav-tabs" role="tablist">
-											<button class="nav-link active" id="nav-shortcode-tab" data-toggle="tab" data-target="#nav-shortcode" type="button" role="tab" aria-controls="nav-shortcode" aria-selected="false">Embed Code</button>
-											<button class="nav-link" id="nav-stats-tab" data-toggle="tab" data-target="#nav-stats" type="button" role="tab" aria-controls="nav-stats" aria-selected="true">Stats</button>
-											<button class="nav-link" id="nav-encoding-tab" data-toggle="tab" data-target="#nav-encoding" type="button" role="tab" aria-controls="nav-encoding" aria-selected="false">Captions</button>
-											<button class="nav-link" id="nav-security-tab" data-toggle="tab" data-target="#nav-security" type="button" role="tab" aria-controls="nav-security" aria-selected="false">Chapters</button>
-											<button class="nav-link" id="nav-security-tab" data-toggle="tab" data-target="#nav-security" type="button" role="tab" aria-controls="nav-security" aria-selected="false">Moments</button>
+											<button class="nav-link active" id="nav-shortcode-tab" data-toggle="tab" data-target="#nav-shortcode" type="button" role="tab" aria-controls="nav-shortcode" aria-selected="false"><span class="dashicons dashicons-shortcode"></span> Embed Code</button>
+											<button class="nav-link" id="nav-stats-tab" data-toggle="tab" data-target="#nav-stats" type="button" role="tab" aria-controls="nav-stats" aria-selected="true"><span class="dashicons dashicons-chart-area"></span> Stats</button>
+											<button class="nav-link" id="nav-encoding-tab" data-toggle="tab" data-target="#nav-encoding" type="button" role="tab" aria-controls="nav-encoding" aria-selected="false"><span class="dashicons dashicons-format-status"></span> Captions</button>
+											<button class="nav-link" id="nav-security-tab" data-toggle="tab" data-target="#nav-security" type="button" role="tab" aria-controls="nav-security" aria-selected="false"><span class="dashicons dashicons-text"></span> Chapters</button>
+											<button class="nav-link" id="nav-security-tab" data-toggle="tab" data-target="#nav-security" type="button" role="tab" aria-controls="nav-security" aria-selected="false"><span class="dashicons dashicons-images-alt"></span> Moments</button>
 										</div>
 									</nav>
 								</div>
@@ -575,7 +635,7 @@ class Infinite_Uploads_Stream {
 												</div>
 
 												<div class="custom-control custom-switch custom-control-inline">
-													<input type="checkbox" class="custom-control-input" id="customSwitch2">
+													<input type="checkbox" class="custom-control-input" id="customSwitch2" checked>
 													<label class="custom-control-label" for="customSwitch2">Preload</label>
 												</div>
 
@@ -593,7 +653,7 @@ class Infinite_Uploads_Stream {
 										</div>
 										<div class="row">
 											<div class="col">
-												<textarea class="form-control" rows="3" readonly>[infinite-uploads id="3aadf1e3-b76d-41db-bcfa-9e6b670b185c"]</textarea>
+												<textarea class="form-control" rows="3" readonly>[infinite-uploads id="3aadf1e3-b76d-41db-bcfa-9e6b670b185c" preload="true"]</textarea>
 											</div>
 										</div>
 									</div>
