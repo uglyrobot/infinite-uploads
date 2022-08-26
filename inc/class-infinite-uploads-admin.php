@@ -731,7 +731,7 @@ class Infinite_Uploads_Admin {
 		if ( is_multisite() ) {
 			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
 		} else {
-			$base = admin_url( 'upload.php?page=infinite_uploads' );
+			$base = admin_url( 'options-general.php?page=infinite_uploads' );
 		}
 
 		return add_query_arg( $args, $base );
@@ -771,7 +771,7 @@ class Infinite_Uploads_Admin {
 				]
 			);
 		} else {
-			$page = add_media_page(
+			$page = add_options_page(
 				__( 'Infinite Uploads', 'infinite-uploads' ),
 				__( 'Infinite Uploads', 'infinite-uploads' ),
 				$this->iup_instance->capability,
