@@ -1,7 +1,10 @@
 <div class="card">
 	<div class="card-header">
 		<div class="d-flex align-items-center">
-			<h5 class="h5 m-0 mr-auto p-0"><span class="dashicons dashicons-format-video"></span> <?php esc_html_e( 'Stream Video', 'infinite-uploads' ); ?></h5>
+			<h5 class="h5 m-0 mr-auto p-0">
+				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-gray.svg', dirname( __FILE__ ) ) ); ?>" alt="Infinite Uploads Stream" height="20" width="20"/>
+				<?php esc_html_e( 'Stream Video', 'infinite-uploads' ); ?>
+			</h5>
 			<nav id="stream-nav-tab">
 				<div class="nav nav-tabs" role="tablist">
 					<button class="nav-link" id="nav-stats-tab" data-toggle="tab" data-target="#nav-stats" type="button" role="tab" aria-controls="nav-stats" aria-selected="true">Stats</button>

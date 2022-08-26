@@ -258,14 +258,15 @@ class Infinite_Uploads_Stream {
 	 */
 	function admin_menu() {
 		$page = add_media_page(
-			__( 'Video Library - Infinite Uploads', 'infinite-uploads' ),
+			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Video Library', 'infinite-uploads' ),
 			$this->iup_instance->capability,
 			'infinite_uploads_vids',
 			[
 				$this,
 				'video_library_page',
-			]
+			],
+			1.1678 //for unique menu position above Add New.
 		);
 
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
@@ -274,7 +275,7 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 *
+	 * @todo adjust for the video library page.
 	 */
 	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
@@ -320,12 +321,12 @@ class Infinite_Uploads_Stream {
 	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
 	 */
 	function video_library_page() {
-		global $wpdb;
 		?>
 		<div id="container" class="wrap iup-background">
 
-			<h1>
-				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
+			<h1 class="text-muted mb-3">
+				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-gray.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="36" width="36"/>
+				<?php esc_html_e( 'Stream Video Library', 'infinite-uploads' ); ?>
 			</h1>
 
 			<div id="iup-error" class="alert alert-danger mt-1" role="alert"></div>
