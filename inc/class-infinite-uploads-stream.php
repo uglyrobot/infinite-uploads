@@ -177,6 +177,7 @@ class Infinite_Uploads_Stream {
 	function script_enqueue() {
 		$data = array(
 			'libraryId' => $this->get_config( 'library_id' ),
+			'cdnUrl'    => $this->get_config( 'url' ), // This give us the base CDN url for the library for building media links.
 			'apiKey'    => $this->get_config( 'key_read' ), //we only expose the read key to the frontend. The write key is only used via backend ajax wrappers.
 			'nonce'     => wp_create_nonce( 'iup_video' ), //used to verify the request is coming from the frontend, CSRF.
 		);
@@ -420,8 +421,8 @@ class Infinite_Uploads_Stream {
 						</div>
 					</a>
 					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
-						<img src="https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/preview.webp'"
-						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/d0160e28-54d8-4133-83ba-7d7a4def8106/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<img src="https://vz-a8691a32-d3c.b-cdn.net/67c8df65-f81e-4ac4-ae60-2d818132c3d3/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/67c8df65-f81e-4ac4-ae60-2d818132c3d3/preview.webp'"
+						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/67c8df65-f81e-4ac4-ae60-2d818132c3d3/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
 							<h6 class="card-title text-truncate">Linkedin-ad.mp4</h6>
 							<small class="row justify-content-between text-muted text-center">
