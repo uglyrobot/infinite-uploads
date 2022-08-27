@@ -47,7 +47,7 @@ class Infinite_Uploads_Stream {
 	 * @return bool
 	 */
 	public function is_stream_enabled() {
-		return (bool) $this->get_config( 'enabled' );
+		return $this->is_stream_active() && $this->get_config( 'enabled' );
 	}
 
 	/**
@@ -186,6 +186,29 @@ class Infinite_Uploads_Stream {
 		wp_add_inline_script( 'iup-dummy-js-header', 'const IUP_STREAM = ' . json_encode( $data ) . ';' );
 	}
 
+
+	/**
+	 * Check permissions for a ajax request.
+	 *
+	 * @param $nonce
+	 *
+	 * @return void
+	 */
+	public function ajax_check_permissions( $nonce = 'iup_video' ) {
+		// check caps
+		if ( ! current_user_can( 'upload_files' ) ) {
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+		}
+
+		//check nonce
+		check_ajax_referer( $nonce, 'nonce' );
+
+		// return error if stream is not enabled
+		if ( ! $this->is_stream_enabled() ) {
+			wp_send_json_error( esc_html__( 'Infinite Uploads Stream is disabled due to an issue with your account.', 'infinite-uploads' ) );
+		}
+	}
+
 	/**
 	 * Create a video in the stream library, and returns the params for executing the tus upload.
 	 *
@@ -195,15 +218,7 @@ class Infinite_Uploads_Stream {
 	 * @return void
 	 */
 	public function ajax_create_video() {
-		global $wpdb;
-
-		// check caps
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
-		}
-
-		//check nonce
-		check_ajax_referer( 'iup_video', 'nonce' );
+		$this->ajax_check_permissions();
 
 		$result = $this->api_call( '/videos', [ 'title' => sanitize_text_field( $_REQUEST['title'] ) ] );
 		if ( is_wp_error( $result ) ) {
@@ -223,22 +238,14 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 * Update a video in the stream library, and returns the params for executing the tus upload.
+	 * Update a video in the stream library.
 	 *
 	 * @see https://docs.bunny.net/reference/video_updatevideo
 	 *
 	 * @return void
 	 */
 	public function ajax_update_video() {
-		global $wpdb;
-
-		// check caps
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
-		}
-
-		//check nonce
-		check_ajax_referer( 'iup_video', 'nonce' );
+		$this->ajax_check_permissions();
 
 		//TODO validate and sanitize these.
 		$args = $_REQUEST['params'];
@@ -246,6 +253,26 @@ class Infinite_Uploads_Stream {
 		$video_id = sanitize_text_field( $args['video_id'] );
 
 		$result = $this->api_call( "/videos/$video_id", $args );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Delete a video in the stream library.
+	 *
+	 * @see https://docs.bunny.net/reference/video_deletevideo
+	 *
+	 * @return void
+	 */
+	public function ajax_delete_video() {
+		$this->ajax_check_permissions();
+
+		$video_id = sanitize_text_field( $_REQUEST['video_id'] );
+
+		$result = $this->api_call( "/videos/$video_id", [], 'DELETE' );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result );
 		}
