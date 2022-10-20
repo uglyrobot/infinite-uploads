@@ -180,6 +180,7 @@ function infinite_uploads_autoload( $class_name ) {
 	 * - Class name: Infinite_Uploads_Image_Editor_Imagick.
 	 * - File name: class-infinite-uploads-image-editor-imagick.php.
 	 */
+
 	$class_file = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
 	$class_path = dirname( __FILE__ ) . '/inc/' . $class_file;
 
@@ -191,3 +192,94 @@ function infinite_uploads_autoload( $class_name ) {
 }
 
 spl_autoload_register( 'infinite_uploads_autoload' );
+
+function create_block_bunnytest_block_init() {
+	register_block_type( __DIR__ . '/build' );
+}
+add_action( 'init', 'create_block_bunnytest_block_init' );
+
+/**
+ * Enqueue the block's assets for the editor.
+ *
+ * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
+ */
+function bunny_script_enqueue() {
+	$data = array(
+		'libraryId' => '56793',
+		'apiKey' => BUNNY_API_KEY
+	);
+	wp_register_script( 'bunnytest-dummy-js-header', '');
+	wp_enqueue_script( 'bunnytest-dummy-js-header' );
+	wp_add_inline_script( 'bunnytest-dummy-js-header', 'const BUNNYTEST = ' . json_encode( $data ) . ';' );
+
+}
+add_action( 'enqueue_block_editor_assets', 'bunny_script_enqueue' );
+
+// function wpdocs_register_my_custom_menu_page() {
+// 	add_menu_page(
+// 		__( 'Video Library', 'textdomain' ),
+// 		'Video Library',
+// 		'manage_options',
+// 		'test_function',
+// 		'',
+// 		'',
+// 		6
+// 	);
+// }
+// add_action( 'admin_menu', 'wpdocs_register_my_custom_menu_page' );
+
+ 
+//  add_action('admin_menu', 'addAdminPageContent');
+// function addAdminPageContent() {
+	
+//     add_menu_page('Video Uploads', 'Video Uploads', 'manage_options', 'video_uploads', 'videoAdminPage', 'dashicons-edit-page');
+// } 
+
+// function videoAdminPage (){
+	 
+// 	$class_file = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
+// 	$class_path = dirname( __FILE__ ) . '/inc/' . $class_file;
+
+// 	if ( file_exists( $class_path ) ) {
+// 		require $class_path;
+
+// 		return;
+// 	}
+// 	spl_autoload_register( 'videoAdminPage' );
+	
+// }
+
+
+
+add_action( 'wp_ajax_custom_ajax_callback', 'custom_ajax_callback' );
+function custom_ajax_callback(){
+	$curl = curl_init();
+
+	curl_setopt_array($curl, [
+	CURLOPT_URL => "https://video.bunnycdn.com/library/56793/videos",
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => "",
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 30,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => "POST",
+	CURLOPT_POSTFIELDS => "{\"title\":\"Test\"}",
+	CURLOPT_HTTPHEADER => [
+		"AccessKey: 293abf14-8359-4f92-ba6e2d1a291b-c2cd-4f92",
+		"accept: application/json",
+		"content-type: application/*+json"
+	],
+	]);
+
+	$response = curl_exec($curl);
+	$err = curl_error($curl);
+
+	curl_close($curl);
+
+	if ($err) {
+	echo "cURL Error #:" . $err;
+	} else {
+	echo $response;
+	}
+	die();	
+}

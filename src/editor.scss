@@ -1,0 +1,42 @@
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+@import '@uppy/core/dist/style.css';
+@import '@uppy/drag-drop/dist/style.css';
+@import '@uppy/status-bar/dist/style.css';
+
+.wp-block-infinite-uploads-video {
+  box-sizing: border-box;
+  position: relative;
+  text-align: left;
+  color: #1e1e1e;
+  -moz-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: subpixel-antialiased;
+  border-radius: 2px;
+  background-color: #fff;
+  box-shadow: inset 0 0 0 1px #1e1e1e;
+  outline: 1px solid transparent;
+}
+
+.wp-block-infinite-uploads-video .uppy-wrapper {
+  padding: 1em;
+}
+
+.wp-block-infinite-uploads-video .uppy-StatusBar-progress {
+  height: 1em;
+  background-color: var(--wp-admin-theme-color);
+}
+
+.wp-block-infinite-uploads-video .uppy-StatusBar::before {
+  height: 1em;
+}
+
+.wp-block-infinite-uploads-video .uppy-StatusBar-content {
+  margin-top: 1em;
+}
+
+.wp-block-infinite-uploads-video .uppy-StatusBar-actions {
+  margin-top: 1em;
+}

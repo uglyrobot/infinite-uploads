@@ -1,5 +1,6 @@
 <?php
 
+
 use UglyRobot\Infinite_Uploads\GuzzleHttp;
 
 class Infinite_Uploads_Stream {
@@ -9,14 +10,15 @@ class Infinite_Uploads_Stream {
 	private $api;
 
 	public function __construct() {
+
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
 		add_action( 'wp_ajax_infinite-uploads-stream-create', [ &$this, 'ajax_create_video' ] );
-		//add_action( 'wp_ajax_infinite-uploads-stream-get', [ &$this, 'ajax_get_video' ] );
-	}
+		add_action( 'wp_ajax_infinite-uploads-stream-get', [ &$this, 'ajax_get_video' ] );
+	}	
 
 	/**
 	 *
@@ -184,6 +186,7 @@ class Infinite_Uploads_Stream {
 		wp_register_script( 'iup-dummy-js-header', '' );
 		wp_enqueue_script( 'iup-dummy-js-header' );
 		wp_add_inline_script( 'iup-dummy-js-header', 'const IUP_STREAM = ' . json_encode( $data ) . ';' );
+
 	}
 
 
@@ -218,6 +221,7 @@ class Infinite_Uploads_Stream {
 	 * @return void
 	 */
 	public function ajax_create_video() {
+		 
 		$this->ajax_check_permissions();
 
 		$result = $this->api_call( '/videos', [ 'title' => sanitize_text_field( $_REQUEST['title'] ) ] );
@@ -284,7 +288,7 @@ class Infinite_Uploads_Stream {
 	 * Registers the video library page under Media.
 	 */
 	function admin_menu() {
-		$page = add_media_page(
+		/*$page = add_media_page(
 			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Video Library', 'infinite-uploads' ),
 			$this->iup_instance->capability,
@@ -294,11 +298,26 @@ class Infinite_Uploads_Stream {
 				'video_library_page',
 			],
 			1.1678 //for unique menu position above Add New.
+		);*/
+		$page1 = add_media_page(
+			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
+			__( 'Cloud Video Library', 'cloud-infinite-uploads' ),
+			$this->iup_instance->capability,
+			'cloud_video_library',
+			[
+				$this,
+				'cloud_video_library',
+			],
+			1.1678 //for unique menu position above Add New.
 		);
 
-		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
+		/*add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
-		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
+		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );*/
+
+		add_action( 'admin_print_scripts-' . $page1, [ &$this, 'script_enqueue' ] ); //Bunny.Net
+		add_action( 'admin_print_scripts-' . $page1, [ &$this, 'admin_scripts' ] );
+		add_action( 'admin_print_styles-' . $page1, [ &$this, 'admin_styles' ] );
 	}
 
 	/**
@@ -306,8 +325,28 @@ class Infinite_Uploads_Stream {
 	 */
 	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
-		//wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
+
 		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [ 'wp-color-picker' ], INFINITE_UPLOADS_VERSION );
+		wp_register_script( 'jquery_js_query',  plugins_url('infinite-uploads/src/nodex.js'), null, null, true);
+
+		wp_register_script( 'tus-js',  plugins_url('infinite-uploads/src/tus.js'),  null, null, true);
+
+		wp_register_script( 'jquery_js_query2',  plugins_url('infinite-uploads/src/crypto-js.min.js') );
+		
+		wp_register_script( 'sha256-min-js', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/sha256.min.js', null, null, true );
+
+		wp_register_style( 'bootstrap_css', 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css', null, null, true);
+
+		wp_enqueue_style('bootstrap');
+
+		wp_enqueue_script('sha256-min-js');
+
+		wp_enqueue_script( 'tus-js' );
+		
+		wp_enqueue_script( 'jquery_js_query' );
+
+		wp_enqueue_script( 'jquery_js_query1' );
+		wp_enqueue_script( 'jquery_js_query2' );
 
 		$data            = [];
 		$data['strings'] = [
@@ -347,8 +386,7 @@ class Infinite_Uploads_Stream {
 	 *
 	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
 	 */
-	function video_library_page() {
-		?>
+	function cloud_video_library() { ?>
 		<div id="container" class="wrap iup-background">
 
 			<h1 class="text-muted mb-3">
@@ -388,11 +426,11 @@ class Infinite_Uploads_Stream {
 						</div>
 					</div>
 					<div class="col-12 col-sm-10 col-lg-4 col-xl-3 text-center">
-						<button class="btn text-nowrap btn-info btn-lg btn-block" data-toggle="modal" data-target="#upload-modal" type="button"><?php esc_html_e( 'New Video', 'infinite-uploads' ); ?></button>
+						<button class="btn text-nowrap btn-info btn-lg btn-block" id="new_video" data-toggle="modal" data-target="#upload-modal1" type="button"><?php esc_html_e( 'New Video', 'infinite-uploads1' ); ?></button>
 					</div>
 				</div>
 
-
+				
 				<div class="row justify-content-start d-flex">
 
 
@@ -498,9 +536,17 @@ class Infinite_Uploads_Stream {
 				</div>
 			</div>
 		</div>
-
-		<!-- Example Upload modal -->
-		<div class="modal fade" id="upload-modal" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
+<script>
+	jQuery(document).ready(function($){
+		$(document).on("click", "#clickImg", function(e) {
+				$("#file").trigger("click");				
+		}); 
+	}); 
+	function encfiletobase64(element){
+		 tusUpload(element);
+	}
+</script>		
+		<div class="modal fade" id="upload-modal1" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -515,9 +561,20 @@ class Infinite_Uploads_Stream {
 								<div class="col text-center">
 									<h4><?php esc_html_e( 'Add a New Video to the Infinite Uploads Cloud', 'infinite-uploads' ); ?></h4>
 									<p class="lead"><?php esc_html_e( 'Drop your videos here to upload them to your cloud video library for encoding and embedding on your site.', 'infinite-uploads' ); ?></p>
-
-									<img class="mb-4" src="<?php echo esc_url( plugins_url( '/inc/assets/img/push-to-cloud.svg', dirname( __FILE__ ) ) ); ?>" alt="Upload to Cloud" height="76" width="76"/>
-
+									<div id="upload-list"></div>
+									<img id="clickImg" class="mb-4" src="<?php echo esc_url( plugins_url( '/inc/assets/img/push-to-cloud.svg', dirname( __FILE__ ) ) ); ?>" alt="Upload to Cloud" height="76" width="76"/>
+									<form method="POST" enctype="multipart/form-data">
+										<input id="file" type="file" name="inupt_files" onchange="encfiletobase64(this)" style="display:none" >
+									</form>
+									<div class="progressBarCustom">
+								        <div class="span8">
+								          <div class="progress progress-striped progress-success">
+								            <div class="bar" style="width: 0%;"></div>
+								          </div>
+								        </div><br/>
+								        <div id="file_name"></div>
+      								</div><br/>
+      								<div class="encod_progress"></div>
 								</div>
 							</div>
 						</div>
@@ -525,7 +582,6 @@ class Infinite_Uploads_Stream {
 				</div>
 			</div>
 		</div>
-
 		<!-- Example Upload modal -->
 		<div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="video-modal-label" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-xl">
@@ -543,8 +599,8 @@ class Infinite_Uploads_Stream {
 									<div class="row mb-2">
 										<div class="col">
 											<div style="position: relative; padding-top: 56.25%;">
-												<iframe src="https://iframe.mediadelivery.net/embed/26801/3aadf1e3-b76d-41db-bcfa-9e6b670b185c?autoplay=false" loading="lazy" style="border: none; position: absolute; top: 0; height: 100%; width: 100%;"
-												        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"></iframe>
+												<iframe src="https://iframe.mediadelivery.net/embed/26801/3aadf1e3-b76d-41db-bcfa-9e6b670b185c?autoplay=false" loading="lazy" style="border: none; position: absolute; top: 0; height: 100%; width: 100%;"allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true">
+												</iframe>
 											</div>
 										</div>
 									</div>

@@ -23,6 +23,7 @@ class Infinite_Uploads_Admin {
 
 		//single site
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+		//add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'load-media_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
 		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
 

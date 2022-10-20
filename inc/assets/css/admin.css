@@ -203,3 +203,25 @@ p.lead {
 #stream-nav-tab {
   margin-bottom: -0.8rem;
 }
+
+
+.progress {
+  height: 32px !important;
+}
+
+.span8 {
+    width: 476px;
+}
+
+.progress-success.progress-striped .bar, .progress-striped .bar-success {
+    background-color: #62c462;
+}
+div#file_name {
+    float: left;
+}
+.progressBarCustom .progress.progress-striped.progress-success .bar {
+  border-radius: 1rem;
+}
+.progressBarCustom .span8 {
+  width: 100%;
+}

@@ -108,10 +108,6 @@ class Infinite_Uploads {
 			add_filter( 'infinite_uploads_s3_client_params', function ( $params ) use ( $api_data ) {
 				$params['endpoint']                = $api_data->site->upload_endpoint;
 				$params['use_path_style_endpoint'] = true;
-				//$params['debug'] = [
-				//	'logfn'        => 'error_log',
-				//	'stream_size'  => 0,
-				//];
 				return $params;
 			} );
 		} else { //if we don't have cloud data we have to disable everything to avoid errors
