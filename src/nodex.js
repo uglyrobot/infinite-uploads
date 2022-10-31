@@ -150,21 +150,18 @@ function tusUpload(element){
 		    	const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2)	
 			    progressBar.style.width = `${percentage}%`
 			    file_name.innerHTML = `${upload.file.name}`
-			    console.log("progressBar", bytesUploaded, bytesTotal, `${percentage}%`)
+			    //console.log("progressBar", bytesUploaded, bytesTotal, `${percentage}%`)
 		    },
 		    onSuccess: function () { 
-		    	/*const anchor = document.createElement('a')
-		        anchor.textContent = `Download ${upload.file.name} (${upload.file.size} bytes)`
-		        anchor.href = upload.url
-		        anchor.className = 'btn btn-success'
-		        uploadList.appendChild(anchor)*/
-		        //encod_progress.innerHTML = 
-		        file_name.innerHTML = `${upload.file.name}`
-		        console.log("Download %s from %s", upload.file.name, upload.url)
+		      setInterval(() => {
+  					getbunnyVideo(json.guid);
+				}, 10000);
+		      file_name.innerHTML = `${upload.file.name}`
+		      console.log("Download %s from %s", upload.file.name, upload.url)
 		    }
 		})
 
-		//console.log("Upload", upload);
+			console.log("Upload", upload);
 
 		// Check if there are any previous uploads to continue.
 		upload.findPreviousUploads().then(function (previousUploads) {
@@ -175,23 +172,41 @@ function tusUpload(element){
 
 		    // Start the upload
 		    upload.start()
+		    uploadIsRunning = true
 		})
-
-		const url = 'https://video.bunnycdn.com/library/56793/videos/'+json.guid;
-		const options = {
-		  method: 'GET',
-		  headers: {
-		    accept: 'application/json',
-		    AccessKey: '293abf14-8359-4f92-ba6e2d1a291b-c2cd-4f92'
-		  }
-		};
-
-		fetch(url, options)
-		  .then(res => res.json())
-		  .then(json => console.log("EncodedProgress", json.encodeProgress)
-
-
-		)
 	})
 	.catch(err => console.error('error:' + err));
+}
+
+
+
+function getbunnyVideo(videoId){
+
+	const options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        AccessKey: '293abf14-8359-4f92-ba6e2d1a291b-c2cd-4f92'
+      },
+    };
+    
+    fetch(`https://video.bunnycdn.com/library/56793/videos/${videoId}`, options)
+      .then((response) => response.json())
+      .then((data) => {
+        //console.log("Video:", data);
+
+        //console.log(data.thumbnailFileName);
+
+        console.log(`https://vz-a8691a32-d3c.b-cdn.net/${videoID}/${data.thumbnailFileName}`);
+
+        if(data.status == 3){
+        	encod_progress.innerHTML = "Uploading &nbsp" +data.encodeProgress+'%';
+        }
+        if(data.status == 4){
+        	encod_progress.innerHTML = "Video" +data.encodeProgress+'% Processed...';
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 }

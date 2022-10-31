@@ -299,7 +299,7 @@ class Infinite_Uploads_Stream {
 			],
 			1.1678 //for unique menu position above Add New.
 		);*/
-		$page1 = add_media_page(
+		$page = add_media_page(
 			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Cloud Video Library', 'cloud-infinite-uploads' ),
 			$this->iup_instance->capability,
@@ -308,16 +308,12 @@ class Infinite_Uploads_Stream {
 				$this,
 				'cloud_video_library',
 			],
-			1.1678 //for unique menu position above Add New.
+			//1.1678 //for unique menu position above Add New.
 		);
 
-		/*add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
+		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
-		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );*/
-
-		add_action( 'admin_print_scripts-' . $page1, [ &$this, 'script_enqueue' ] ); //Bunny.Net
-		add_action( 'admin_print_scripts-' . $page1, [ &$this, 'admin_scripts' ] );
-		add_action( 'admin_print_styles-' . $page1, [ &$this, 'admin_styles' ] );
+		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
 	}
 
 	/**
@@ -331,9 +327,9 @@ class Infinite_Uploads_Stream {
 
 		wp_register_script( 'tus-js',  plugins_url('infinite-uploads/src/tus.js'),  null, null, true);
 
-		wp_register_script( 'jquery_js_query2',  plugins_url('infinite-uploads/src/crypto-js.min.js') );
+		/*wp_register_script( 'jquery_js_query2',  plugins_url('infinite-uploads/src/crypto-js.min.js') );*/
 		
-		wp_register_script( 'sha256-min-js', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/sha256.min.js', null, null, true );
+		/*wp_register_script( 'sha256-min-js', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/sha256.min.js', null, null, true );*/
 
 		wp_register_style( 'bootstrap_css', 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css', null, null, true);
 
@@ -432,8 +428,6 @@ class Infinite_Uploads_Stream {
 
 				
 				<div class="row justify-content-start d-flex">
-
-
 					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
@@ -446,7 +440,6 @@ class Infinite_Uploads_Stream {
 							</small>
 						</div>
 					</a>
-
 					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
 						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
 						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">

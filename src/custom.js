@@ -134,5 +134,4 @@ toggleBtn.addEventListener('click', (e) => {
     input.click()
   }
 })
-
 input.addEventListener('change', startUpload)
