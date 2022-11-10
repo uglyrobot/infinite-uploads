@@ -69,9 +69,6 @@ export default function Edit( { attributes, setAttributes } ) {
     return () => stopPollVideo();
   }, [] );
 
-
-  
-
   const startPollVideo = () => {
     console.log('Maybe skip start interval, existing:',intervalId)
     if (intervalId) {

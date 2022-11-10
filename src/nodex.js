@@ -3,6 +3,7 @@ const progressBar     = progress.querySelector('.bar')
 const uploadList      = document.querySelector('#upload-list')
 const file_name = document.querySelector('#file_name')
 const encod_progress = document.querySelector(".encod_progress")
+const video_encoding = document.querySelector(".processing_encode")
 
 var sha256 = function sha256(ascii) {
 	function rightRotate(value, amount) {
@@ -118,6 +119,8 @@ function tusUpload(element){
 		const library_id = "56793";
 		const api_key = "293abf14-8359-4f92-ba6e2d1a291b-c2cd-4f92";
 		const expiration_time = Math.floor(( Date.now() / 1000 ) + 3600 ).toString(); // 1 hour 
+		console.log("expire time", expiration_time);
+		return false;
 		fetch(url, options)
 		  .then(res => res.json())
 		  .then(json => {
@@ -134,7 +137,6 @@ function tusUpload(element){
 		        filetype: file.type,
 		        title: name,
 		    },
-
 		    onError: function (error) { 
 		    	if (error.originalRequest) {
 			        if (window.confirm(`Failed because: ${error}\nDo you want to retry?`)) {
@@ -147,21 +149,22 @@ function tusUpload(element){
 			      }
 		    },
 		    onProgress: function (bytesUploaded, bytesTotal) { 
+		    	//console.log("progressBar", bytesUploaded, bytesTotal, `${percentage}%`)
 		    	const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2)	
 			    progressBar.style.width = `${percentage}%`
 			    file_name.innerHTML = `${upload.file.name}`
-			    //console.log("progressBar", bytesUploaded, bytesTotal, `${percentage}%`)
 		    },
-		    onSuccess: function () { 
-		      setInterval(() => {
+		    onSuccess: function () { 		        
+		     const intervalId = setInterval(() => {
   					getbunnyVideo(json.guid);
 				}, 10000);
-		      file_name.innerHTML = `${upload.file.name}`
-		      console.log("Download %s from %s", upload.file.name, upload.url)
+		     		file_name.innerHTML = `${upload.file.name}`
+		        console.log("Download %s from %s", upload.file.name, upload.url)
+		        console.log("");
 		    }
 		})
 
-			console.log("Upload", upload);
+		console.log("Upload", upload);
 
 		// Check if there are any previous uploads to continue.
 		upload.findPreviousUploads().then(function (previousUploads) {
@@ -169,19 +172,14 @@ function tusUpload(element){
 		    if (previousUploads.length) {
 		        upload.resumeFromPreviousUpload(previousUploads[0])
 		    }
-
 		    // Start the upload
 		    upload.start()
-		    uploadIsRunning = true
 		})
 	})
 	.catch(err => console.error('error:' + err));
 }
 
-
-
 function getbunnyVideo(videoId){
-
 	const options = {
       method: 'GET',
       headers: {
@@ -189,21 +187,15 @@ function getbunnyVideo(videoId){
         AccessKey: '293abf14-8359-4f92-ba6e2d1a291b-c2cd-4f92'
       },
     };
-    
     fetch(`https://video.bunnycdn.com/library/56793/videos/${videoId}`, options)
       .then((response) => response.json())
       .then((data) => {
-        //console.log("Video:", data);
-
-        //console.log(data.thumbnailFileName);
-
-        console.log(`https://vz-a8691a32-d3c.b-cdn.net/${videoID}/${data.thumbnailFileName}`);
-
+        console.log("Video:", data);
         if(data.status == 3){
-        	encod_progress.innerHTML = "Uploading &nbsp" +data.encodeProgress+'%';
+        	encod_progress.innerHTML = "Uploading" +data.encodeProgress+'%';
         }
         if(data.status == 4){
-        	encod_progress.innerHTML = "Video" +data.encodeProgress+'% Processed...';
+        	// encod_progress.innerHTML = "Processing" +data.encodeProgress+'%';
         }
       })
       .catch((error) => {
