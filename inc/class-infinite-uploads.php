@@ -97,7 +97,7 @@ class Infinite_Uploads {
 
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
-		if ( $api_data && isset( $api_data->site ) && isset( $api_data->site->upload_key ) ) {
+		if ( $api_data && isset( $api_data->site ) && ! empty( $api_data->site->upload_key ) && ! empty( $api_data->site->upload_secret ) ) {
 			$this->bucket     = $api_data->site->upload_bucket;
 			$this->key        = $api_data->site->upload_key;
 			$this->secret     = $api_data->site->upload_secret;
@@ -114,11 +114,13 @@ class Infinite_Uploads {
 				return $params;
 			} );
 		} else { //if we don't have cloud data we have to disable everything to avoid errors
-			//turn of enabled flag
+			//turn off enabled flag
 			if ( infinite_uploads_enabled() ) {
 				$this->toggle_cloud( false );
 			}
 		}
+
+		add_filter( 'infinite_uploads_sync_exclusions', [ $this, 'compatibility_exclusions' ] );
 
 		// don't register all this until we've enabled rewriting.
 		if ( ! infinite_uploads_enabled() ) {
@@ -923,6 +925,16 @@ class Infinite_Uploads {
 
 		//Handle WooCommerce CSV imports
 		add_filter( 'woocommerce_product_csv_importer_check_import_file_path', '__return_false' );
+
+		//BuddyPress/BuddyBoss
+		$original = $this->get_original_upload_dir();
+		if ( ! defined( 'BP_AVATAR_UPLOAD_PATH' ) ) {
+			define( 'BP_AVATAR_UPLOAD_PATH', $original['basedir'] );
+		}
+		if ( ! defined( 'BP_AVATAR_URL' ) ) {
+			define( 'BP_AVATAR_URL', $original['baseurl'] );
+		}
+		add_filter( 'bp_attachments_uploads_dir_get', [ $this, 'bp_attachments_uploads_dir_get' ], 10, 2 );
 	}
 
 	/**
@@ -934,5 +946,65 @@ class Infinite_Uploads {
 			'path' => WP_CONTENT_DIR . '/wp-migrate-db', // note missing end trailing slash
 			'url'  => WP_CONTENT_URL . '/wp-migrate-db' // note missing end trailing slash
 		);
+	}
+
+	/**
+	 * Filter BuddyPress uploads dir
+	 */
+	function bp_attachments_uploads_dir_get( $retval, $data ) {
+
+		$attachments_dir = 'buddypress';
+
+		if ( 'dir' === $data ) {
+			$retval = $attachments_dir;
+		} else {
+			$upload_data = $this->get_original_upload_dir_root();
+
+			// Return empty string, if Uploads data are not available.
+			if ( ! $upload_data ) {
+				return $retval;
+			}
+
+			// Build the Upload data array for BuddyPress attachments.
+			foreach ( $upload_data as $key => $value ) {
+				if ( 'basedir' === $key || 'baseurl' === $key ) {
+					$upload_data[ $key ] = trailingslashit( $value ) . $attachments_dir;
+
+					// Fix for HTTPS.
+					if ( 'baseurl' === $key && is_ssl() ) {
+						$upload_data[ $key ] = str_replace( 'http://', 'https://', $upload_data[ $key ] );
+					}
+				} else {
+					unset( $upload_data[ $key ] );
+				}
+			}
+
+			// Add the dir to the array.
+			$upload_data['dir'] = $attachments_dir;
+
+			if ( empty( $data ) ) {
+				$retval = $upload_data;
+			} elseif ( isset( $upload_data[ $data ] ) ) {
+				$retval = $upload_data[ $data ];
+			}
+		}
+
+		return $retval;
+	}
+
+	/**
+	 * Exclude specific dirs for various plugins
+	 */
+	function compatibility_exclusions( $exclusions ) {
+
+		//BuddyPress
+		if ( function_exists( 'bp_is_active' ) ) {
+			$exclusions[] = '/avatars/';
+			$exclusions[] = '/group-avatars/';
+			$exclusions[] = '/blog-avatars/';
+			$exclusions[] = '/buddypress/';
+		}
+
+		return $exclusions;
 	}
 }

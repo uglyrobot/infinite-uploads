@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Infinite Uploads
+# Copyright (C) 2022 Infinite Uploads
 # This file is distributed under the same license as the Infinite Uploads package.
 msgid ""
 msgstr ""
@@ -13,610 +13,616 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: infinite-uploads.php:144, build/infinite-uploads/infinite-uploads.php:144
+#: infinite-uploads.php:144, build/infinite-uploads/infinite-uploads.php:144, build/infinite-uploads 2/infinite-uploads.php:144
 msgid "The Infinite Uploads plugin requires PHP version 5.5.0 or higher. Your server is running PHP version %s."
 msgstr ""
 
-#: infinite-uploads.php:158, build/infinite-uploads/infinite-uploads.php:158
+#: infinite-uploads.php:158, build/infinite-uploads/infinite-uploads.php:158, build/infinite-uploads 2/infinite-uploads.php:158
 msgid "The Infinite Uploads plugin requires WordPress version 5.3 or higher. Your server is running WordPress version %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:73, build/infinite-uploads/inc/class-infinite-uploads-admin.php:71
+#: inc/class-infinite-uploads-admin.php:72, build/infinite-uploads/inc/class-infinite-uploads-admin.php:71, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:72
 msgid "When you upload files on this site, your files are transferred to and stored in the Infinite Uploads cloud. When you visit pages on this site media files may be downloaded from the Infinite Uploads cloud CDN which stores web log information including IP, User Agent, referrer, Location, and ISP info of site visitors for 7 days. The Infinite Uploads privacy policy is %1$s here %2$s."
 msgstr ""
 
 #. translators: %s: Plugin name.
-#: inc/class-infinite-uploads-admin.php:76, inc/class-infinite-uploads-admin.php:714, inc/class-infinite-uploads-admin.php:776, inc/class-infinite-uploads-admin.php:777, inc/class-infinite-uploads-admin.php:765, inc/class-infinite-uploads-admin.php:766, build/infinite-uploads/inc/class-infinite-uploads-admin.php:74, build/infinite-uploads/inc/class-infinite-uploads-admin.php:762, build/infinite-uploads/inc/class-infinite-uploads-admin.php:763, build/infinite-uploads/inc/class-infinite-uploads-admin.php:751, build/infinite-uploads/inc/class-infinite-uploads-admin.php:752
+#. translators: %s: Plugin name.
+#: inc/class-infinite-uploads-admin.php:75, inc/class-infinite-uploads-admin.php:713, inc/class-infinite-uploads-admin.php:775, inc/class-infinite-uploads-admin.php:776, inc/class-infinite-uploads-admin.php:764, inc/class-infinite-uploads-admin.php:765, build/infinite-uploads/inc/class-infinite-uploads-admin.php:74, build/infinite-uploads/inc/class-infinite-uploads-admin.php:762, build/infinite-uploads/inc/class-infinite-uploads-admin.php:763, build/infinite-uploads/inc/class-infinite-uploads-admin.php:751, build/infinite-uploads/inc/class-infinite-uploads-admin.php:752, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:75, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:713, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:775, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:776, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:764, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:765
 msgid "Infinite Uploads"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:98, inc/class-infinite-uploads-admin.php:109, inc/class-infinite-uploads-admin.php:125, inc/class-infinite-uploads-admin.php:139, inc/class-infinite-uploads-admin.php:208, inc/class-infinite-uploads-admin.php:302, inc/class-infinite-uploads-admin.php:548, inc/class-infinite-uploads-admin.php:575, inc/class-infinite-uploads-admin.php:666, inc/class-infinite-uploads-admin.php:855, build/infinite-uploads/inc/class-infinite-uploads-admin.php:96, build/infinite-uploads/inc/class-infinite-uploads-admin.php:107, build/infinite-uploads/inc/class-infinite-uploads-admin.php:123, build/infinite-uploads/inc/class-infinite-uploads-admin.php:137, build/infinite-uploads/inc/class-infinite-uploads-admin.php:206, build/infinite-uploads/inc/class-infinite-uploads-admin.php:300, build/infinite-uploads/inc/class-infinite-uploads-admin.php:546, build/infinite-uploads/inc/class-infinite-uploads-admin.php:573, build/infinite-uploads/inc/class-infinite-uploads-admin.php:664, build/infinite-uploads/inc/class-infinite-uploads-admin.php:829
+#: inc/class-infinite-uploads-admin.php:97, inc/class-infinite-uploads-admin.php:108, inc/class-infinite-uploads-admin.php:124, inc/class-infinite-uploads-admin.php:138, inc/class-infinite-uploads-admin.php:207, inc/class-infinite-uploads-admin.php:301, inc/class-infinite-uploads-admin.php:547, inc/class-infinite-uploads-admin.php:574, inc/class-infinite-uploads-admin.php:665, inc/class-infinite-uploads-admin.php:854, build/infinite-uploads/inc/class-infinite-uploads-admin.php:96, build/infinite-uploads/inc/class-infinite-uploads-admin.php:107, build/infinite-uploads/inc/class-infinite-uploads-admin.php:123, build/infinite-uploads/inc/class-infinite-uploads-admin.php:137, build/infinite-uploads/inc/class-infinite-uploads-admin.php:206, build/infinite-uploads/inc/class-infinite-uploads-admin.php:300, build/infinite-uploads/inc/class-infinite-uploads-admin.php:546, build/infinite-uploads/inc/class-infinite-uploads-admin.php:573, build/infinite-uploads/inc/class-infinite-uploads-admin.php:664, build/infinite-uploads/inc/class-infinite-uploads-admin.php:829, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:97, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:108, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:124, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:138, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:207, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:301, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:547, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:574, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:665, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:854
 msgid "Permissions Error: Please refresh the page and try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:509, inc/class-infinite-uploads-admin.php:518, inc/class-infinite-uploads-admin.php:422, build/infinite-uploads/inc/class-infinite-uploads-admin.php:507, build/infinite-uploads/inc/class-infinite-uploads-admin.php:516, build/infinite-uploads/inc/class-infinite-uploads-admin.php:420
+#: inc/class-infinite-uploads-admin.php:508, inc/class-infinite-uploads-admin.php:517, inc/class-infinite-uploads-admin.php:421, build/infinite-uploads/inc/class-infinite-uploads-admin.php:507, build/infinite-uploads/inc/class-infinite-uploads-admin.php:516, build/infinite-uploads/inc/class-infinite-uploads-admin.php:420, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:508, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:517, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:421
 msgid "Error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:507, inc/class-infinite-uploads-admin.php:516, inc/class-infinite-uploads-admin.php:420, inc/class-infinite-uploads-wp-cli-command.php:298, build/infinite-uploads/inc/class-infinite-uploads-admin.php:505, build/infinite-uploads/inc/class-infinite-uploads-admin.php:514, build/infinite-uploads/inc/class-infinite-uploads-admin.php:418, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:298
+#: inc/class-infinite-uploads-admin.php:506, inc/class-infinite-uploads-admin.php:515, inc/class-infinite-uploads-admin.php:419, inc/class-infinite-uploads-wp-cli-command.php:298, build/infinite-uploads/inc/class-infinite-uploads-admin.php:505, build/infinite-uploads/inc/class-infinite-uploads-admin.php:514, build/infinite-uploads/inc/class-infinite-uploads-admin.php:418, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:298, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:506, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:515, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:419, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:298
 msgid "Error uploading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:425, build/infinite-uploads/inc/class-infinite-uploads-admin.php:423
+#: inc/class-infinite-uploads-admin.php:424, build/infinite-uploads/inc/class-infinite-uploads-admin.php:423, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:424
 msgid "Error uploading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:639, build/infinite-uploads/inc/class-infinite-uploads-admin.php:637
+#: inc/class-infinite-uploads-admin.php:638, build/infinite-uploads/inc/class-infinite-uploads-admin.php:637, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:638
 msgid "Error downloading file. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:636, inc/class-infinite-uploads-wp-cli-command.php:546, build/infinite-uploads/inc/class-infinite-uploads-admin.php:634, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:546
+#: inc/class-infinite-uploads-admin.php:635, inc/class-infinite-uploads-wp-cli-command.php:556, build/infinite-uploads/inc/class-infinite-uploads-admin.php:634, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:546, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:635, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:546
 msgid "Error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:634, inc/class-infinite-uploads-wp-cli-command.php:544, build/infinite-uploads/inc/class-infinite-uploads-admin.php:632, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:544
+#: inc/class-infinite-uploads-admin.php:633, inc/class-infinite-uploads-wp-cli-command.php:554, build/infinite-uploads/inc/class-infinite-uploads-admin.php:632, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:544, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:633, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:544
 msgid "Error downloading %s. Retries exceeded."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:703, inc/class-infinite-uploads.php:407, inc/templates/connect.php:49, build/infinite-uploads/inc/class-infinite-uploads-admin.php:701, build/infinite-uploads/inc/class-infinite-uploads.php:407, build/infinite-uploads/inc/templates/connect.php:49
+#: inc/class-infinite-uploads-admin.php:702, inc/class-infinite-uploads.php:415, inc/templates/connect.php:50, build/infinite-uploads/inc/class-infinite-uploads-admin.php:701, build/infinite-uploads/inc/class-infinite-uploads.php:407, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:702, build/infinite-uploads 2/inc/class-infinite-uploads.php:410, build/infinite-uploads/inc/templates/connect.php:49, build/infinite-uploads 2/inc/templates/connect.php:50
 msgid "Connect"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:701, build/infinite-uploads/inc/class-infinite-uploads-admin.php:699
+#: inc/class-infinite-uploads-admin.php:700, build/infinite-uploads/inc/class-infinite-uploads-admin.php:699, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:700
 msgid "Settings"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:705, inc/templates/footer.php:9, build/infinite-uploads/inc/class-infinite-uploads-admin.php:703, build/infinite-uploads/inc/templates/footer.php:9
+#: inc/class-infinite-uploads-admin.php:704, inc/templates/footer.php:9, build/infinite-uploads/inc/class-infinite-uploads-admin.php:703, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:704, build/infinite-uploads/inc/templates/footer.php:9, build/infinite-uploads 2/inc/templates/footer.php:9
 msgid "Support"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:801, build/infinite-uploads/inc/class-infinite-uploads-admin.php:787
+#: inc/class-infinite-uploads-admin.php:800, build/infinite-uploads/inc/class-infinite-uploads-admin.php:787, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:800
 msgid "Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:802, build/infinite-uploads/inc/class-infinite-uploads-admin.php:788
+#: inc/class-infinite-uploads-admin.php:801, build/infinite-uploads/inc/class-infinite-uploads-admin.php:788, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:801
 msgid "Too many server errors. Please try again."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:803, build/infinite-uploads/inc/class-infinite-uploads-admin.php:789
+#: inc/class-infinite-uploads-admin.php:802, build/infinite-uploads/inc/class-infinite-uploads-admin.php:789, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:802
 msgid "If you leave this page the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:890, build/infinite-uploads/inc/class-infinite-uploads-admin.php:864
+#: inc/class-infinite-uploads-admin.php:889, build/infinite-uploads/inc/class-infinite-uploads-admin.php:864, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:889
 msgid "United States"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:891, build/infinite-uploads/inc/class-infinite-uploads-admin.php:865
+#: inc/class-infinite-uploads-admin.php:890, build/infinite-uploads/inc/class-infinite-uploads-admin.php:865, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:890
 msgid "Europe"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:920, build/infinite-uploads/inc/class-infinite-uploads-admin.php:894
+#: inc/class-infinite-uploads-admin.php:919, build/infinite-uploads/inc/class-infinite-uploads-admin.php:894, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:919
 msgid "Files can't be uploaded and your CDN will be disabled soon due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:916, build/infinite-uploads/inc/class-infinite-uploads-admin.php:890
+#: inc/class-infinite-uploads-admin.php:915, build/infinite-uploads/inc/class-infinite-uploads-admin.php:890, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:915
 msgid "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. Please <a href='%s' class='alert-link'>visit your account page</a> to fix, or disconnect this site from the cloud. Images and links to media on your site may be broken until you take action. <a href='%s' class='alert-link' data-toggle='tooltip' title='Refresh account data'>Already fixed?</a>"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:926
+#: inc/class-infinite-uploads-admin.php:927, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:927
 msgid "There is uploaded media from your site that may only exist in the Infinite Uploads cloud. <strong>You MUST download your media files before deactivating this plugin to prevent data loss!</strong>"
 msgstr ""
 
-#: inc/class-infinite-uploads-admin.php:927, inc/templates/modal-download.php:5, inc/templates/settings.php:109, build/infinite-uploads/inc/templates/modal-download.php:5
+#: inc/class-infinite-uploads-admin.php:930, inc/templates/modal-download.php:5, inc/templates/settings.php:109, build/infinite-uploads 2/inc/class-infinite-uploads-admin.php:930, build/infinite-uploads/inc/templates/modal-download.php:5, build/infinite-uploads 2/inc/templates/modal-download.php:5, build/infinite-uploads 2/inc/templates/settings.php:109
 msgid "Download & Disconnect"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:218, inc/class-infinite-uploads-wp-cli-command.php:426, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:218, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:426
+#: inc/class-infinite-uploads-wp-cli-command.php:214, inc/class-infinite-uploads-wp-cli-command.php:436, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:218, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:426, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:218, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:426
 msgid "%s files (%s) remaining to be synced."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:226, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:226
+#: inc/class-infinite-uploads-wp-cli-command.php:226, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:226, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:226
 msgid "Copying to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:278, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:278
+#: inc/class-infinite-uploads-wp-cli-command.php:278, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:278, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:278
 msgid "%s - Synced %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:305, inc/class-infinite-uploads-wp-cli-command.php:300, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:305, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:300
+#: inc/class-infinite-uploads-wp-cli-command.php:307, inc/class-infinite-uploads-wp-cli-command.php:305
+msgid "There was an error during upload: %s. Queued for retry."
+msgstr ""
+
+#: inc/class-infinite-uploads-wp-cli-command.php:300, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:305, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:300, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:305, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:300
 msgid "%s error uploading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:321, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:321
+#: inc/class-infinite-uploads-wp-cli-command.php:323, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:321, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:321
 msgid "Unable to upload %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:323, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:323
+#: inc/class-infinite-uploads-wp-cli-command.php:325, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:323, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:323
 msgid "Sync complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:335, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:335
+#: inc/class-infinite-uploads-wp-cli-command.php:336, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:335, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:335
 msgid "Scanning local filesystem..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:340, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:340
+#: inc/class-infinite-uploads-wp-cli-command.php:341, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:340, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:340
 msgid "%s files (%s) found in uploads."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:342, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:342
+#: inc/class-infinite-uploads-wp-cli-command.php:350, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:342, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:342
 msgid "Comparing to the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:434, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:434
+#: inc/class-infinite-uploads-wp-cli-command.php:444, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:434, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:434
 msgid "Deleting local copies of synced files..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:447, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:447
+#: inc/class-infinite-uploads-wp-cli-command.php:457, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:447, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:447
 msgid "Could not delete %s."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:442, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:442
+#: inc/class-infinite-uploads-wp-cli-command.php:452, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:442, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:442
 msgid "%s - Deleted %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:454, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:454
+#: inc/class-infinite-uploads-wp-cli-command.php:464, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:454, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:454
 msgid "Delete complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:480, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:480
+#: inc/class-infinite-uploads-wp-cli-command.php:490, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:480, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:480
 msgid "%s files (%s) remaining to be downloaded."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:489, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:489
+#: inc/class-infinite-uploads-wp-cli-command.php:499, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:489, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:489
 msgid "Downloading from the cloud..."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:524, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:524
+#: inc/class-infinite-uploads-wp-cli-command.php:534, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:524, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:524
 msgid "%s - Downloaded %s of %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:550, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:550
+#: inc/class-infinite-uploads-wp-cli-command.php:560, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:550, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:550
 msgid "%s error downloading %s. Queued for retry."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:565, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:565
+#: inc/class-infinite-uploads-wp-cli-command.php:575, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:565, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:565
 msgid "Unable to download %s files."
 msgstr ""
 
-#: inc/class-infinite-uploads-wp-cli-command.php:567, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:567
+#: inc/class-infinite-uploads-wp-cli-command.php:577, build/infinite-uploads/inc/class-infinite-uploads-wp-cli-command.php:567, build/infinite-uploads 2/inc/class-infinite-uploads-wp-cli-command.php:567
 msgid "Download complete!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:397, build/infinite-uploads/inc/class-infinite-uploads.php:397
+#: inc/class-infinite-uploads.php:405, build/infinite-uploads/inc/class-infinite-uploads.php:397, build/infinite-uploads 2/inc/class-infinite-uploads.php:400
 msgid "Infinite Uploads is almost ready!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:402, build/infinite-uploads/inc/class-infinite-uploads.php:402
+#: inc/class-infinite-uploads.php:410, build/infinite-uploads/inc/class-infinite-uploads.php:402, build/infinite-uploads 2/inc/class-infinite-uploads.php:405
 msgid "Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:400, build/infinite-uploads/inc/class-infinite-uploads.php:400
+#: inc/class-infinite-uploads.php:408, build/infinite-uploads/inc/class-infinite-uploads.php:400, build/infinite-uploads 2/inc/class-infinite-uploads.php:403
 msgid "Finish syncing your images, audio, video, and documents to the cloud to enable."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:407, build/infinite-uploads/inc/class-infinite-uploads.php:407
+#: inc/class-infinite-uploads.php:415, build/infinite-uploads/inc/class-infinite-uploads.php:407, build/infinite-uploads 2/inc/class-infinite-uploads.php:410
 msgid "Finish Sync"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:482, build/infinite-uploads/inc/class-infinite-uploads.php:482
+#: inc/class-infinite-uploads.php:489, build/infinite-uploads/inc/class-infinite-uploads.php:482, build/infinite-uploads 2/inc/class-infinite-uploads.php:484
 msgid "%s file totalling %s"
 msgid_plural "%s files totalling %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:487, build/infinite-uploads/inc/class-infinite-uploads.php:487
+#: inc/class-infinite-uploads.php:494, build/infinite-uploads/inc/class-infinite-uploads.php:487, build/infinite-uploads 2/inc/class-infinite-uploads.php:489
 msgid "%s / %s File"
 msgid_plural "%s / %s Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/class-infinite-uploads.php:497, build/infinite-uploads/inc/class-infinite-uploads.php:497
+#: inc/class-infinite-uploads.php:504, build/infinite-uploads/inc/class-infinite-uploads.php:497, build/infinite-uploads 2/inc/class-infinite-uploads.php:499
 msgid "Images"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:498, build/infinite-uploads/inc/class-infinite-uploads.php:498
+#: inc/class-infinite-uploads.php:505, build/infinite-uploads/inc/class-infinite-uploads.php:498, build/infinite-uploads 2/inc/class-infinite-uploads.php:500
 msgid "Audio"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:499, build/infinite-uploads/inc/class-infinite-uploads.php:499
+#: inc/class-infinite-uploads.php:506, build/infinite-uploads/inc/class-infinite-uploads.php:499, build/infinite-uploads 2/inc/class-infinite-uploads.php:501
 msgid "Video"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:500, build/infinite-uploads/inc/class-infinite-uploads.php:500
+#: inc/class-infinite-uploads.php:507, build/infinite-uploads/inc/class-infinite-uploads.php:500, build/infinite-uploads 2/inc/class-infinite-uploads.php:502
 msgid "Documents"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:501, build/infinite-uploads/inc/class-infinite-uploads.php:501
+#: inc/class-infinite-uploads.php:508, build/infinite-uploads/inc/class-infinite-uploads.php:501, build/infinite-uploads 2/inc/class-infinite-uploads.php:503
 msgid "Archives"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:502, build/infinite-uploads/inc/class-infinite-uploads.php:502
+#: inc/class-infinite-uploads.php:509, build/infinite-uploads/inc/class-infinite-uploads.php:502, build/infinite-uploads 2/inc/class-infinite-uploads.php:504
 msgid "Code"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:503, build/infinite-uploads/inc/class-infinite-uploads.php:503
+#: inc/class-infinite-uploads.php:510, build/infinite-uploads/inc/class-infinite-uploads.php:503, build/infinite-uploads 2/inc/class-infinite-uploads.php:505
 msgid "Other"
 msgstr ""
 
-#: inc/class-infinite-uploads.php:695, inc/class-infinite-uploads.php:725, inc/class-infinite-uploads.php:744, build/infinite-uploads/inc/class-infinite-uploads.php:695, build/infinite-uploads/inc/class-infinite-uploads.php:725, build/infinite-uploads/inc/class-infinite-uploads.php:744
+#: inc/class-infinite-uploads.php:702, inc/class-infinite-uploads.php:732, inc/class-infinite-uploads.php:751, build/infinite-uploads/inc/class-infinite-uploads.php:695, build/infinite-uploads/inc/class-infinite-uploads.php:725, build/infinite-uploads/inc/class-infinite-uploads.php:744, build/infinite-uploads 2/inc/class-infinite-uploads.php:697, build/infinite-uploads 2/inc/class-infinite-uploads.php:727, build/infinite-uploads 2/inc/class-infinite-uploads.php:746
 msgid "Files can't be uploaded due to a billing issue with your Infinite Uploads account."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:692, build/infinite-uploads/inc/class-infinite-uploads.php:692
+#: inc/class-infinite-uploads.php:699, build/infinite-uploads/inc/class-infinite-uploads.php:692, build/infinite-uploads 2/inc/class-infinite-uploads.php:694
 msgid "Files can't be uploaded due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading."
 msgstr ""
 
-#: inc/class-infinite-uploads.php:712, build/infinite-uploads/inc/class-infinite-uploads.php:712
+#: inc/class-infinite-uploads.php:719, build/infinite-uploads/inc/class-infinite-uploads.php:712, build/infinite-uploads 2/inc/class-infinite-uploads.php:714
 msgid "Files can't be uploaded and your CDN is disabled due to a billing issue with your Infinite Uploads account. <a href='%s'>Please resolve the issue</a> to resume uploading. <a href='%s'>Already fixed?</a>"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:4, build/infinite-uploads/inc/templates/cloud-overview.php:4
+#: inc/templates/cloud-overview.php:4, build/infinite-uploads/inc/templates/cloud-overview.php:4, build/infinite-uploads 2/inc/templates/cloud-overview.php:4
 msgid "Cloud Storage Overview"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:11, build/infinite-uploads/inc/templates/cloud-overview.php:11
+#: inc/templates/cloud-overview.php:11, build/infinite-uploads/inc/templates/cloud-overview.php:11, build/infinite-uploads 2/inc/templates/cloud-overview.php:11
 msgid "This Site's Cloud Bytes / Files"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:22, inc/templates/settings.php:40, build/infinite-uploads/inc/templates/cloud-overview.php:11, build/infinite-uploads/inc/templates/settings.php:22, build/infinite-uploads/inc/templates/settings.php:40
+#: inc/templates/cloud-overview.php:11, inc/templates/settings.php:22, inc/templates/settings.php:40, build/infinite-uploads/inc/templates/cloud-overview.php:11, build/infinite-uploads/inc/templates/settings.php:22, build/infinite-uploads/inc/templates/settings.php:40, build/infinite-uploads 2/inc/templates/cloud-overview.php:11, build/infinite-uploads 2/inc/templates/settings.php:22, build/infinite-uploads 2/inc/templates/settings.php:40
 msgid "Recalculated every 24 hours"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:27, inc/templates/settings.php:28, inc/templates/settings.php:44, build/infinite-uploads/inc/templates/cloud-overview.php:25, build/infinite-uploads/inc/templates/settings.php:27, build/infinite-uploads/inc/templates/settings.php:28, build/infinite-uploads/inc/templates/settings.php:44
+#: inc/templates/cloud-overview.php:25, inc/templates/settings.php:27, inc/templates/settings.php:28, inc/templates/settings.php:44, build/infinite-uploads/inc/templates/cloud-overview.php:25, build/infinite-uploads/inc/templates/settings.php:27, build/infinite-uploads/inc/templates/settings.php:28, build/infinite-uploads/inc/templates/settings.php:44, build/infinite-uploads 2/inc/templates/cloud-overview.php:25, build/infinite-uploads 2/inc/templates/settings.php:27, build/infinite-uploads 2/inc/templates/settings.php:28, build/infinite-uploads 2/inc/templates/settings.php:44
 msgid "%s / %s"
 msgstr ""
 
-#: inc/templates/cloud-overview.php:31, build/infinite-uploads/inc/templates/cloud-overview.php:31
+#: inc/templates/cloud-overview.php:31, build/infinite-uploads/inc/templates/cloud-overview.php:31, build/infinite-uploads 2/inc/templates/cloud-overview.php:31
 msgid "Visit the Infinite Uploads site to view, manage, or change your plan."
 msgstr ""
 
-#: inc/templates/cloud-overview.php:32, inc/templates/sync.php:42, build/infinite-uploads/inc/templates/cloud-overview.php:32, build/infinite-uploads/inc/templates/sync.php:42
+#: inc/templates/cloud-overview.php:32, inc/templates/sync.php:42, build/infinite-uploads/inc/templates/cloud-overview.php:32, build/infinite-uploads/inc/templates/sync.php:42, build/infinite-uploads 2/inc/templates/cloud-overview.php:32, build/infinite-uploads 2/inc/templates/sync.php:42
 msgid "Account Management"
 msgstr ""
 
-#: inc/templates/connect.php:4, build/infinite-uploads/inc/templates/connect.php:4
+#: inc/templates/connect.php:4, build/infinite-uploads/inc/templates/connect.php:4, build/infinite-uploads 2/inc/templates/connect.php:4
 msgid "Local File Overview"
 msgstr ""
 
-#: inc/templates/connect.php:11, build/infinite-uploads/inc/templates/connect.php:11
+#: inc/templates/connect.php:11, build/infinite-uploads/inc/templates/connect.php:11, build/infinite-uploads 2/inc/templates/connect.php:11
 msgid "Total Bytes / Files"
 msgstr ""
 
-#: inc/templates/connect.php:23, inc/templates/sync.php:23, build/infinite-uploads/inc/templates/connect.php:23, build/infinite-uploads/inc/templates/sync.php:23
+#: inc/templates/connect.php:23, inc/templates/sync.php:23, build/infinite-uploads/inc/templates/connect.php:23, build/infinite-uploads/inc/templates/sync.php:23, build/infinite-uploads 2/inc/templates/connect.php:23, build/infinite-uploads 2/inc/templates/sync.php:23
 msgid "Scanned %s ago"
 msgstr ""
 
-#: inc/templates/connect.php:25, inc/templates/sync.php:25, build/infinite-uploads/inc/templates/connect.php:25, build/infinite-uploads/inc/templates/sync.php:25
+#: inc/templates/connect.php:25, inc/templates/sync.php:25, build/infinite-uploads/inc/templates/connect.php:25, build/infinite-uploads/inc/templates/sync.php:25, build/infinite-uploads 2/inc/templates/connect.php:25, build/infinite-uploads 2/inc/templates/sync.php:25
 msgid "Run a new scan to detect and sync recently uploaded files."
 msgstr ""
 
-#: inc/templates/connect.php:25, inc/templates/sync.php:25, build/infinite-uploads/inc/templates/connect.php:25, build/infinite-uploads/inc/templates/sync.php:25
+#: inc/templates/connect.php:25, inc/templates/sync.php:25, build/infinite-uploads/inc/templates/connect.php:25, build/infinite-uploads/inc/templates/sync.php:25, build/infinite-uploads 2/inc/templates/connect.php:25, build/infinite-uploads 2/inc/templates/sync.php:25
 msgid "Refresh"
 msgstr ""
 
-#: inc/templates/connect.php:36, build/infinite-uploads/inc/templates/connect.php:36
+#: inc/templates/connect.php:36, build/infinite-uploads/inc/templates/connect.php:36, build/infinite-uploads 2/inc/templates/connect.php:36
 msgid "Ready to Connect!"
 msgstr ""
 
-#: inc/templates/connect.php:37, build/infinite-uploads/inc/templates/connect.php:37
+#: inc/templates/connect.php:37, build/infinite-uploads/inc/templates/connect.php:37, build/infinite-uploads 2/inc/templates/connect.php:37
 msgid "Get smart plan recommendations, create or connect to existing account, and sync to the cloud."
 msgstr ""
 
-#: inc/templates/footer.php:4, build/infinite-uploads/inc/templates/footer.php:4
+#: inc/templates/footer.php:4, build/infinite-uploads/inc/templates/footer.php:4, build/infinite-uploads 2/inc/templates/footer.php:4
 msgid "The Cloud by Infinite Uploads"
 msgstr ""
 
-#: inc/templates/footer.php:10, build/infinite-uploads/inc/templates/footer.php:10
+#: inc/templates/footer.php:10, build/infinite-uploads/inc/templates/footer.php:10, build/infinite-uploads 2/inc/templates/footer.php:10
 msgid "Terms of Service"
 msgstr ""
 
-#: inc/templates/footer.php:11, build/infinite-uploads/inc/templates/footer.php:11
+#: inc/templates/footer.php:11, build/infinite-uploads/inc/templates/footer.php:11, build/infinite-uploads 2/inc/templates/footer.php:11
 msgid "Privacy Policy"
 msgstr ""
 
-#: inc/templates/footer.php:16, build/infinite-uploads/inc/templates/footer.php:16
+#: inc/templates/footer.php:16, build/infinite-uploads/inc/templates/footer.php:16, build/infinite-uploads 2/inc/templates/footer.php:16
 msgid "Twitter"
 msgstr ""
 
-#: inc/templates/footer.php:17, build/infinite-uploads/inc/templates/footer.php:17
+#: inc/templates/footer.php:17, build/infinite-uploads/inc/templates/footer.php:17, build/infinite-uploads 2/inc/templates/footer.php:17
 msgid "Facebook"
 msgstr ""
 
-#: inc/templates/install-error.php:5, build/infinite-uploads/inc/templates/install-error.php:5
+#: inc/templates/install-error.php:5, build/infinite-uploads/inc/templates/install-error.php:5, build/infinite-uploads 2/inc/templates/install-error.php:5
 msgid "Installation Error"
 msgstr ""
 
-#: inc/templates/install-error.php:6, build/infinite-uploads/inc/templates/install-error.php:6
+#: inc/templates/install-error.php:6, build/infinite-uploads/inc/templates/install-error.php:6, build/infinite-uploads 2/inc/templates/install-error.php:6
 msgid "We are so sorry, there appears to have been a problem installing the needed tables for the Infinite Uploads plugin. We want to get this working for you so please contact us and we will help you out!"
 msgstr ""
 
-#: inc/templates/install-error.php:11, build/infinite-uploads/inc/templates/install-error.php:11
+#: inc/templates/install-error.php:11, build/infinite-uploads/inc/templates/install-error.php:11, build/infinite-uploads 2/inc/templates/install-error.php:11
 msgid "Contact Support"
 msgstr ""
 
-#: inc/templates/modal-delete.php:5, inc/templates/settings.php:87, build/infinite-uploads/inc/templates/modal-delete.php:5, build/infinite-uploads/inc/templates/settings.php:87
+#: inc/templates/modal-delete.php:5, inc/templates/settings.php:87, build/infinite-uploads/inc/templates/modal-delete.php:5, build/infinite-uploads/inc/templates/settings.php:87, build/infinite-uploads 2/inc/templates/modal-delete.php:5, build/infinite-uploads 2/inc/templates/settings.php:87
 msgid "Free Up Local Storage"
 msgstr ""
 
-#: inc/templates/modal-delete.php:14, build/infinite-uploads/inc/templates/modal-delete.php:14
+#: inc/templates/modal-delete.php:14, build/infinite-uploads/inc/templates/modal-delete.php:14, build/infinite-uploads 2/inc/templates/modal-delete.php:14
 msgid "Delete Local Files"
 msgstr ""
 
-#: inc/templates/modal-delete.php:15, build/infinite-uploads/inc/templates/modal-delete.php:15
+#: inc/templates/modal-delete.php:15, build/infinite-uploads/inc/templates/modal-delete.php:15, build/infinite-uploads 2/inc/templates/modal-delete.php:15
 msgid "This will delete the duplicate copies of your files stored in your local media library. This saves space and improves server performance but will require downloading these files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/modal-delete.php:16, build/infinite-uploads/inc/templates/modal-delete.php:16
+#: inc/templates/modal-delete.php:16, build/infinite-uploads/inc/templates/modal-delete.php:16, build/infinite-uploads 2/inc/templates/modal-delete.php:16
 msgid "If your host provides access to WP CLI, you can also execute the command:"
 msgstr ""
 
-#: inc/templates/modal-delete.php:24, build/infinite-uploads/inc/templates/modal-delete.php:24
+#: inc/templates/modal-delete.php:24, build/infinite-uploads/inc/templates/modal-delete.php:24, build/infinite-uploads 2/inc/templates/modal-delete.php:24
 msgid "<span id=\"iup-delete-size\">%s</span> / <span id=\"iup-delete-files\">%s</span> Deletable Files"
 msgstr ""
 
-#: inc/templates/modal-delete.php:29, build/infinite-uploads/inc/templates/modal-delete.php:29
+#: inc/templates/modal-delete.php:29, build/infinite-uploads/inc/templates/modal-delete.php:29, build/infinite-uploads 2/inc/templates/modal-delete.php:29
 msgid "Start Delete"
 msgstr ""
 
-#: inc/templates/modal-download.php:15, build/infinite-uploads/inc/templates/modal-download.php:15
+#: inc/templates/modal-download.php:15, build/infinite-uploads/inc/templates/modal-download.php:15, build/infinite-uploads 2/inc/templates/modal-download.php:15
 msgid "Downloading Files"
 msgstr ""
 
-#: inc/templates/modal-download.php:16, build/infinite-uploads/inc/templates/modal-download.php:16
+#: inc/templates/modal-download.php:16, build/infinite-uploads/inc/templates/modal-download.php:16, build/infinite-uploads 2/inc/templates/modal-download.php:16
 msgid "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the download is being processed. If you close the tab the download will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/templates/modal-download.php:17, inc/templates/modal-upload.php:17, build/infinite-uploads/inc/templates/modal-download.php:17, build/infinite-uploads/inc/templates/modal-upload.php:17
+#: inc/templates/modal-download.php:17, inc/templates/modal-upload.php:17, build/infinite-uploads/inc/templates/modal-download.php:17, build/infinite-uploads/inc/templates/modal-upload.php:17, build/infinite-uploads 2/inc/templates/modal-download.php:17, build/infinite-uploads 2/inc/templates/modal-upload.php:17
 msgid "If your host provides access to WP CLI, that is the fastest and most efficient way to sync your files. Simply execute the command:"
 msgstr ""
 
-#: inc/templates/modal-download.php:34, build/infinite-uploads/inc/templates/modal-download.php:34
+#: inc/templates/modal-download.php:34, build/infinite-uploads/inc/templates/modal-download.php:34, build/infinite-uploads 2/inc/templates/modal-download.php:34
 msgid "<span id=\"iup-download-size\">%s</span> / <span id=\"iup-download-files\">%s</span> File(s) Remaining"
 msgstr ""
 
-#: inc/templates/modal-enable.php:5, build/infinite-uploads/inc/templates/modal-enable.php:5
+#: inc/templates/modal-enable.php:5, build/infinite-uploads/inc/templates/modal-enable.php:5, build/infinite-uploads 2/inc/templates/modal-enable.php:5
 msgid "Enable Infinite Uploads"
 msgstr ""
 
-#: inc/templates/modal-enable.php:14, build/infinite-uploads/inc/templates/modal-enable.php:14
+#: inc/templates/modal-enable.php:14, build/infinite-uploads/inc/templates/modal-enable.php:14, build/infinite-uploads 2/inc/templates/modal-enable.php:14
 msgid "Enable the Infinite Uploads Cloud"
 msgstr ""
 
-#: inc/templates/modal-enable.php:15, build/infinite-uploads/inc/templates/modal-enable.php:15
+#: inc/templates/modal-enable.php:15, build/infinite-uploads/inc/templates/modal-enable.php:15, build/infinite-uploads 2/inc/templates/modal-enable.php:15
 msgid "Your media library has finished syncing to the Infinite Uploads cloud. Enable now to serve all media from the cloud and global CDN. All new media uploaded will skip the local filesystem and be synced directly to the Infinite Uploads cloud."
 msgstr ""
 
-#: inc/templates/modal-enable.php:18, build/infinite-uploads/inc/templates/modal-enable.php:18
+#: inc/templates/modal-enable.php:18, build/infinite-uploads/inc/templates/modal-enable.php:18, build/infinite-uploads 2/inc/templates/modal-enable.php:18
 msgid "<span>%s</span> file(s) errored while syncing to the cloud."
 msgstr ""
 
-#: inc/templates/modal-enable.php:19, build/infinite-uploads/inc/templates/modal-enable.php:19
+#: inc/templates/modal-enable.php:19, build/infinite-uploads/inc/templates/modal-enable.php:19, build/infinite-uploads 2/inc/templates/modal-enable.php:19
 msgid "Show errors"
 msgstr ""
 
-#: inc/templates/modal-enable.php:43, build/infinite-uploads/inc/templates/modal-enable.php:43
+#: inc/templates/modal-enable.php:43, build/infinite-uploads/inc/templates/modal-enable.php:43, build/infinite-uploads 2/inc/templates/modal-enable.php:43
 msgid "Note: If any of these files are referenced in posts or pages they might show as missing after enabling. You can retry syncing them, or ignore and enable anyway."
 msgstr ""
 
-#: inc/templates/modal-enable.php:44, build/infinite-uploads/inc/templates/modal-enable.php:44
+#: inc/templates/modal-enable.php:44, build/infinite-uploads/inc/templates/modal-enable.php:44, build/infinite-uploads 2/inc/templates/modal-enable.php:44
 msgid "Need help?"
 msgstr ""
 
-#: inc/templates/modal-enable.php:50, build/infinite-uploads/inc/templates/modal-enable.php:50
+#: inc/templates/modal-enable.php:50, build/infinite-uploads/inc/templates/modal-enable.php:50, build/infinite-uploads 2/inc/templates/modal-enable.php:50
 msgid "Retry Sync"
 msgstr ""
 
-#: inc/templates/modal-enable.php:51, build/infinite-uploads/inc/templates/modal-enable.php:51
+#: inc/templates/modal-enable.php:51, build/infinite-uploads/inc/templates/modal-enable.php:51, build/infinite-uploads 2/inc/templates/modal-enable.php:51
 msgid "Enable"
 msgstr ""
 
-#: inc/templates/modal-remote-scan.php:5, build/infinite-uploads/inc/templates/modal-remote-scan.php:5
+#: inc/templates/modal-remote-scan.php:5, build/infinite-uploads/inc/templates/modal-remote-scan.php:5, build/infinite-uploads 2/inc/templates/modal-remote-scan.php:5
 msgid "Scanning Cloud"
 msgstr ""
 
-#: inc/templates/modal-remote-scan.php:17, build/infinite-uploads/inc/templates/modal-remote-scan.php:17
+#: inc/templates/modal-remote-scan.php:17, build/infinite-uploads/inc/templates/modal-remote-scan.php:17, build/infinite-uploads 2/inc/templates/modal-remote-scan.php:17
 msgid "Comparing to Cloud"
 msgstr ""
 
-#: inc/templates/modal-remote-scan.php:18, build/infinite-uploads/inc/templates/modal-remote-scan.php:18
+#: inc/templates/modal-remote-scan.php:18, build/infinite-uploads/inc/templates/modal-remote-scan.php:18, build/infinite-uploads 2/inc/templates/modal-remote-scan.php:18
 msgid "Checking for files already existing in the cloud. Please leave this tab open while we complete your scan."
 msgstr ""
 
-#: inc/templates/modal-remote-scan.php:24, build/infinite-uploads/inc/templates/modal-remote-scan.php:24
+#: inc/templates/modal-remote-scan.php:24, build/infinite-uploads/inc/templates/modal-remote-scan.php:24, build/infinite-uploads 2/inc/templates/modal-remote-scan.php:24
 msgid "<span id=\"iup-scan-remote-storage\">%s</span> / <span id=\"iup-scan-remote-files\">%s</span> Files Synced"
 msgstr ""
 
-#: inc/templates/modal-scan.php:5, build/infinite-uploads/inc/templates/modal-scan.php:5
+#: inc/templates/modal-scan.php:5, build/infinite-uploads/inc/templates/modal-scan.php:5, build/infinite-uploads 2/inc/templates/modal-scan.php:5
 msgid "Scanning Files"
 msgstr ""
 
-#: inc/templates/modal-scan.php:17, build/infinite-uploads/inc/templates/modal-scan.php:17
+#: inc/templates/modal-scan.php:17, build/infinite-uploads/inc/templates/modal-scan.php:17, build/infinite-uploads 2/inc/templates/modal-scan.php:17
 msgid "Scanning Local Filesystem"
 msgstr ""
 
-#: inc/templates/modal-scan.php:18, build/infinite-uploads/inc/templates/modal-scan.php:18
+#: inc/templates/modal-scan.php:18, build/infinite-uploads/inc/templates/modal-scan.php:18, build/infinite-uploads 2/inc/templates/modal-scan.php:18
 msgid "This usually only takes a minute or two but can take longer for very large media libraries with a lot of files. Please leave this tab open while we complete your scan."
 msgstr ""
 
 #. translators: %3$s is the opening a tag for files
 #. translators: %3$s is the opening a tag for files
-#: inc/templates/modal-scan.php:30, build/infinite-uploads/inc/templates/modal-scan.php:30
+#. translators: %3$s is the opening a tag for files
+#: inc/templates/modal-scan.php:30, build/infinite-uploads/inc/templates/modal-scan.php:30, build/infinite-uploads 2/inc/templates/modal-scan.php:30
 msgid "Found %1$s0 MB%2$s / %3$s0%4$s Files..."
 msgstr ""
 
-#: inc/templates/modal-upload.php:5, build/infinite-uploads/inc/templates/modal-upload.php:5
+#: inc/templates/modal-upload.php:5, build/infinite-uploads/inc/templates/modal-upload.php:5, build/infinite-uploads 2/inc/templates/modal-upload.php:5
 msgid "Upload to Cloud"
 msgstr ""
 
-#: inc/templates/modal-upload.php:15, build/infinite-uploads/inc/templates/modal-upload.php:15
+#: inc/templates/modal-upload.php:15, build/infinite-uploads/inc/templates/modal-upload.php:15, build/infinite-uploads 2/inc/templates/modal-upload.php:15
 msgid "Sync in Progress"
 msgstr ""
 
-#: inc/templates/modal-upload.php:16, build/infinite-uploads/inc/templates/modal-upload.php:16
+#: inc/templates/modal-upload.php:16, build/infinite-uploads/inc/templates/modal-upload.php:16, build/infinite-uploads 2/inc/templates/modal-upload.php:16
 msgid "This process can take many hours for very large media libraries with a lot of files. Please leave this tab open while the sync is being processed. If you close the tab the sync will be interrupted and you will have to continue where you left off later."
 msgstr ""
 
-#: inc/templates/modal-upload.php:34, build/infinite-uploads/inc/templates/modal-upload.php:34
+#: inc/templates/modal-upload.php:34, build/infinite-uploads/inc/templates/modal-upload.php:34, build/infinite-uploads 2/inc/templates/modal-upload.php:34
 msgid "<span id=\"iup-progress-size\">%s</span> / <span id=\"iup-progress-files\">%s</span> File(s) Remaining"
 msgstr ""
 
-#: inc/templates/settings.php:4, build/infinite-uploads/inc/templates/settings.php:4
+#: inc/templates/settings.php:4, build/infinite-uploads/inc/templates/settings.php:4, build/infinite-uploads 2/inc/templates/settings.php:4
 msgid "Account & Settings"
 msgstr ""
 
-#: inc/templates/settings.php:4, build/infinite-uploads/inc/templates/settings.php:4
+#: inc/templates/settings.php:4, build/infinite-uploads/inc/templates/settings.php:4, build/infinite-uploads 2/inc/templates/settings.php:4
 msgid "Includes usage data for all connected sites"
 msgstr ""
 
-#: inc/templates/settings.php:9, build/infinite-uploads/inc/templates/settings.php:9
+#: inc/templates/settings.php:9, build/infinite-uploads/inc/templates/settings.php:9, build/infinite-uploads 2/inc/templates/settings.php:9
 msgid "Refresh account data"
 msgstr ""
 
-#: inc/templates/settings.php:10, build/infinite-uploads/inc/templates/settings.php:10
+#: inc/templates/settings.php:10, build/infinite-uploads/inc/templates/settings.php:10, build/infinite-uploads 2/inc/templates/settings.php:10
 msgid "Updated %s ago"
 msgstr ""
 
-#: inc/templates/settings.php:17, build/infinite-uploads/inc/templates/settings.php:17
+#: inc/templates/settings.php:17, build/infinite-uploads/inc/templates/settings.php:17, build/infinite-uploads 2/inc/templates/settings.php:17
 msgid "Infinite Uploads Plan"
 msgstr ""
 
-#: inc/templates/settings.php:18, build/infinite-uploads/inc/templates/settings.php:18
+#: inc/templates/settings.php:18, build/infinite-uploads/inc/templates/settings.php:18, build/infinite-uploads 2/inc/templates/settings.php:18
 msgid "Your current Infinite Uploads plan and storage."
 msgstr ""
 
-#: inc/templates/settings.php:22, inc/templates/settings.php:40, build/infinite-uploads/inc/templates/settings.php:22, build/infinite-uploads/inc/templates/settings.php:40
+#: inc/templates/settings.php:22, inc/templates/settings.php:40, build/infinite-uploads/inc/templates/settings.php:22, build/infinite-uploads/inc/templates/settings.php:40, build/infinite-uploads 2/inc/templates/settings.php:22, build/infinite-uploads 2/inc/templates/settings.php:40
 msgid "Used / Available"
 msgstr ""
 
-#: inc/templates/settings.php:23, build/infinite-uploads/inc/templates/settings.php:23
+#: inc/templates/settings.php:23, build/infinite-uploads/inc/templates/settings.php:23, build/infinite-uploads 2/inc/templates/settings.php:23
 msgid "Need more?"
 msgstr ""
 
-#: inc/templates/settings.php:23, build/infinite-uploads/inc/templates/settings.php:23
+#: inc/templates/settings.php:23, build/infinite-uploads/inc/templates/settings.php:23, build/infinite-uploads 2/inc/templates/settings.php:23
 msgid "Switch to a new plan."
 msgstr ""
 
-#: inc/templates/settings.php:35, build/infinite-uploads/inc/templates/settings.php:35
+#: inc/templates/settings.php:35, build/infinite-uploads/inc/templates/settings.php:35, build/infinite-uploads 2/inc/templates/settings.php:35
 msgid "CDN Bandwidth"
 msgstr ""
 
-#: inc/templates/settings.php:36, build/infinite-uploads/inc/templates/settings.php:36
+#: inc/templates/settings.php:36, build/infinite-uploads/inc/templates/settings.php:36, build/infinite-uploads 2/inc/templates/settings.php:36
 msgid "Infinite Uploads includes allotted bandwidth for CDN delivery of your files."
 msgstr ""
 
-#: inc/templates/settings.php:51, build/infinite-uploads/inc/templates/settings.php:51
+#: inc/templates/settings.php:51, build/infinite-uploads/inc/templates/settings.php:51, build/infinite-uploads 2/inc/templates/settings.php:51
 msgid "CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:52, build/infinite-uploads/inc/templates/settings.php:52
+#: inc/templates/settings.php:52, build/infinite-uploads/inc/templates/settings.php:52, build/infinite-uploads 2/inc/templates/settings.php:52
 msgid "Your uploads are served from this CDN url via 45+ edge locations around the world."
 msgstr ""
 
-#: inc/templates/settings.php:56, build/infinite-uploads/inc/templates/settings.php:56
+#: inc/templates/settings.php:56, build/infinite-uploads/inc/templates/settings.php:56, build/infinite-uploads 2/inc/templates/settings.php:56
 msgid "Current CDN URL"
 msgstr ""
 
-#: inc/templates/settings.php:58, build/infinite-uploads/inc/templates/settings.php:58
+#: inc/templates/settings.php:58, build/infinite-uploads/inc/templates/settings.php:58, build/infinite-uploads 2/inc/templates/settings.php:58
 msgid "Use your own custom domain!"
 msgstr ""
 
-#: inc/templates/settings.php:71, build/infinite-uploads/inc/templates/settings.php:71
+#: inc/templates/settings.php:71, build/infinite-uploads/inc/templates/settings.php:71, build/infinite-uploads 2/inc/templates/settings.php:71
 msgid "Storage Region"
 msgstr ""
 
-#: inc/templates/settings.php:72, build/infinite-uploads/inc/templates/settings.php:72
+#: inc/templates/settings.php:72, build/infinite-uploads/inc/templates/settings.php:72, build/infinite-uploads 2/inc/templates/settings.php:72
 msgid "The location of our servers storing your uploads."
 msgstr ""
 
-#: inc/templates/settings.php:76, build/infinite-uploads/inc/templates/settings.php:76
+#: inc/templates/settings.php:76, build/infinite-uploads/inc/templates/settings.php:76, build/infinite-uploads 2/inc/templates/settings.php:76
 msgid "Region"
 msgstr ""
 
-#: inc/templates/settings.php:76, build/infinite-uploads/inc/templates/settings.php:76
+#: inc/templates/settings.php:76, build/infinite-uploads/inc/templates/settings.php:76, build/infinite-uploads 2/inc/templates/settings.php:76
 msgid "Region can only be selected when first connecting your site."
 msgstr ""
 
-#: inc/templates/settings.php:88, build/infinite-uploads/inc/templates/settings.php:88
+#: inc/templates/settings.php:88, build/infinite-uploads/inc/templates/settings.php:88, build/infinite-uploads 2/inc/templates/settings.php:88
 msgid "There are unused local copies of files already synced to the cloud. You can optionally delete these to free up local storage space."
 msgstr ""
 
-#: inc/templates/settings.php:92, build/infinite-uploads/inc/templates/settings.php:92
+#: inc/templates/settings.php:92, build/infinite-uploads/inc/templates/settings.php:92, build/infinite-uploads 2/inc/templates/settings.php:92
 msgid "This saves space and improves server performance."
 msgstr ""
 
-#: inc/templates/settings.php:96, build/infinite-uploads/inc/templates/settings.php:96
+#: inc/templates/settings.php:96, build/infinite-uploads/inc/templates/settings.php:96, build/infinite-uploads 2/inc/templates/settings.php:96
 msgid "Delete"
 msgstr ""
 
-#: inc/templates/settings.php:101, build/infinite-uploads/inc/templates/settings.php:101
+#: inc/templates/settings.php:101, build/infinite-uploads/inc/templates/settings.php:101, build/infinite-uploads 2/inc/templates/settings.php:101
 msgid "%s / %s deletable files"
 msgstr ""
 
-#: inc/templates/settings.php:110, build/infinite-uploads/inc/templates/settings.php:110
+#: inc/templates/settings.php:110, build/infinite-uploads/inc/templates/settings.php:110, build/infinite-uploads 2/inc/templates/settings.php:110
 msgid "Download your media files and disconnect from our cloud. To cancel or manage your storage plan please visit <a href=\"%s\" class=\"text-warning\">account management</a>."
 msgstr ""
 
-#: inc/templates/settings.php:114, build/infinite-uploads/inc/templates/settings.php:114
+#: inc/templates/settings.php:114, build/infinite-uploads/inc/templates/settings.php:114, build/infinite-uploads 2/inc/templates/settings.php:114
 msgid "We will download your files back to the uploads directory before disconnecting to prevent broken media on your site."
 msgstr ""
 
-#: inc/templates/settings.php:118, build/infinite-uploads/inc/templates/settings.php:118
+#: inc/templates/settings.php:118, build/infinite-uploads/inc/templates/settings.php:118, build/infinite-uploads 2/inc/templates/settings.php:118
 msgid "Disconnect"
 msgstr ""
 
-#: inc/templates/status-icon.php:2, build/infinite-uploads/inc/templates/status-icon.php:2
+#: inc/templates/status-icon.php:2, build/infinite-uploads/inc/templates/status-icon.php:2, build/infinite-uploads 2/inc/templates/status-icon.php:2
 msgid "Status"
 msgstr ""
 
-#: inc/templates/status-icon.php:10, build/infinite-uploads/inc/templates/status-icon.php:10
+#: inc/templates/status-icon.php:10, build/infinite-uploads/inc/templates/status-icon.php:10, build/infinite-uploads 2/inc/templates/status-icon.php:10
 msgid "Disabled - waiting to connect"
 msgstr ""
 
-#: inc/templates/status-icon.php:8, build/infinite-uploads/inc/templates/status-icon.php:8
+#: inc/templates/status-icon.php:8, build/infinite-uploads/inc/templates/status-icon.php:8, build/infinite-uploads 2/inc/templates/status-icon.php:8
 msgid "Disabled - waiting to sync media to the cloud"
 msgstr ""
 
-#: inc/templates/status-icon.php:6, build/infinite-uploads/inc/templates/status-icon.php:6
+#: inc/templates/status-icon.php:6, build/infinite-uploads/inc/templates/status-icon.php:6, build/infinite-uploads 2/inc/templates/status-icon.php:6
 msgid "Enabled - new uploads are moved to the cloud"
 msgstr ""
 
-#: inc/templates/status-icon.php:4, build/infinite-uploads/inc/templates/status-icon.php:4
+#: inc/templates/status-icon.php:4, build/infinite-uploads/inc/templates/status-icon.php:4, build/infinite-uploads 2/inc/templates/status-icon.php:4
 msgid "There is a problem with your Infinite Uploads account"
 msgstr ""
 
-#: inc/templates/sync.php:4, build/infinite-uploads/inc/templates/sync.php:4
+#: inc/templates/sync.php:4, build/infinite-uploads/inc/templates/sync.php:4, build/infinite-uploads 2/inc/templates/sync.php:4
 msgid "Ready to Sync"
 msgstr ""
 
-#: inc/templates/sync.php:11, build/infinite-uploads/inc/templates/sync.php:11
+#: inc/templates/sync.php:11, build/infinite-uploads/inc/templates/sync.php:11, build/infinite-uploads 2/inc/templates/sync.php:11
 msgid "Total Local Bytes / Files"
 msgstr ""
 
-#: inc/templates/sync.php:49, build/infinite-uploads/inc/templates/sync.php:49
+#: inc/templates/sync.php:49, build/infinite-uploads/inc/templates/sync.php:49, build/infinite-uploads 2/inc/templates/sync.php:49
 msgid "You have %s of premium storage available!"
 msgstr ""
 
-#: inc/templates/sync.php:50, build/infinite-uploads/inc/templates/sync.php:50
+#: inc/templates/sync.php:50, build/infinite-uploads/inc/templates/sync.php:50, build/infinite-uploads 2/inc/templates/sync.php:50
 msgid "Move your media library to the Infinite Uploads cloud."
 msgstr ""
 
-#: inc/templates/sync.php:60, inc/templates/sync.php:58, inc/templates/sync.php:56, build/infinite-uploads/inc/templates/sync.php:60, build/infinite-uploads/inc/templates/sync.php:58, build/infinite-uploads/inc/templates/sync.php:56
+#: inc/templates/sync.php:60, inc/templates/sync.php:58, inc/templates/sync.php:56, build/infinite-uploads/inc/templates/sync.php:60, build/infinite-uploads/inc/templates/sync.php:58, build/infinite-uploads/inc/templates/sync.php:56, build/infinite-uploads 2/inc/templates/sync.php:60, build/infinite-uploads 2/inc/templates/sync.php:58, build/infinite-uploads 2/inc/templates/sync.php:56
 msgid "Sync Now"
 msgstr ""
 
-#: inc/templates/sync.php:37, build/infinite-uploads/inc/templates/sync.php:37
+#: inc/templates/sync.php:37, build/infinite-uploads/inc/templates/sync.php:37, build/infinite-uploads 2/inc/templates/sync.php:37
 msgid "Please fix the billing issue with your account to sync your files to the cloud and enable Infinite Uploads."
 msgstr ""
 
-#: inc/templates/welcome.php:6, build/infinite-uploads/inc/templates/welcome.php:6
+#: inc/templates/welcome.php:6, build/infinite-uploads/inc/templates/welcome.php:6, build/infinite-uploads 2/inc/templates/welcome.php:6
 msgid "Infinite Uploads Setup"
 msgstr ""
 
-#: inc/templates/welcome.php:7, build/infinite-uploads/inc/templates/welcome.php:7
+#: inc/templates/welcome.php:7, build/infinite-uploads/inc/templates/welcome.php:7, build/infinite-uploads 2/inc/templates/welcome.php:7
 msgid "Welcome to Infinite Uploads, scalable cloud storage and delivery for your uploads made easy! Get started with a scan of your existing Media Library. Then our smart recommendations will help you chose the best plan, create or connect your account, and voilà – you're ready to push to the cloud."
 msgstr ""
 
-#: inc/templates/welcome.php:12, build/infinite-uploads/inc/templates/welcome.php:12
+#: inc/templates/welcome.php:12, build/infinite-uploads/inc/templates/welcome.php:12, build/infinite-uploads 2/inc/templates/welcome.php:12
 msgid "Run Scan"
 msgstr ""
 

@@ -1,8 +1,8 @@
 === Infinite Uploads - Offload Your Media to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 6.0
-Stable tag: 1.1.5
+Tested up to: 6.1.1
+Stable tag: 1.1.6
 Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
 Tags: cloud storage, media cloud, media library, offload, stateless, s3, google cloud storage, spaces, storage, cdn, cloud sync
@@ -146,6 +146,13 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 5. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
+
+1.1.6 - 2022-12-13
+----------------------------------------------------------------------
+- Fix error handling on sync for specific error types that were breaking syncs
+- Support for very large directory file counts: Allow filescan via WP CLI before connecting site to cloud
+- Add an 'infinite_uploads_sync_exclusions' filter to exclude files from sync
+- BuddyBoss/BuddyPress workaround: Bypass cloud storage for BuddyBoss media files
 
 1.1.5 - 2021-10-27
 ----------------------------------------------------------------------

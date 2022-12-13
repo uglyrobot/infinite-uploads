@@ -201,22 +201,22 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	public function sync( $args, $args_assoc ) {
 		global $wpdb;
 
-		// Verify first that we have the necessary access keys to connect to S3.
-		if ( ! $this->verify_s3_access_constants() ) {
-			return;
-		}
-
 		$instance   = Infinite_Uploads::get_instance();
-		$s3         = $instance->s3();
 		$args_assoc = wp_parse_args( $args_assoc, [ 'concurrency' => 20, 'noscan' => false, 'verbose' => false ] );
 
 		$path = $instance->get_original_upload_dir_root();
 
 		if ( ! $args_assoc['noscan'] ) {
-			$this->build_scan();
+			if ( ! $this->build_scan() ) {
+				return;
+			}
 			$stats = $instance->get_sync_stats();
 			WP_CLI::line( sprintf( esc_html__( '%s files (%s) remaining to be synced.', 'infinite-uploads' ), $stats['remaining_files'], $stats['remaining_size'] ) );
+		} elseif ( ! $this->verify_s3_access_constants() ) {
+			return;
 		}
+
+		$s3 = $instance->s3();
 
 		//begin transfer
 		$synced       = $wpdb->get_var( "SELECT count(*) AS files FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE synced = 1" );
@@ -287,11 +287,11 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				},
 			];
 			try {
-				$manager = new Transfer( $s3, $from, 's3://' . Infinite_Uploads::get_instance()->bucket . '/', $transfer_args );
+				$manager = new Transfer( $s3, $from, 's3://' . $instance->bucket . '/', $transfer_args );
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file        = str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() );
+					$file        = str_replace( trailingslashit( $instance->bucket ), '', $e->getRequest()->getRequestTarget() );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
@@ -301,8 +301,10 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 					}
 					$wpdb->update( "{$wpdb->base_prefix}infinite_uploads_files", [ 'errors' => $error_count ], [ 'file' => $file ] );
 
+				} elseif ( method_exists( $e, 'getMessage' ) ) {
+					WP_CLI::warning( sprintf( esc_html__( 'There was an error during upload: %s. Queued for retry.', 'infinite-uploads' ), $e->getMessage() ) );
 				} else {
-					WP_CLI::warning( sprintf( esc_html__( '%s error uploading %s. Queued for retry.', 'infinite-uploads' ), $e->getAwsErrorCode(), $file ) );
+					WP_CLI::warning( sprintf( esc_html__( 'There was an error during upload: %s. Queued for retry.', 'infinite-uploads' ), 'Unknown Error' ) );
 				}
 			}
 
@@ -329,7 +331,6 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 	private function build_scan() {
 		global $wpdb;
 		$instance = Infinite_Uploads::get_instance();
-		$s3       = $instance->s3();
 		$path     = $instance->get_original_upload_dir_root();
 
 		WP_CLI::line( esc_html__( 'Scanning local filesystem...', 'infinite-uploads' ) );
@@ -339,15 +340,22 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		$stats = $instance->get_sync_stats();
 		WP_CLI::line( sprintf( esc_html__( '%s files (%s) found in uploads.', 'infinite-uploads' ), $stats['local_files'], $stats['local_size'] ) );
 
+		//now verify that we are logged into cloud
+		if ( ! $this->verify_s3_access_constants() ) {
+			return false;
+		}
+
+		$s3 = $instance->s3();
+
 		WP_CLI::line( esc_html__( 'Comparing to the cloud...', 'infinite-uploads' ) );
 		$prefix = '';
 
-		if ( strpos( Infinite_Uploads::get_instance()->bucket, '/' ) ) {
-			$prefix = trailingslashit( str_replace( strtok( Infinite_Uploads::get_instance()->bucket, '/' ) . '/', '', Infinite_Uploads::get_instance()->bucket ) );
+		if ( strpos( $instance->bucket, '/' ) ) {
+			$prefix = trailingslashit( str_replace( strtok( $instance->bucket, '/' ) . '/', '', $instance->bucket ) );
 		}
 
 		$args = [
-			'Bucket' => strtok( Infinite_Uploads::get_instance()->bucket, '/' ),
+			'Bucket' => strtok( $instance->bucket, '/' ),
 			'Prefix' => $prefix,
 		];
 
@@ -399,6 +407,8 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		} catch ( Exception $e ) {
 			WP_CLI::error( $e->getMessage() );
 		}
+
+		return true;
 	}
 
 	/**
@@ -502,7 +512,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 			//build full paths
 			$to_sync_full = [];
 			foreach ( $to_sync as $key => $file ) {
-				$to_sync_full[] = 's3://' . untrailingslashit( Infinite_Uploads::get_instance()->bucket ) . $file;
+				$to_sync_full[] = 's3://' . untrailingslashit( $instance->bucket ) . $file;
 			}
 
 			$obj  = new ArrayObject( $to_sync_full );
@@ -510,7 +520,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 
 			$transfer_args = [
 				'concurrency' => $args_assoc['concurrency'],
-				'base_dir'    => 's3://' . Infinite_Uploads::get_instance()->bucket,
+				'base_dir'    => 's3://' . $instance->bucket,
 				'before'      => function ( UglyRobot\Infinite_Uploads\Aws\Command $command ) use ( $args_assoc, $progress_bar, $wpdb, $unsynced, &$downloaded ) {
 					//add middleware to intercept result of each file upload
 					if ( in_array( $command->getName(), [ 'GetObject' ], true ) ) {
@@ -537,7 +547,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 				$manager->transfer();
 			} catch ( Exception $e ) {
 				if ( method_exists( $e, 'getRequest' ) ) {
-					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( Infinite_Uploads::get_instance()->bucket ), '', $e->getRequest()->getRequestTarget() ) );
+					$file        = str_replace( untrailingslashit( $path['basedir'] ), '', str_replace( trailingslashit( $instance->bucket ), '', $e->getRequest()->getRequestTarget() ) );
 					$error_count = $wpdb->get_var( $wpdb->prepare( "SELECT errors FROM `{$wpdb->base_prefix}infinite_uploads_files` WHERE file = %s", $file ) );
 					$error_count ++;
 					if ( $error_count >= 3 ) {
@@ -600,7 +610,7 @@ class Infinite_Uploads_WP_CLI_Command extends WP_CLI_Command {
 		}
 
 		try {
-			$objects = $s3->deleteMatchingObjects(
+			$s3->deleteMatchingObjects(
 				strtok( Infinite_Uploads::get_instance()->bucket, '/' ),
 				$prefix,
 				$regex,
