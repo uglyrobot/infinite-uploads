@@ -731,7 +731,7 @@ class Infinite_Uploads_Admin {
 		if ( is_multisite() ) {
 			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
 		} else {
-			$base = admin_url( 'upload.php?page=infinite_uploads' );
+			$base = admin_url( 'options-general.php?page=infinite_uploads' );
 		}
 
 		return add_query_arg( $args, $base );
@@ -771,7 +771,7 @@ class Infinite_Uploads_Admin {
 				]
 			);
 		} else {
-			$page = add_media_page(
+			$page = add_options_page(
 				__( 'Infinite Uploads', 'infinite-uploads' ),
 				__( 'Infinite Uploads', 'infinite-uploads' ),
 				$this->iup_instance->capability,
@@ -793,7 +793,7 @@ class Infinite_Uploads_Admin {
 	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
 		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
-		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [ 'wp-color-picker' ], INFINITE_UPLOADS_VERSION );
 
 		$data            = [];
 		$data['strings'] = [
@@ -836,7 +836,7 @@ class Infinite_Uploads_Admin {
 	 *
 	 */
 	function admin_styles() {
-
+		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'iup-bootstrap', plugins_url( 'assets/bootstrap/css/bootstrap.min.css', __FILE__ ), false, INFINITE_UPLOADS_VERSION );
 		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-bootstrap' ], INFINITE_UPLOADS_VERSION );
 
@@ -961,6 +961,8 @@ class Infinite_Uploads_Admin {
 				require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
+
+				require_once( dirname( __FILE__ ) . '/templates/video-settings.php' );
 
 			} else {
 				if ( ! empty( $stats['files_finished'] ) && $stats['files_finished'] >= ( time() - DAY_IN_SECONDS ) ) {

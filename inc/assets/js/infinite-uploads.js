@@ -1,5 +1,6 @@
 jQuery(document).ready(function ($) {
   $('[data-toggle="tooltip"]').tooltip();
+  $('.color-field').wpColorPicker();
 
   var iupStopLoop = false;
   var iupProcessingLoop = false;
