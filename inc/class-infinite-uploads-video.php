@@ -2,7 +2,7 @@
 
 use UglyRobot\Infinite_Uploads\GuzzleHttp;
 
-class Infinite_Uploads_Stream {
+class Infinite_Uploads_Video {
 
 	private static $instance;
 	private $iup_instance;
@@ -13,52 +13,72 @@ class Infinite_Uploads_Stream {
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+		add_action( 'wp_ajax_infinite-uploads-video-create', [ &$this, 'ajax_create_video' ] );
+		//add_action( 'wp_ajax_infinite-uploads-video-get', [ &$this, 'ajax_get_video' ] );
+
+		//gutenberg block
+		add_action( 'init', [ &$this, 'register_block' ] );
 		add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
-		add_action( 'wp_ajax_infinite-uploads-stream-create', [ &$this, 'ajax_create_video' ] );
-		//add_action( 'wp_ajax_infinite-uploads-stream-get', [ &$this, 'ajax_get_video' ] );
+
+		//for testing, override values that our API would normally provide TODO remove
+		add_filter( 'infinite_uploads_video_config', function ( $return, $key, $data ) {
+			if ( 'library_id' === $key ) {
+				return 56793;
+			} elseif ( 'url' === $key ) {
+				return 'https://vz-30d13541-113.b-cdn.net';
+			} elseif ( 'key_read' === $key ) {
+				return BUNNY_API_KEY;
+			} elseif ( 'key_write' === $key ) {
+				return BUNNY_API_KEY;
+			} elseif ( 'enabled' === $key ) {
+				return defined( 'BUNNY_API_KEY' );
+			}
+
+			return $return;
+		}, 10, 3 );
 	}
 
 	/**
 	 *
-	 * @return Infinite_Uploads_Stream
+	 * @return Infinite_Uploads_Video
 	 */
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
-			self::$instance = new Infinite_Uploads_Stream();
+			self::$instance = new Infinite_Uploads_Video();
 		}
 
 		return self::$instance;
 	}
 
 	/*
-	 * Check if Stream is created/active for this site.
+	 * Check if Video is created/active for this site.
 	 *
 	 * @return bool
 	 */
-	public function is_stream_active() {
+	public function is_video_active() {
 		return (bool) $this->get_config( 'library_id' );
 	}
 
 	/*
-	 * Check if Stream uploading/viewing is enabled. (When user has billing issues,
+	 * Check if Video uploading/viewing is enabled. (When user has billing issues,
 	 * we will disable embeds and return only the read_key for viewing the library but no editing)
 	 *
 	 * @return bool
 	 */
-	public function is_stream_enabled() {
-		return $this->is_stream_active() && $this->get_config( 'enabled' );
+	public function is_video_enabled() {
+		return $this->is_video_active() && $this->get_config( 'enabled' );
 	}
 
 	/**
-	 * Activates Stream service for this site.
+	 * Activates Video service for this site.
 	 *
 	 * @return object|false
 	 */
-	public function activate_stream() {
-		$result = $this->api->call( "site/" . $this->api->get_site_id() . "/stream", [], 'POST' );
+	public function activate_video() {
+		$result = $this->api->call( "site/" . $this->api->get_site_id() . "/video", [], 'POST' );
 		if ( $result ) {
-			//cache the new creds/settings once we enable stream
+			//cache the new creds/settings once we enable video
 			return $this->get_library_settings( true );
 		}
 
@@ -66,16 +86,16 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 * Update the stream library settings.
+	 * Update the video library settings.
 	 *
 	 * @return object|false
 	 */
 	public function update_library_settings( $args = [] ) {
-		return $this->api->call( "site/" . $this->api->get_site_id() . "/stream", $args, 'POST' );
+		return $this->api->call( "site/" . $this->api->get_site_id() . "/video", $args, 'POST' );
 	}
 
 	/**
-	 * Get the stream library settings. They are cached 12hrs in the options table from the regular get_site_data call by default.
+	 * Get the video library settings. They are cached 12hrs in the options table from the regular get_site_data call by default.
 	 *
 	 * @param bool $force_refresh Force a refresh of the settings from api.
 	 *
@@ -92,7 +112,7 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 * Get the stream configuration value for a given key. They are cached 12hrs in the options table from the regular get_site_data call by default.
+	 * Get the video configuration value for a given key. They are cached 12hrs in the options table from the regular get_site_data call by default.
 	 *
 	 * @param string $key           The key to get (enabled, library_id, key_write, key_read, url).
 	 * @param bool   $force_refresh Force a refresh of the credentials.
@@ -101,6 +121,9 @@ class Infinite_Uploads_Stream {
 	 */
 	public function get_config( $key, $force_refresh = false ) {
 		$data = $this->api->get_site_data( $force_refresh );
+		if ( $override = apply_filters( 'infinite_uploads_video_config', null, $key, $data ) ) {
+			return $override;
+		}
 		if ( isset( $data->video->{$key} ) ) {
 			return $data->video->{$key};
 		} else {
@@ -163,7 +186,13 @@ class Infinite_Uploads_Stream {
 		$body = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 201, 202, 204, 204 ], true ) ) {
-			return new WP_Error( $body->ErrorKey, $body->Message, [ 'status' => wp_remote_retrieve_response_code( $response ) ] );
+			error_log( "Bunny API error: " . wp_remote_retrieve_response_code( $response ) . " " . wp_remote_retrieve_body( $response ) );
+
+			if ( isset( $body->ErrorKey ) ) {
+				return new WP_Error( $body->ErrorKey, $body->Message, [ 'status' => wp_remote_retrieve_response_code( $response ) ] );
+			} else {
+				return new WP_Error( 'bunny_api_error', wp_remote_retrieve_response_message( $response ), [ 'status' => wp_remote_retrieve_response_code( $response ) ] );
+			}
 		}
 
 		return $body;
@@ -183,7 +212,7 @@ class Infinite_Uploads_Stream {
 		);
 		wp_register_script( 'iup-dummy-js-header', '' );
 		wp_enqueue_script( 'iup-dummy-js-header' );
-		wp_add_inline_script( 'iup-dummy-js-header', 'const IUP_STREAM = ' . json_encode( $data ) . ';' );
+		wp_add_inline_script( 'iup-dummy-js-header', 'const IUP_VIDEO = ' . json_encode( $data ) . ';' );
 	}
 
 
@@ -201,16 +230,18 @@ class Infinite_Uploads_Stream {
 		}
 
 		//check nonce
-		check_ajax_referer( $nonce, 'nonce' );
+		if ( ! check_ajax_referer( $nonce, 'nonce', false ) ) {
+			wp_send_json_error( esc_html__( 'Permissions Error: Please refresh the page and try again.', 'infinite-uploads' ) );
+		}
 
-		// return error if stream is not enabled
-		if ( ! $this->is_stream_enabled() ) {
-			wp_send_json_error( esc_html__( 'Infinite Uploads Stream is disabled due to an issue with your account.', 'infinite-uploads' ) );
+		// return error if video is not enabled
+		if ( ! $this->is_video_enabled() ) {
+			wp_send_json_error( esc_html__( 'Infinite Uploads Video is disabled due to an issue with your account.', 'infinite-uploads' ) );
 		}
 	}
 
 	/**
-	 * Create a video in the stream library, and returns the params for executing the tus upload.
+	 * Create a video in the video library, and returns the params for executing the tus upload.
 	 *
 	 * @see https://docs.bunny.net/reference/video_createvideo
 	 * @see https://docs.bunny.net/reference/tus-resumable-uploads
@@ -238,7 +269,7 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 * Update a video in the stream library.
+	 * Update a video in the video library.
 	 *
 	 * @see https://docs.bunny.net/reference/video_updatevideo
 	 *
@@ -261,7 +292,7 @@ class Infinite_Uploads_Stream {
 	}
 
 	/**
-	 * Delete a video in the stream library.
+	 * Delete a video in the video library.
 	 *
 	 * @see https://docs.bunny.net/reference/video_deletevideo
 	 *
@@ -285,7 +316,7 @@ class Infinite_Uploads_Stream {
 	 */
 	function admin_menu() {
 		$page = add_media_page(
-			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
+			__( 'Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Video Library', 'infinite-uploads' ),
 			$this->iup_instance->capability,
 			'infinite_uploads_vids',
@@ -299,6 +330,10 @@ class Infinite_Uploads_Stream {
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
+	}
+
+	function register_block() {
+		register_block_type( __DIR__ . '/video/block/src' );
 	}
 
 	/**
@@ -353,7 +388,7 @@ class Infinite_Uploads_Stream {
 
 			<h1 class="text-muted mb-3">
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-gray.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="36" width="36"/>
-				<?php esc_html_e( 'Stream Video Library', 'infinite-uploads' ); ?>
+				<?php esc_html_e( 'Video Library', 'infinite-uploads' ); ?>
 			</h1>
 
 			<div id="iup-error" class="alert alert-danger mt-1" role="alert"></div>
@@ -646,7 +681,7 @@ class Infinite_Uploads_Stream {
 
 							<div class="row justify-content-center mb-4">
 								<div class="col">
-									<nav id="stream-nav-tab">
+									<nav id="video-nav-tab">
 										<div class="nav nav-tabs" role="tablist">
 											<button class="nav-link active" id="nav-shortcode-tab" data-toggle="tab" data-target="#nav-shortcode" type="button" role="tab" aria-controls="nav-shortcode" aria-selected="false"><span class="dashicons dashicons-shortcode"></span> Embed Code</button>
 											<button class="nav-link" id="nav-stats-tab" data-toggle="tab" data-target="#nav-stats" type="button" role="tab" aria-controls="nav-stats" aria-selected="true"><span class="dashicons dashicons-chart-area"></span> Stats</button>

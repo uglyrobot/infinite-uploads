@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "infinite-uploads/video",
+  "version": "0.1.0",
+  "title": "Infinite Uploads Video",
+  "category": "media",
+  "icon": "format-video",
+  "description": "Upload & Embed a video via Infinite Uploads Stream.",
+  "attributes": {
+    "video_id": {
+      "type": "string"
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": false
+    },
+    "loop": {
+      "type": "boolean",
+      "default": false
+    },
+    "muted": {
+      "type": "boolean",
+      "default": false
+    },
+    "preload": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "textdomain": "infinite-uploads",
+  "editorScript": "file:../../../../build/block.js",
+  "editorStyle": "file:../../../../build/block.css",
+  "style": "file:../../../../build/style-block.css"
+}

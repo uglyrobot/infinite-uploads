@@ -94,7 +94,7 @@ class Infinite_Uploads {
 
 		$this->admin  = Infinite_Uploads_Admin::get_instance();
 		$this->api    = Infinite_Uploads_Api_Handler::get_instance();
-		$this->stream = Infinite_Uploads_Stream::get_instance();
+		$this->stream = Infinite_Uploads_Video::get_instance();
 
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
