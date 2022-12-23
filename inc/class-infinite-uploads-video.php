@@ -209,6 +209,7 @@ class Infinite_Uploads_Video {
 			'cdnUrl'    => $this->get_config( 'url' ), // This give us the base CDN url for the library for building media links.
 			'apiKey'    => $this->get_config( 'key_read' ), //we only expose the read key to the frontend. The write key is only used via backend ajax wrappers.
 			'nonce'     => wp_create_nonce( 'iup_video' ), //used to verify the request is coming from the frontend, CSRF.
+			'assetBase' => plugins_url( 'assets', __FILE__ ),
 		);
 		wp_register_script( 'iup-dummy-js-header', '' );
 		wp_enqueue_script( 'iup-dummy-js-header' );
@@ -340,31 +341,18 @@ class Infinite_Uploads_Video {
 	 * @todo adjust for the video library page.
 	 */
 	function admin_scripts() {
-		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
-		//wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
-		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [ 'wp-color-picker' ], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-settings-js', plugins_url( 'build/settings.js', __DIR__ ), array( 'wp-element', 'wp-i18n' ), time(), false );
+		wp_set_script_translations( 'iup-settings-js', 'infinite-uploads' );
 
 		$data            = [];
+		$data['base']    = plugins_url( 'assets', __FILE__ );
 		$data['strings'] = [
 			'leave_confirm'      => esc_html__( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
 			'ajax_error'         => esc_html__( 'Too many server errors. Please try again.', 'infinite-uploads' ),
 			'leave_confirmation' => esc_html__( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
 		];
 
-		$data['local_types'] = $this->iup_instance->get_filetypes( true );
-
-		$api_data = $this->api->get_site_data();
-		if ( $this->api->has_token() && $api_data ) {
-			$data['cloud_types'] = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
-		}
-
-		$data['nonce'] = [
-			'scan'     => wp_create_nonce( 'iup_scan' ),
-			'sync'     => wp_create_nonce( 'iup_sync' ),
-			'delete'   => wp_create_nonce( 'iup_delete' ),
-			'download' => wp_create_nonce( 'iup_download' ),
-			'toggle'   => wp_create_nonce( 'iup_toggle' ),
-		];
+		//$data['nonce'] = wp_create_nonce( 'iup_video' );
 
 		wp_localize_script( 'iup-js', 'iup_data', $data );
 	}
@@ -373,8 +361,8 @@ class Infinite_Uploads_Video {
 	 *
 	 */
 	function admin_styles() {
-		wp_enqueue_style( 'iup-bootstrap', plugins_url( 'assets/bootstrap/css/bootstrap.min.css', __FILE__ ), false, INFINITE_UPLOADS_VERSION );
-		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-bootstrap' ], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_style( 'iup-settings-bootstrap', plugins_url( 'build/settings.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
+		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-settings-bootstrap' ], INFINITE_UPLOADS_VERSION );
 	}
 
 	/**
@@ -383,6 +371,20 @@ class Infinite_Uploads_Video {
 	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
 	 */
 	function video_library_page() {
+		?>
+		<div id="iup-settings-page" class="wrap iup-background">
+		</div>
+
+		<?php
+		require_once( dirname( __FILE__ ) . '/templates/footer.php' );
+	}
+
+	/**
+	 * Video library page display callback.
+	 *
+	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
+	 */
+	function video_library_page2() {
 		?>
 		<div id="container" class="wrap iup-background">
 
