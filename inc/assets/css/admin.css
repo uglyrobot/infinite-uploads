@@ -67,9 +67,10 @@ body.mobile.modal-open #wpwrap {
 }
 
 .btn-info {
-  background-color: #EE7C1E;
-  border-radius: 24px;
-  border-width: 0;
+    background-color: #EE7C1E;
+    border-radius: 24px;
+    border-width: 0;
+    color: #ffffff;
 }
 
 .btn-info:hover, .btn-info:active, .btn-info:focus {
@@ -195,11 +196,19 @@ p.lead {
 }
 
 #iup-collapse-errors .list-group-item {
-  padding: 0.25rem 1.25rem;
-  margin: 0;
+    padding: 0.25rem 1.25rem;
+    margin: 0;
 }
 
 /* --------- Stream Settings--------- */
 #stream-nav-tab {
-  margin-bottom: -0.8rem;
+    margin-bottom: -0.8rem;
+}
+
+li.nav-item {
+    margin-bottom: 0;
+}
+
+.form-check .form-check-input {
+    margin-top: .25em;
 }

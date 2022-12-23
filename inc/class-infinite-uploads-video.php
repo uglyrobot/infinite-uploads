@@ -13,8 +13,11 @@ class Infinite_Uploads_Video {
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+
+		//all write API calls we make on backend to not expose write API key
 		add_action( 'wp_ajax_infinite-uploads-video-create', [ &$this, 'ajax_create_video' ] );
-		//add_action( 'wp_ajax_infinite-uploads-video-get', [ &$this, 'ajax_get_video' ] );
+		add_action( 'wp_ajax_infinite-uploads-video-update', [ &$this, 'ajax_update_video' ] );
+		add_action( 'wp_ajax_infinite-uploads-video-delete', [ &$this, 'ajax_delete_video' ] );
 
 		//gutenberg block
 		add_action( 'init', [ &$this, 'register_block' ] );
@@ -279,12 +282,18 @@ class Infinite_Uploads_Video {
 	public function ajax_update_video() {
 		$this->ajax_check_permissions();
 
-		//TODO validate and sanitize these.
-		$args = $_REQUEST['params'];
+		$video_id = sanitize_text_field( $_REQUEST['video_id'] );
 
-		$video_id = sanitize_text_field( $args['video_id'] );
+		if ( isset( $_REQUEST['title'] ) ) {
+			$title  = sanitize_text_field( $_REQUEST['title'] );
+			$result = $this->api_call( "/videos/$video_id", compact( 'title' ) );
+		} elseif ( isset( $_REQUEST['thumbnail'] ) ) {
+			$thumbnail = sanitize_text_field( $_REQUEST['thumbnail'] );
+			$result    = $this->api_call( "/videos/$video_id/thumbnail?thumbnailUrl=" . $thumbnail );
+		} else {
+			wp_send_json_error( esc_html__( 'Invalid request', 'infinite-uploads' ) );
+		}
 
-		$result = $this->api_call( "/videos/$video_id", $args );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result );
 		}
@@ -362,13 +371,10 @@ class Infinite_Uploads_Video {
 	 */
 	function admin_styles() {
 		wp_enqueue_style( 'iup-settings-bootstrap', plugins_url( 'build/settings.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
-		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-settings-bootstrap' ], INFINITE_UPLOADS_VERSION );
 	}
 
 	/**
 	 * Video library page display callback.
-	 *
-	 * @todo This should be adapted to all bootstrap-react in it's own template files loaded by admin_scripts().
 	 */
 	function video_library_page() {
 		?>

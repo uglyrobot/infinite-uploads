@@ -34,7 +34,7 @@ function Header({orderBy, setOrderBy, search, setSearch}) {
         </InputGroup>
       </Col>
       <Col className="d-flex justify-content-end mb-3">
-        <Button variant="info" size="lg" className="text-nowrap text-white px-12">{__('New Video', 'infinite-uploads')}</Button>
+        <Button variant="primary" size="lg" className="text-nowrap text-white px-12">{__('New Video', 'infinite-uploads')}</Button>
       </Col>
     </Row>
   )

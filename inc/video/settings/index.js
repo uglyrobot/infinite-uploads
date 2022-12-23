@@ -19,7 +19,10 @@ export default function Page() {
 
   //get videos on render
   useEffect(() => {
-    getVideos()
+	  console.log('getting videos');
+	  if (!loading) {
+		  getVideos()
+	  }
   }, [orderBy, page]);
 
   useEffect(() => {
@@ -53,41 +56,10 @@ export default function Page() {
       });
   }
 
-  function getVideo() {
-    if (!attributes.video_id) {
-      return false
-    }
-    const options = {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        AccessKey: IUP_VIDEO.apiKey
-      },
-    };
-
-    fetch(`https://video.bunnycdn.com/library/${IUP_VIDEO.libraryId}/videos/${attributes.video_id}`, options)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Video:", data);
-        setVideoStatus(data.status);
-        setEncodeProgress(data.encodeProgress);
-
-        if (data.status === 4) {
-          stopPollVideo();
-        } else {
-          startPollVideo();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-
   return (
     <>
       <h1 className="text-muted mb-3">
-        <img src={IUP_VIDEO.assetBase + "/img/iu-logo-gray.svg"} alt="Infinite Uploads Logo" height="32" width="32" className="mr-1"/>
+	      <img src={IUP_VIDEO.assetBase + "/img/iu-logo-gray.svg"} alt="Infinite Uploads Logo" height="32" width="32" className="me-2"/>
         {__('Video Library', 'infinite-uploads')}
       </h1>
       <Container fluid>
@@ -100,7 +72,7 @@ export default function Page() {
               {videos.map((video, index) => {
                 return (
                   <Col key={index + video.guid}>
-                    <VideoCard video={video}/>
+	                  <VideoCard {...{video, setVideos}} />
                   </Col>
                 )
               })}
@@ -108,11 +80,11 @@ export default function Page() {
             <Paginator {...{page, setPage, totalItems, itemsPerPage}} />
           </Container>
         ) : (
-          <Container className="h-50 d-flex justify-content-center align-middle">
-            <Spinner animation="grow" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </Container>
+	        <Container className="d-flex justify-content-center align-middle my-5">
+		        <Spinner animation="grow" role="status" className="my-5">
+			        <span className="visually-hidden">Loading...</span>
+		        </Spinner>
+	        </Container>
         )}
 
       </Container>
