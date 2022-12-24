@@ -92,10 +92,6 @@ function VideoCard({video, videos, setVideos}) {
 								</Col>
 								<Col></Col>
 								<Col>
-									<VideoViews video={video}/>
-								</Col>
-								<Col></Col>
-								<Col>
 									<VideoSize video={video}/>
 								</Col>
 							</small>

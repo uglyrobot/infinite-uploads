@@ -12,6 +12,7 @@ import Button from "react-bootstrap/Button";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import DeleteModal from "./DeleteModal";
+import Spinner from "react-bootstrap/Spinner";
 
 export default function VideoModal({video, setVideos, children}) {
 	const [show, setShow] = useState(false);
@@ -21,6 +22,7 @@ export default function VideoModal({video, setVideos, children}) {
 	const [muted, setMuted] = useState(false);
 	const [preload, setPreload] = useState(true);
 	const [embedParams, setEmbedParams] = useState('');
+	const [uploading, setUploading] = useState(false);
 
 	useEffect(() => {
 		let params = []
@@ -108,6 +110,39 @@ export default function VideoModal({video, setVideos, children}) {
 			});
 	}
 
+	function uploadThumbnail(file) {
+		setUploading(true);
+		const formData = new FormData();
+		formData.append('thumbnailFile', file);
+		formData.append('video_id', video.guid);
+		formData.append('nonce', IUP_VIDEO.nonce);
+
+		const options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+			},
+			body: formData,
+		};
+
+		fetch(`${ajaxurl}?action=infinite-uploads-video-update`, options)
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+				if (data.success) {
+					getVideo(); // refresh video data
+					setUploading(false);
+				} else {
+					console.error(data.data);
+					setUploading(false);
+				}
+			})
+			.catch((error) => {
+				console.log('Error:', error);
+				setUploading(false);
+			});
+	}
+
 	function getVideo() {
 		const options = {
 			method: 'GET',
@@ -120,8 +155,8 @@ export default function VideoModal({video, setVideos, children}) {
 		fetch(`https://video.bunnycdn.com/library/${IUP_VIDEO.libraryId}/videos/${video.guid}`, options)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log("Video:", data);
-
+				//replace video in videos array
+				setVideos(videos => videos.map(v => v.guid === video.guid ? {...v, ...data} : v));
 			})
 			.catch((error) => {
 				console.error(error);
@@ -145,6 +180,24 @@ export default function VideoModal({video, setVideos, children}) {
 			</Col>
 		);
 	}
+	thumbnails.push(
+		<Col key="fileupload" className="mb-2">
+			<Card className="h-100 p-0 border-4 border-secondary" style={{borderStyle: 'dashed'}} role="button" onClick={() => document.getElementById("upload-thumbnail").click()}>
+				<div className="ratio ratio-16x9 overflow-hidden bg-light border-0 rounded">
+					<div>
+						{uploading ? (
+							<div className="h-100 w-100 d-flex align-items-center justify-content-center">
+								<Spinner animation="border" role="status" className="text-muted"/>
+							</div>
+						) : (
+							<span className="dashicons dashicons-upload h-100 w-100 d-flex align-items-center justify-content-center text-muted h3"></span>
+						)}
+					</div>
+				</div>
+				<Form.Control type="file" id="upload-thumbnail" className="d-none" accept="image/png, image/jpeg" onChange={() => uploadThumbnail(document.getElementById("upload-thumbnail").files[0])}/>
+			</Card>
+		</Col>
+	);
 
 	return (
 		<>

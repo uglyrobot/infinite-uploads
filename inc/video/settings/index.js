@@ -68,16 +68,16 @@ export default function Page() {
 
         {!loading ? (
           <Container fluid>
-            <Row xs={1} sm={1} md={2} lg={2} xl={3} xxl={4}>
-              {videos.map((video, index) => {
-                return (
-                  <Col key={index + video.guid}>
-	                  <VideoCard {...{video, setVideos}} />
-                  </Col>
-                )
-              })}
+            <Row xs={1} sm={1} md={2} lg={3} xl={4} xxl={5}>
+	            {videos.map((video, index) => {
+		            return (
+			            <Col key={index + video.guid}>
+				            <VideoCard {...{video, setVideos}} />
+			            </Col>
+		            )
+	            })}
             </Row>
-            <Paginator {...{page, setPage, totalItems, itemsPerPage}} />
+	          <Paginator {...{page, setPage, totalItems, itemsPerPage}} />
           </Container>
         ) : (
 	        <Container className="d-flex justify-content-center align-middle my-5">

@@ -167,6 +167,13 @@ class Infinite_Uploads_Video {
 
 				$response = wp_remote_post( $url, $args );
 				break;
+			case 'post_file':
+				$args['body']                    = $data;
+				$args['headers']['Content-Type'] = 'application/binary';
+				$args['method']                  = 'POST';
+
+				$response = wp_remote_post( $url, $args );
+				break;
 			case 'get':
 				if ( ! empty( $data ) ) {
 					$url = add_query_arg( $data, $url );
@@ -290,6 +297,8 @@ class Infinite_Uploads_Video {
 		} elseif ( isset( $_REQUEST['thumbnail'] ) ) {
 			$thumbnail = sanitize_text_field( $_REQUEST['thumbnail'] );
 			$result    = $this->api_call( "/videos/$video_id/thumbnail?thumbnailUrl=" . $thumbnail );
+		} elseif ( isset( $_FILES['thumbnailFile'] ) ) {
+			$result = $this->api_call( "/videos/$video_id/thumbnail", file_get_contents( $_FILES['thumbnailFile']['tmp_name'] ), 'POST_FILE' );
 		} else {
 			wp_send_json_error( esc_html__( 'Invalid request', 'infinite-uploads' ) );
 		}
