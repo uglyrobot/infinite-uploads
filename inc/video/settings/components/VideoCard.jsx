@@ -9,7 +9,12 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import DeleteModal from "./DeleteModal";
 
 function VideoCard({video, videos, setVideos}) {
-	const [src, setSrc] = useState(IUP_VIDEO.cdnUrl + '/' + video.guid + '/' + video.thumbnailFileName);
+
+	const getThumbnail = (file) => {
+		return IUP_VIDEO.cdnUrl + '/' + video.guid + '/' + file;
+	}
+
+	const [src, setSrc] = useState(getThumbnail(video.thumbnailFileName));
 
 	const statusLabels = {
 		0: __('Awaiting Upload', 'infinite-uploads'),
@@ -67,11 +72,10 @@ function VideoCard({video, videos, setVideos}) {
 			<VideoModal {...{video, setVideos}}>
 				<Card className="m-0 shadow-sm">
 					<div className="ratio ratio-16x9 overflow-hidden bg-black rounded-top">
-						<div>
-							<Card.Img variant="top" src={src} className="w-auto h-100 mx-auto d-block"
-							          onMouseOver={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/preview.webp')}
-							          onMouseOut={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/thumbnail.jpg')}
-							          alt={__('Video thumbnail', 'infinite-uploads')}/>
+						<div className="iup-video-thumb" style={{backgroundImage: `url("${src}")`}}
+						     onMouseOver={() => setSrc(getThumbnail('preview.webp'))}
+						     onMouseOut={() => setSrc(getThumbnail(video.thumbnailFileName))}
+						>
 						</div>
 					</div>
 					<Card.Body className={"p-2"}>

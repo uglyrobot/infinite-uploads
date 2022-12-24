@@ -212,3 +212,10 @@ li.nav-item {
 .form-check .form-check-input {
     margin-top: .25em;
 }
+
+.iup-video-thumb {
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-color: #000000;
+}

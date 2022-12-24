@@ -23,6 +23,7 @@ export default function VideoModal({video, setVideos, children}) {
 	const [preload, setPreload] = useState(true);
 	const [embedParams, setEmbedParams] = useState('');
 	const [uploading, setUploading] = useState(false);
+	const [iframe, setIframe] = useState(null);
 
 	useEffect(() => {
 		let params = []
@@ -40,6 +41,12 @@ export default function VideoModal({video, setVideos, children}) {
 		}
 		setEmbedParams(params.join(' '))
 	}, [autoPlay, loop, muted, preload]);
+
+	useEffect(() => {
+		const component = <iframe src={`https://iframe.mediadelivery.net/embed/${video.videoLibraryId}/${video.guid}?autoplay=false&v=${Math.random()}`} loading="lazy" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen={true}></iframe>
+		setIframe(component)
+		console.log(component)
+	}, [video]);
 
 	const getThumbnail = (file) => {
 		return IUP_VIDEO.cdnUrl + '/' + video.guid + '/' + file;
@@ -169,8 +176,7 @@ export default function VideoModal({video, setVideos, children}) {
 			<Col key={i} className="mb-2">
 				<Card className="bg-dark text-white h-100 p-0" role="button" onClick={() => setThumbnail('thumbnail_' + i + '.jpg')}>
 					<div className="ratio ratio-16x9 overflow-hidden bg-black">
-						<div>
-							<Card.Img src={getThumbnail('thumbnail_' + i + '.jpg')} className="w-auto h-100 mx-auto d-block" alt={__('New Thumbnail', 'infinite-uploads')}/>
+						<div className="iup-video-thumb" style={{backgroundImage: `url("${getThumbnail('thumbnail_' + i + '.jpg')}")`}}>
 						</div>
 					</div>
 					<div className="card-img-overlay">
@@ -225,8 +231,7 @@ export default function VideoModal({video, setVideos, children}) {
 								<Row className="mb-2">
 									<Col>
 										<div className="ratio ratio-16x9">
-											<iframe src={`https://iframe.mediadelivery.net/embed/${video.videoLibraryId}/${video.guid}?autoplay=false`} loading="lazy"
-											        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen={true}></iframe>
+											{iframe}
 										</div>
 									</Col>
 								</Row>
@@ -270,8 +275,7 @@ export default function VideoModal({video, setVideos, children}) {
 										<h6>{__('Current Thumbnail', 'infinite-uploads')}</h6>
 										<Card className="bg-dark text-white w-100 p-0 mb-2">
 											<div className="ratio ratio-16x9 overflow-hidden bg-black">
-												<div>
-													<Card.Img src={getThumbnail(video.thumbnailFileName)} className="w-auto h-100 mx-auto d-block" alt={__('Current Thumbnail', 'infinite-uploads')}/>
+												<div className="iup-video-thumb" style={{backgroundImage: `url("${getThumbnail(video.thumbnailFileName)}")`}}>
 												</div>
 											</div>
 										</Card>
