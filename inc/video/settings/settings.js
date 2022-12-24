@@ -16,6 +16,6 @@ class InfiniteUploads extends Component {
 document.addEventListener("DOMContentLoaded", function (event) {
   render(
     <InfiniteUploads/>,
-    document.getElementById('iup-settings-page')
+    document.getElementById('iup-videos-page')
   )
 });

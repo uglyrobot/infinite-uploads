@@ -893,7 +893,7 @@ class Infinite_Uploads_Admin {
 		$stats    = $this->iup_instance->get_sync_stats();
 		$api_data = $this->api->get_site_data();
 		?>
-		<div id="container" class="wrap iup-background">
+		<div id="iup-settings-page" class="wrap iup-background">
 
 			<h1>
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>

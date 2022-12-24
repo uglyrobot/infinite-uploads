@@ -89,19 +89,19 @@ body.mobile.modal-open #wpwrap {
   margin-right: 1rem;
 }
 
-.progress {
-  height: 30px;
-  border-radius: 15px;
-  padding: 5px;
+#iup-settings-page .progress {
+    height: 30px;
+    border-radius: 15px;
+    padding: 5px;
 }
 
-.progress .progress-bar {
-  background-color: rgba(38, 169, 224, 1);
-  border-radius: 10px;
+#iup-settings-page .progress .progress-bar {
+    background-color: rgba(38, 169, 224, 1);
+    border-radius: 10px;
 }
 
-.progress.download .progress-bar {
-  background-color: #EE7C1E;
+#iup-settings-page .progress.download .progress-bar {
+    background-color: #EE7C1E;
 }
 
 .tooltip {

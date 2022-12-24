@@ -5,39 +5,106 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import {VideoLength, VideoViews, VideoSize} from './VideoAttributes';
 import VideoModal from "./VideoModal";
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import DeleteModal from "./DeleteModal";
 
 function VideoCard({video, videos, setVideos}) {
 	const [src, setSrc] = useState(IUP_VIDEO.cdnUrl + '/' + video.guid + '/' + video.thumbnailFileName);
 
-	return (
+	const statusLabels = {
+		0: __('Awaiting Upload', 'infinite-uploads'),
+		1: __('Uploaded', 'infinite-uploads'),
+		2: __('Processing', 'infinite-uploads'),
+		3: __('Transcoding', 'infinite-uploads'),
+		4: __('Finished', 'infinite-uploads'),
+		5: __('Error', 'infinite-uploads'),
+		6: __('Upload Failed', 'infinite-uploads'),
+	}
+	const status = statusLabels[video.status];
 
-		<VideoModal {...{video, setVideos}}>
-			<Card className="m-0 shadow-sm">
-				<div className="ratio ratio-16x9 overflow-hidden bg-black">
+	if ([0, 1, 5, 6].includes(video.status)) {
+		return (
+			<span className="m-3 w-100 p-0">
+				<Card className="m-0 shadow-sm">
+					<div className="ratio ratio-16x9 overflow-hidden bg-black text-white rounded-top">
+						<div>
+							<div className="d-flex justify-content-center align-items-center h-100 text-secondary font-weight-bold">
+							{status}
+							</div>
+						</div>
+					</div>
+					<Card.Body className={"p-2"}>
+						<Card.Title className="h6 card-title text-truncate">{video.title}</Card.Title>
+						<Row className="justify-content-end text-muted align-items-center">
+							<Col className="justify-content-end d-flex">
+								<DeleteModal video={video} setVideos={setVideos}/>
+							</Col>
+						</Row>
+					</Card.Body>
+				</Card>
+			</span>
+		)
+	} else if ([2].includes(video.status)) { //processing
+		return (
+			<span className="m-3 w-100 p-0">
+				<Card className="m-0 shadow-sm">
+				<div className="ratio ratio-16x9 overflow-hidden bg-black text-white rounded-top">
 					<div>
-						<Card.Img variant="top" src={src} className="w-auto h-100 mx-auto d-block"
-						          onMouseOver={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/preview.webp')}
-						          onMouseOut={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/thumbnail.jpg')}
-						          alt={__('Video thumbnail', 'infinite-uploads')}/>
+						<div className="d-flex justify-content-center align-items-center h-100 text-secondary font-weight-bold">
+							{status}
+						</div>
 					</div>
 				</div>
 				<Card.Body className={"p-2"}>
 					<Card.Title className="h6 card-title text-truncate">{video.title}</Card.Title>
-					<small className="row justify-content-between text-muted text-center">
-						<Col>
-							<VideoLength video={video}/>
-						</Col>
-						<Col>
-							<VideoViews video={video}/>
-						</Col>
-						<Col>
-							<VideoSize video={video}/>
-						</Col>
-					</small>
+					<ProgressBar animated now={video.encodeProgress} label={`${video.encodeProgress}%`} className="w-100"/>
 				</Card.Body>
 			</Card>
-		</VideoModal>
-  )
+			</span>
+		)
+	} else {
+		return (
+			<VideoModal {...{video, setVideos}}>
+				<Card className="m-0 shadow-sm">
+					<div className="ratio ratio-16x9 overflow-hidden bg-black rounded-top">
+						<div>
+							<Card.Img variant="top" src={src} className="w-auto h-100 mx-auto d-block"
+							          onMouseOver={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/preview.webp')}
+							          onMouseOut={() => setSrc(IUP_VIDEO.cdnUrl + '/' + video.guid + '/thumbnail.jpg')}
+							          alt={__('Video thumbnail', 'infinite-uploads')}/>
+						</div>
+					</div>
+					<Card.Body className={"p-2"}>
+						<Card.Title className="h6 card-title text-truncate">{video.title}</Card.Title>
+						{video.status === 3 ? (
+							<small className="row justify-content-between text-muted align-items-center">
+								<Col className="col-auto">
+									{__('Transcoding', 'infinite-uploads')}:
+								</Col>
+								<Col>
+									<ProgressBar animated now={video.encodeProgress} label={`${video.encodeProgress}%`} className="w-100"/>
+								</Col>
+							</small>
+						) : (
+							<small className="row justify-content-between text-muted align-items-center">
+								<Col>
+									<VideoLength video={video}/>
+								</Col>
+								<Col></Col>
+								<Col>
+									<VideoViews video={video}/>
+								</Col>
+								<Col></Col>
+								<Col>
+									<VideoSize video={video}/>
+								</Col>
+							</small>
+						)}
+					</Card.Body>
+				</Card>
+			</VideoModal>
+		)
+	}
 }
 
 export default VideoCard;

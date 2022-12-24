@@ -148,7 +148,7 @@ export default function VideoModal({video, setVideos, children}) {
 
 	return (
 		<>
-			<a className="col m-3 w-100 p-0 text-decoration-none" role="button" aria-label={__('Open video modal', 'infinite-uploads')} onClick={handleShow}>
+			<a className="m-3 w-100 p-0 text-decoration-none" role="button" aria-label={__('Open video modal', 'infinite-uploads')} onClick={handleShow}>
 				{children}
 			</a>
 

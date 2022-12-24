@@ -10,7 +10,7 @@ export function VideoSize({video}) {
 	}
 
 	return (
-		<span className="d-inline-flex" title={__('Storage Size', 'infinite-uploads')}><span className="dashicons dashicons-media-video me-1"></span>{sizeOf(video.storageSize)}</span>
+		<span className="d-inline-flex text-nowrap" title={__('Storage Size', 'infinite-uploads')}><span className="dashicons dashicons-media-video me-1"></span>{sizeOf(video.storageSize)}</span>
 	)
 }
 
@@ -24,14 +24,14 @@ export function VideoLength({video}) {
 	}
 
 	return (
-		<span className="d-inline-flex" title={__('Video Length', 'infinite-uploads')}><span className="dashicons dashicons-clock me-1"></span>{secondsToTime(video.length)}</span>
+		<span className="d-inline-flex text-nowrap" title={__('Video Length', 'infinite-uploads')}><span className="dashicons dashicons-clock me-1"></span>{secondsToTime(video.length)}</span>
 	)
 }
 
 
 export function VideoViews({video}) {
 	return (
-		<span className="d-inline-flex" title={__('View Count', 'infinite-uploads')}><span className="dashicons dashicons-welcome-view-site me-1"></span>{video.views}</span>
+		<span className="d-inline-flex text-nowrap" title={__('View Count', 'infinite-uploads')}><span className="dashicons dashicons-welcome-view-site me-1"></span>{video.views}</span>
 	)
 }
 
