@@ -15,31 +15,41 @@ export default function Page() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(60);
+	const [itemsPerPage, setItemsPerPage] = useState(40);
 
   //get videos on render
   useEffect(() => {
 	  console.log('getting videos');
 	  if (!loading) {
+		  setLoading(true);
 		  getVideos()
 	  }
   }, [orderBy, page]);
 
-  useEffect(() => {
-    if (search.length > 2 || search.length === 0) {
-      getVideos()
-    }
-  }, [search]);
+	useEffect(() => {
+		if (search.length > 2 || search.length === 0) {
+			setPage(1);
+			setLoading(true);
+			getVideos()
+		}
+	}, [search]);
 
-  function getVideos() {
-    setLoading(true);
-    const options = {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        AccessKey: IUP_VIDEO.apiKey
-      },
-    };
+	//fetch videos on a 30s interval
+	useEffect(() => {
+		const interval = setInterval(() => {
+			getVideos();
+		}, 30000);
+		return () => clearInterval(interval);
+	}, [orderBy, page, search]);
+
+	function getVideos() {
+		const options = {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				AccessKey: IUP_VIDEO.apiKey
+			},
+		};
 
     fetch(`https://video.bunnycdn.com/library/${IUP_VIDEO.libraryId}/videos?page=${page}&itemsPerPage=${itemsPerPage}&orderBy=${orderBy}&search=${search}`, options)
       .then((response) => response.json())

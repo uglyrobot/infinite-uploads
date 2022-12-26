@@ -40,7 +40,7 @@ export default function DeleteModal({video, setVideos}) {
 
 	return (
 		<>
-			<Button variant="info" className="text-white" onClick={handleShow}>{__('Delete Video', 'infinite-uploads')}</Button>
+			<Button variant="outline-danger" size="sm" onClick={handleShow} className="rounded-4">{__('Delete Video', 'infinite-uploads')}</Button>
 
 			<Modal show={show} onHide={handleClose}>
 				<Modal.Header closeButton>

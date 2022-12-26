@@ -23,6 +23,7 @@ export default function VideoModal({video, setVideos, children}) {
 	const [preload, setPreload] = useState(true);
 	const [embedParams, setEmbedParams] = useState('');
 	const [uploading, setUploading] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [iframe, setIframe] = useState(null);
 
 	useEffect(() => {
@@ -60,6 +61,7 @@ export default function VideoModal({video, setVideos, children}) {
 	}
 
 	function updateVideo() {
+		setLoading(true);
 		const formData = new FormData();
 		formData.append('title', title);
 		formData.append('video_id', video.guid);
@@ -82,13 +84,16 @@ export default function VideoModal({video, setVideos, children}) {
 				} else {
 					console.error(data.data);
 				}
+				setLoading(false);
 			})
 			.catch((error) => {
 				console.log('Error:', error);
+				setLoading(false);
 			});
 	}
 
 	function setThumbnail(thumbnailFileName) {
+		setLoading(true);
 		const formData = new FormData();
 		formData.append('thumbnail', thumbnailFileName);
 		formData.append('video_id', video.guid);
@@ -111,9 +116,11 @@ export default function VideoModal({video, setVideos, children}) {
 				} else {
 					console.error(data.data);
 				}
+				setLoading(false);
 			})
 			.catch((error) => {
 				console.log('Error:', error);
+				setLoading(false);
 			});
 	}
 
@@ -174,7 +181,7 @@ export default function VideoModal({video, setVideos, children}) {
 	for (let i = 1; i <= 5; i++) {
 		thumbnails.push(
 			<Col key={i} className="mb-2">
-				<Card className="bg-dark text-white h-100 p-0" role="button" onClick={() => setThumbnail('thumbnail_' + i + '.jpg')}>
+				<Card className="bg-dark text-white h-100 p-0" role="button" disabled={loading || uploading} onClick={() => setThumbnail('thumbnail_' + i + '.jpg')}>
 					<div className="ratio ratio-16x9 overflow-hidden bg-black">
 						<div className="iup-video-thumb" style={{backgroundImage: `url("${getThumbnail('thumbnail_' + i + '.jpg')}")`}}>
 						</div>
@@ -188,7 +195,7 @@ export default function VideoModal({video, setVideos, children}) {
 	}
 	thumbnails.push(
 		<Col key="fileupload" className="mb-2">
-			<Card className="h-100 p-0 border-4 border-secondary" style={{borderStyle: 'dashed'}} role="button" onClick={() => document.getElementById("upload-thumbnail").click()}>
+			<Card className="h-100 p-0 border-4 border-secondary" style={{borderStyle: 'dashed'}} disabled={loading || uploading} role="button" onClick={() => document.getElementById("upload-thumbnail").click()}>
 				<div className="ratio ratio-16x9 overflow-hidden bg-light border-0 rounded">
 					<div>
 						{uploading ? (
@@ -200,7 +207,7 @@ export default function VideoModal({video, setVideos, children}) {
 						)}
 					</div>
 				</div>
-				<Form.Control type="file" id="upload-thumbnail" className="d-none" accept="image/png, image/jpeg" onChange={() => uploadThumbnail(document.getElementById("upload-thumbnail").files[0])}/>
+				<Form.Control type="file" id="upload-thumbnail" className="d-none" accept="image/png, image/jpeg" disabled={loading || uploading} onChange={() => uploadThumbnail(document.getElementById("upload-thumbnail").files[0])}/>
 			</Card>
 		</Col>
 	);
@@ -262,8 +269,9 @@ export default function VideoModal({video, setVideos, children}) {
 												aria-label={__('Title', 'infinite-uploads')}
 												value={title}
 												onChange={(e) => setTitle(e.target.value)}
+												disabled={loading || uploading}
 											/>
-											<Button variant="primary" className="text-white" onClick={updateVideo}>
+											<Button variant="primary" className="text-white" disabled={loading || uploading} onClick={updateVideo}>
 												{__('Update', 'infinite-uploads')}
 											</Button>
 										</InputGroup>
