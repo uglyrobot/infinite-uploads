@@ -510,6 +510,3 @@ jQuery(document).ready(function ($) {
     }
   };
 });
-
-
-

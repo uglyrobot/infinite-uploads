@@ -2,7 +2,7 @@
  * WordPress components that create the necessary UI elements for the block
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-components/
- *
+ *        
  * See https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/video/
  */
 /**
@@ -68,6 +68,9 @@ export default function Edit( { attributes, setAttributes } ) {
     //clear interval on destroy
     return () => stopPollVideo();
   }, [] );
+
+
+  
 
   const startPollVideo = () => {
     console.log('Maybe skip start interval, existing:',intervalId)
@@ -172,13 +175,23 @@ export default function Edit( { attributes, setAttributes } ) {
   if ( ! isUploading && attributes.video_id ) {
     if ( videoStatus === 4 ) {
       return (
+        <>
         <div {...blockProps}>
           <figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio wp-block-embed is-type-video">
             <div class="wp-block-embed__wrapper">
               <iframe src={`https://iframe.mediadelivery.net/embed/56793/${attributes.video_id}?autoplay=${attributes.autoplay}&preload=${attributes.preload}&loop=${attributes.loop}&muted=${attributes.muted}`} loading="lazy" width="864" height="486" className="components-sandbox" sandbox="allow-scripts allow-same-origin allow-presentation" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen="true"></iframe>
-            </div>
+              </div>
           </figure>
         </div>
+          <InspectorControls>
+            <PanelBody title={ __( 'Settings' ) }>
+              <VideoCommonSettings
+                setAttributes={ setAttributes }
+                attributes={ attributes }
+              />
+            </PanelBody>
+          </InspectorControls>
+        </>
       );
     } else {
       let label = '';
@@ -236,4 +249,4 @@ export default function Edit( { attributes, setAttributes } ) {
     </div>
   );
   }
-}
+}           

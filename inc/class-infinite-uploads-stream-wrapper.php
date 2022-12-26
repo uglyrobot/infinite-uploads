@@ -466,9 +466,12 @@ class Infinite_Uploads_Stream_Wrapper {
 		$instance = $this->getOption( 'iup_instance' );
 		if ( isset( $instance->stream_file_cache[ $key ] ) ) {
 			$this->debug_cache( 'Object HIT', $key );
+
 			return $instance->stream_file_cache[ $key ];
 		}
+
 		$this->debug_cache( 'Object MISS', $key );
+
 		return null;
 	}
 
@@ -941,7 +944,7 @@ class Infinite_Uploads_Stream_Wrapper {
 		$this->clearCacheKey( $path );
 		$params = $this->withPath( $path );
 		$client = $this->getClient();
-		
+
 		if ( ! $params['Bucket'] ) {
 			return $this->triggerError( 'You must specify a bucket' );
 		}
@@ -1106,7 +1109,7 @@ class Infinite_Uploads_Stream_Wrapper {
 					$contentsAndPrefixes,
 					function ( $key ) use ( $filterFn ) {
 						return ( ! $filterFn || call_user_func( $filterFn, $key ) )
-						    && ( ! isset( $key['Key'] ) || substr( $key['Key'], - 1, 1 ) !== '/' );
+						       && ( ! isset( $key['Key'] ) || substr( $key['Key'], - 1, 1 ) !== '/' );
 					}
 				);
 			}

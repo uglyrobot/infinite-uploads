@@ -3,22 +3,26 @@
 use UglyRobot\Infinite_Uploads\GuzzleHttp;
 
 class Infinite_Uploads_Stream {
+
 	private static $instance;
 	private $iup_instance;
 	private $api;
+
 	public function __construct() {
+
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
+
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
 		add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
 		add_action( 'wp_ajax_infinite-uploads-stream-create', [ &$this, 'ajax_create_video' ] );
 		add_action( 'wp_ajax_infinite-uploads-stream-get', [ &$this, 'ajax_get_video' ] );
 	}	
+
 	/**
 	 *
 	 * @return Infinite_Uploads_Stream
 	 */
-
 	public static function get_instance() {
 
 		if ( ! self::$instance ) {
@@ -135,12 +139,14 @@ class Infinite_Uploads_Stream {
 		switch ( strtolower( $method ) ) {
 			case 'post':
 				$args['body'] = wp_json_encode( $data );
+
 				$response = wp_remote_post( $url, $args );
 				break;
 			case 'get':
 				if ( ! empty( $data ) ) {
 					$url = add_query_arg( $data, $url );
 				}
+
 				$response = wp_remote_get( $url, $args );
 				break;
 			default:
@@ -154,10 +160,13 @@ class Infinite_Uploads_Stream {
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
+
 		$body = json_decode( wp_remote_retrieve_body( $response ) );
+
 		if ( ! in_array( wp_remote_retrieve_response_code( $response ), [ 200, 201, 202, 204, 204 ], true ) ) {
 			return new WP_Error( $body->ErrorKey, $body->Message, [ 'status' => wp_remote_retrieve_response_code( $response ) ] );
 		}
+
 		return $body;
 	}
 
@@ -176,7 +185,10 @@ class Infinite_Uploads_Stream {
 		wp_register_script( 'iup-dummy-js-header', '' );
 		wp_enqueue_script( 'iup-dummy-js-header' );
 		wp_add_inline_script( 'iup-dummy-js-header', 'const IUP_STREAM = ' . json_encode( $data ) . ';' );
+
 	}
+
+
 	/**
 	 * Check permissions for a ajax request.
 	 *
@@ -260,21 +272,23 @@ class Infinite_Uploads_Stream {
 	 */
 	public function ajax_delete_video() {
 		$this->ajax_check_permissions();
+
 		$video_id = sanitize_text_field( $_REQUEST['video_id'] );
+
 		$result = $this->api_call( "/videos/$video_id", [], 'DELETE' );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result );
 		}
+
 		wp_send_json_success( $result );
 	}
-	
+
 	/**
 	 * Registers the video library page under Media.
 	 */
-
 	function admin_menu() {
 		$page = add_media_page(
-			__( 'Stream Video Library - Infinite Uploads', 'infinite-uploads' ),
+			__( 'Cloud Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Cloud Video Library', 'cloud-infinite-uploads' ),
 			$this->iup_instance->capability,
 			'cloud_video_library',
@@ -283,6 +297,7 @@ class Infinite_Uploads_Stream {
 				'cloud_video_library',
 			],
 		);
+
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
@@ -293,14 +308,29 @@ class Infinite_Uploads_Stream {
 	 */
 	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
+
 		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [ 'wp-color-picker' ], INFINITE_UPLOADS_VERSION );
 		wp_register_script( 'jquery_js_query',  plugins_url('infinite-uploads/src/nodex.js'), null, null, true);
+
 		wp_register_script( 'tus-js',  plugins_url('infinite-uploads/src/tus.js'),  null, null, true);
-		wp_register_style( 'bootstrap_css', 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css', null, null, true);
-		wp_enqueue_style('bootstrap');
-		wp_enqueue_script( 'tus-js' );
-		wp_enqueue_script( 'jquery_js_query' );
+
+		wp_register_script( 'jquery_js_query2',  plugins_url('infinite-uploads/src/crypto-js.min.js') );
 		
+		wp_register_script( 'sha256-min-js', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/sha256.min.js', null, null, true );
+
+		wp_register_style( 'bootstrap_css', 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css', null, null, true);
+
+		wp_enqueue_style('bootstrap');
+
+		wp_enqueue_script('sha256-min-js');
+
+		wp_enqueue_script( 'tus-js' );
+		
+		wp_enqueue_script( 'jquery_js_query' );
+
+		wp_enqueue_script( 'jquery_js_query1' );
+		wp_enqueue_script( 'jquery_js_query2' );
+
 		$data            = [];
 		$data['strings'] = [
 			'leave_confirm'      => esc_html__( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
@@ -312,7 +342,7 @@ class Infinite_Uploads_Stream {
 
 		$api_data = $this->api->get_site_data();
 		if ( $this->api->has_token() && $api_data ) {
-			$data['cloud_types'] = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
+		   $data['cloud_types'] = $this->iup_instance->get_filetypes( true, $api_data->stats->site->types );
 		}
 
 		$data['nonce'] = [
@@ -322,7 +352,7 @@ class Infinite_Uploads_Stream {
 			'download' => wp_create_nonce( 'iup_download' ),
 			'toggle'   => wp_create_nonce( 'iup_toggle' ),
 		];
-		//echo "<pre>"; print_r($data); echo "</pre>"; exit;
+
 		wp_localize_script( 'iup-js', 'iup_data', $data );
 	}
 
@@ -344,7 +374,7 @@ class Infinite_Uploads_Stream {
 
 			<h1 class="text-muted mb-3">
 				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-gray.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="36" width="36"/>
-				<?php esc_html_e( 'Stream Video Library', 'infinite-uploads' ); ?>
+				<?php esc_html_e( 'Cloud Video Library', 'infinite-uploads' ); ?>
 			</h1>
 
 			<div id="iup-error" class="alert alert-danger mt-1" role="alert"></div>
@@ -382,26 +412,14 @@ class Infinite_Uploads_Stream {
 						<button class="btn text-nowrap btn-info btn-lg btn-block" id="new_video" data-toggle="modal" data-target="#upload-modal1" type="button"><?php esc_html_e( 'New Video', 'infinite-uploads1' ); ?></button>
 					</div>
 				</div>
+
 				
-				<div class="row justify-content-start d-flex">
-					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
-						<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/preview.webp'"
-						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+				<div class="row justify-content-start d-flex" id="list_video">
+					<!-- <a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/a1a9e1bb-6dc0-4bf4-8818-0fcdf08c8b2d/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/a1a9e1bb-6dc0-4bf4-8818-0fcdf08c8b2d/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/a1a9e1bb-6dc0-4bf4-8818-0fcdf08c8b2d/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
 						<div class="card-body">
-							<h6 class="card-title text-truncate">Live Wallpaper - 112722.mp4</h6>
-							<small class="row justify-content-between text-muted text-center">
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:00:30</div>
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 0</div>
-								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 32.45MB</div>
-								<div class="encode_video_progress"></div>
-							</small>
-						</div>
-					</a>
-					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
-						<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" onmouseover="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/preview.webp'"
-						     onmouseout="this.src='https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
-						<div class="card-body">
-							<h6 class="card-title text-truncate">I Will Survive Coronavirus.mp4</h6>
+							<h6 class="card-title text-truncate">Fog - 130876.mp4</h6>
 							<small class="row justify-content-between text-muted text-center">
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
 								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
@@ -409,6 +427,104 @@ class Infinite_Uploads_Stream {
 							</small>
 						</div>
 					</a>
+									
+					 <a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/38d416fe-333d-49f3-a4e0-09df24c9df0b/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/38d416fe-333d-49f3-a4e0-09df24c9df0b/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/38d416fe-333d-49f3-a4e0-09df24c9df0b/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Cat - 65438.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						
+						<img src="https://vz-30d13541-113.b-cdn.net/7f19afb1-7399-4e75-b115-24563df9fb65/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/7f19afb1-7399-4e75-b115-24563df9fb65/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/7f19afb1-7399-4e75-b115-24563df9fb65/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Waves - 71122.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/61fb529e-2e5d-408d-80b0-4e404c26af23/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/61fb529e-2e5d-408d-80b0-4e404c26af23/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/61fb529e-2e5d-408d-80b0-4e404c26af23/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Beach.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/d2b019df-e5e1-4316-b6ee-8a2d86a38cee/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/d2b019df-e5e1-4316-b6ee-8a2d86a38cee/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/d2b019df-e5e1-4316-b6ee-8a2d86a38cee/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Ski - 8558.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/c3736d62-ea97-45b8-863a-e6e8a74b3cfd/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/c3736d62-ea97-45b8-863a-e6e8a74b3cfd/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/c3736d62-ea97-45b8-863a-e6e8a74b3cfd/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Mountain - 34608.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/e92f5f03-ae43-487d-a248-7c655df738c7/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/e92f5f03-ae43-487d-a248-7c655df738c7/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/e92f5f03-ae43-487d-a248-7c655df738c7/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">vecteezy_drone-shot-during.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a>
+					
+					<a class="card col m-3 h-100 p-0 shadow-sm text-decoration-none" role="button" data-toggle="modal" data-target="#video-modal">
+						<img src="https://vz-30d13541-113.b-cdn.net/77efca7f-9622-40c4-a6a2-67ebe89b269e/thumbnail.jpg" onmouseover="this.src='https://vz-30d13541-113.b-cdn.net/77efca7f-9622-40c4-a6a2-67ebe89b269e/preview.webp'"
+						     onmouseout="this.src='https://vz-30d13541-113.b-cdn.net/77efca7f-9622-40c4-a6a2-67ebe89b269e/thumbnail.jpg'" class="card-img-top" alt="video thumbnail">
+						<div class="card-body">
+							<h6 class="card-title text-truncate">Ink - 67358.mp4</h6>
+							<small class="row justify-content-between text-muted text-center">
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+								<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
+							</small>
+						</div>
+					</a> -->
+
 				</div>
 			</div>
 		</div>
@@ -419,10 +535,7 @@ class Infinite_Uploads_Stream {
 		}); 
 	}); 
 	function encfiletobase64(element){
-		alert("Hello");
-		console.log("Hello");
-		return false;
-		tusUpload(element);
+		 tusUpload(element);
 	}
 </script>		
 		<div class="modal fade" id="upload-modal1" tabindex="-1" role="dialog" aria-labelledby="upload-modal-label" aria-hidden="true">
@@ -453,8 +566,8 @@ class Infinite_Uploads_Stream {
 								        </div><br/>
 								        <div id="file_name"></div>
       								</div><br/>
-      								<div class="encod_progress"></div><br/>
-      								<div class="processing_encode"></div>
+      								<div class="encod_progress"></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -466,7 +579,7 @@ class Infinite_Uploads_Stream {
 			<div class="modal-dialog modal-dialog-centered modal-xl">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="video-modal-label"><?php esc_html_e( 'Edit Video:', 'infinite-uploads' ); ?> Live Wallpaper - 112722.mp4</h5>
+						<h5 class="modal-title" id="video-modal-label"><?php esc_html_e( 'Edit Video:', 'infinite-uploads' ); ?> I Will Survive Coronavirus.mp4</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -478,14 +591,15 @@ class Infinite_Uploads_Stream {
 									<div class="row mb-2">
 										<div class="col">
 											<div style="position: relative; padding-top: 56.25%;">
-												<iframe src="https://iframe.mediadelivery.net/embed/56793/8c68f160-0a1d-4cba-a376-47c22d6dced4?autoplay=true" loading="lazy" style="border: none; position: absolute; top: 0; height: 100%; width: 100%;" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"></iframe>
+												<iframe src="https://iframe.mediadelivery.net/embed/56793/3aadf1e3-b76d-41db-bcfa-9e6b670b185c?autoplay=false" loading="lazy" style="border: none; position: absolute; top: 0; height: 100%; width: 100%;"allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true">
+												</iframe>
 											</div>
 										</div>
 									</div>
 									<div class="row justify-content-between text-muted text-center">
-										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:00:30</div>
-										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 0</div>
-										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 32.45MB</div>
+										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Video Length', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-clock"></span> 00:01:18</div>
+										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'View Count', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-welcome-view-site"></span> 2,234</div>
+										<div class="col" data-toggle="tooltip" title="<?php esc_attr_e( 'Storage Size', 'infinite-uploads' ); ?>"><span class="dashicons dashicons-media-video"></span> 112.21MB</div>
 									</div>
 								</div>
 								<div class="col">
@@ -494,7 +608,7 @@ class Infinite_Uploads_Stream {
 										<div class="col">
 											<label for="video-title">Video Title</label>
 											<div class="input-group mb-3">
-												<input type="text" id="video-title" class="form-control" placeholder="Enter a Title" aria-label="Enter a Title" aria-describedby="button-addon2" value="Live Wallpaper - 112722.mp4">
+												<input type="text" id="video-title" class="form-control" placeholder="Enter a Title" aria-label="Enter a Title" aria-describedby="button-addon2" value="I Will Survive Coronavirus.mp4">
 												<div class="input-group-append">
 													<button class="btn btn-primary" type="button" id="button-addon2"><span class="dashicons dashicons-saved"></span> Save</button>
 												</div>
@@ -506,7 +620,7 @@ class Infinite_Uploads_Stream {
 										<div class="col-4">
 											<h6><?php esc_html_e( 'Current Thumbnail', 'infinite-uploads' ); ?></h6>
 											<div class="card bg-dark text-white w-100 p-0 mb-2" role="button">
-												<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+												<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail.jpg" class="card-img" alt="...">
 											</div>
 										</div>
 										<div class="col-8">
@@ -515,7 +629,7 @@ class Infinite_Uploads_Stream {
 											<div class="row justify-content-start d-flex row-cols-2 row-cols-md-3">
 												<div class="col mb-2">
 													<a class="card bg-dark text-white h-100 p-0" role="button">
-														<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_1.jpg" class="card-img" alt="...">
 														<div class="card-img-overlay">
 															<div class="card-title align-middle text-center text-white"></div>
 														</div>
@@ -523,7 +637,7 @@ class Infinite_Uploads_Stream {
 												</div>
 												<div class="col mb-2">
 													<a class="card bg-dark text-white p-0" role="button">
-														<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_2.jpg" class="card-img" alt="...">
 														<div class="card-img-overlay">
 															<div class="card-title align-middle text-center text-white"></div>
 														</div>
@@ -531,7 +645,7 @@ class Infinite_Uploads_Stream {
 												</div>
 												<div class="col mb-2">
 													<a class="card bg-dark text-white p-0" role="button">
-														<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_3.jpg" class="card-img" alt="...">
 														<div class="card-img-overlay">
 															<div class="card-title align-middle text-center text-white"></div>
 														</div>
@@ -539,7 +653,7 @@ class Infinite_Uploads_Stream {
 												</div>
 												<div class="col mb-2">
 													<a class="card bg-dark text-white p-0" role="button">
-														<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_4.jpg" class="card-img" alt="...">
 														<div class="card-img-overlay">
 															<div class="card-title align-middle text-center text-white"></div>
 														</div>
@@ -547,7 +661,7 @@ class Infinite_Uploads_Stream {
 												</div>
 												<div class="col mb-2">
 													<a class="card bg-dark text-white p-0" role="button">
-														<img src="https://vz-30d13541-113.b-cdn.net/8c68f160-0a1d-4cba-a376-47c22d6dced4/thumbnail.jpg" class="card-img" alt="...">
+														<img src="https://vz-a8691a32-d3c.b-cdn.net/3aadf1e3-b76d-41db-bcfa-9e6b670b185c/thumbnail_5.jpg" class="card-img" alt="...">
 														<div class="card-img-overlay">
 															<div class="card-title align-middle text-center text-white"></div>
 														</div>
@@ -560,8 +674,10 @@ class Infinite_Uploads_Stream {
 														</div>
 													</div>
 												</div>
+
 											</div>
 										</div>
+
 									</div>
 
 									<div class="row justify-content-between mb-3">
@@ -571,8 +687,10 @@ class Infinite_Uploads_Stream {
 											<button type="button" class="btn btn-info w-100">Delete Video</button>
 										</div>
 									</div>
+
 								</div>
 							</div>
+
 
 							<div class="row justify-content-center mb-4">
 								<div class="col">
@@ -617,7 +735,6 @@ class Infinite_Uploads_Stream {
 													<input type="checkbox" class="custom-control-input" id="customSwitch4">
 													<label class="custom-control-label" for="customSwitch4">Muted</label>
 												</div>
-
 											</div>
 										</div>
 										<div class="row">
@@ -652,6 +769,6 @@ class Infinite_Uploads_Stream {
 			</div>
 		</div>
 		<?php
-		require_once( dirname( __FILE__ ) . '/templates/footer.php' );
+		//require_once( dirname( __FILE__ ) . '/templates/footer.php' );
 	}
 }

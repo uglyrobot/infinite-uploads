@@ -11,7 +11,7 @@
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Network: true
- *
+ *x
  * Inspired by AWS PHP SDK stream wrapper code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
  *
  * Copyright 2021 UglyRobot, LLC
@@ -186,7 +186,6 @@ function infinite_uploads_autoload( $class_name ) {
 
 	if ( file_exists( $class_path ) ) {
 		require $class_path;
-
 		return;
 	}
 }
@@ -211,6 +210,5 @@ function bunny_script_enqueue() {
 	wp_register_script( 'bunnytest-dummy-js-header', '');
 	wp_enqueue_script( 'bunnytest-dummy-js-header' );
 	wp_add_inline_script( 'bunnytest-dummy-js-header', 'const BUNNYTEST = ' . json_encode( $data ) . ';' );
-
 }
 add_action( 'enqueue_block_editor_assets', 'bunny_script_enqueue' );

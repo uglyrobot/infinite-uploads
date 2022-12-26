@@ -921,7 +921,8 @@ class Infinite_Uploads_Admin {
 				</div>
 			<?php } ?>
 
-			<?php if ( isset( $_GET['deactivate-notice'] ) && $this->api->has_token() && $api_data ) { ?>
+			<?php 
+			if ( isset( $_GET['deactivate-notice'] ) && $this->api->has_token() && $api_data ) { ?>
 				<div class="alert alert-warning mt-1" role="alert">
 					<div class="row align-items-center">
 						<div class="col-md col-12 mb-md-0 mb-2">
@@ -958,11 +959,9 @@ class Infinite_Uploads_Admin {
 				}
 
 				require_once( dirname( __FILE__ ) . '/templates/settings.php' );
-
 				require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
-
 				require_once( dirname( __FILE__ ) . '/templates/video-settings.php' );
 
 			} else {
