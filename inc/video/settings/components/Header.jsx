@@ -6,17 +6,17 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-function Header({orderBy, setOrderBy, search, setSearch}) {
+function Header({orderBy, setOrderBy, search, setSearch, selectVideo}) {
 
-  return (
-    <Row>
-      <Col sm={8} md={3} className="mb-3">
-        <InputGroup>
-          <InputGroup.Text><span className="dashicons dashicons-search"></span></InputGroup.Text>
-          <Form.Control
-            placeholder={__('Search', 'infinite-uploads')}
-            aria-label={__('Search', 'infinite-uploads')}
-            value={search}
+	return (
+		<Row>
+			<Col sm={8} md={3} className="mb-3">
+				<InputGroup>
+					<InputGroup.Text><span className="dashicons dashicons-search"></span></InputGroup.Text>
+					<Form.Control
+						placeholder={__('Search', 'infinite-uploads')}
+						aria-label={__('Search', 'infinite-uploads')}
+						value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
@@ -34,7 +34,7 @@ function Header({orderBy, setOrderBy, search, setSearch}) {
         </InputGroup>
       </Col>
       <Col className="d-flex justify-content-end mb-3">
-        <Button variant="primary" size="lg" className="text-nowrap text-white px-12">{__('New Video', 'infinite-uploads')}</Button>
+	      {!selectVideo && <Button variant="primary" size="lg" className="text-nowrap text-white px-12">{__('New Video', 'infinite-uploads')}</Button>}
       </Col>
     </Row>
   )

@@ -50,18 +50,19 @@ class UppyCreateVid extends UIPlugin {
 
   prepareUpload = (fileIDs) => {
     const promises = fileIDs.map((fileID) => {
-      const file = this.uppy.getFile(fileID)
-      const title = file.name;
+	    const file = this.uppy.getFile(fileID)
+	    //get the title from the file name and remove the extension
+	    const title = file.name.replace(/\.[^/.]+$/, "");
 
-      return this.createVideo(title).then((upload) => {
-          console.log(`Video ${upload.VideoId} created`);
-          this.opts.blockProps.video_id = upload.VideoId;
-          this.opts.blockProps.auth = upload;
-        }
-      ).catch((err) => {
-        this.uppy.log(`Video could not be created ${file.id}:`, 'warning')
-        this.uppy.log(err, 'warning')
-      })
+	    return this.createVideo(title).then((upload) => {
+			    console.log(`Video ${upload.VideoId} created`);
+			    this.opts.blockProps.video_id = upload.VideoId;
+			    this.opts.blockProps.auth = upload;
+		    }
+	    ).catch((err) => {
+		    this.uppy.log(`Video could not be created ${file.id}:`, 'warning')
+		    this.uppy.log(err, 'warning')
+	    })
     })
 
     const emitPreprocessCompleteForAll = () => {

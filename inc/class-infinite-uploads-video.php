@@ -292,7 +292,7 @@ class Infinite_Uploads_Video {
 		$video_id = sanitize_text_field( $_REQUEST['video_id'] );
 
 		if ( isset( $_REQUEST['title'] ) ) {
-			$title  = sanitize_text_field( $_REQUEST['title'] );
+			$title  = sanitize_text_field( wp_unslash( $_REQUEST['title'] ) );
 			$result = $this->api_call( "/videos/$video_id", compact( 'title' ) );
 		} elseif ( isset( $_REQUEST['thumbnail'] ) ) {
 			$thumbnail = sanitize_text_field( $_REQUEST['thumbnail'] );
@@ -352,7 +352,7 @@ class Infinite_Uploads_Video {
 	}
 
 	function register_block() {
-		register_block_type( __DIR__ . '/video/block/src' );
+		register_block_type( __DIR__ . '/video/block' );
 	}
 
 	/**

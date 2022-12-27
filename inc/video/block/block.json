@@ -6,7 +6,7 @@
   "title": "Infinite Uploads Video",
   "category": "media",
   "icon": "format-video",
-  "description": "Upload & Embed a video via Infinite Uploads Stream.",
+  "description": "Upload & Embed a video via Infinite Uploads Video Cloud.",
   "attributes": {
     "video_id": {
       "type": "string"
@@ -32,7 +32,7 @@
     "html": false
   },
   "textdomain": "infinite-uploads",
-  "editorScript": "file:../../../../build/block.js",
-  "editorStyle": "file:../../../../build/block.css",
-  "style": "file:../../../../build/style-block.css"
+  "editorScript": "file:../../../build/block.js",
+  "editorStyle": "file:../../../build/block.css",
+  "style": "file:../../../build/style-block.css"
 }

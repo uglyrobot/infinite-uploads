@@ -14,7 +14,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import DeleteModal from "./DeleteModal";
 import Spinner from "react-bootstrap/Spinner";
 
-export default function VideoModal({video, setVideos, children}) {
+export default function VideoModal({video, setVideos, selectVideo, children}) {
 	const [show, setShow] = useState(false);
 	const [title, setTitle] = useState(video.title);
 	const [autoPlay, setAutoPlay] = useState(false);
@@ -46,7 +46,6 @@ export default function VideoModal({video, setVideos, children}) {
 	useEffect(() => {
 		const component = <iframe src={`https://iframe.mediadelivery.net/embed/${video.videoLibraryId}/${video.guid}?autoplay=false&v=${Math.random()}`} loading="lazy" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen={true}></iframe>
 		setIframe(component)
-		console.log(component)
 	}, [video]);
 
 	const getThumbnail = (file) => {
@@ -78,7 +77,6 @@ export default function VideoModal({video, setVideos, children}) {
 		fetch(`${ajaxurl}?action=infinite-uploads-video-update`, options)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				if (data.success) {
 					setVideos(videos => videos.map(v => v.guid === video.guid ? {...v, title} : v));
 				} else {
@@ -110,7 +108,6 @@ export default function VideoModal({video, setVideos, children}) {
 		fetch(`${ajaxurl}?action=infinite-uploads-video-update`, options)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				if (data.success) {
 					setVideos(videos => videos.map(v => v.guid === video.guid ? {...v, thumbnailFileName} : v));
 				} else {
@@ -142,7 +139,6 @@ export default function VideoModal({video, setVideos, children}) {
 		fetch(`${ajaxurl}?action=infinite-uploads-video-update`, options)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				if (data.success) {
 					getVideo(); // refresh video data
 					setUploading(false);
@@ -214,7 +210,13 @@ export default function VideoModal({video, setVideos, children}) {
 
 	return (
 		<>
-			<a className="m-3 w-100 p-0 text-decoration-none" role="button" aria-label={__('Open video modal', 'infinite-uploads')} onClick={handleShow}>
+			<a className="m-3 w-100 p-0 text-decoration-none" role="button" aria-label={__('Open video modal', 'infinite-uploads')} onClick={() => {
+				if (selectVideo) {
+					selectVideo(video);
+				} else {
+					handleShow();
+				}
+			}}>
 				{children}
 			</a>
 

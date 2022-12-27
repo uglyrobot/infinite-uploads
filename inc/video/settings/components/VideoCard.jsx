@@ -8,7 +8,7 @@ import VideoModal from "./VideoModal";
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import DeleteModal from "./DeleteModal";
 
-function VideoCard({video, videos, setVideos}) {
+function VideoCard({video, videos, setVideos, selectVideo}) {
 
 	const getThumbnail = (file) => {
 		return IUP_VIDEO.cdnUrl + '/' + video.guid + '/' + file;
@@ -69,7 +69,7 @@ function VideoCard({video, videos, setVideos}) {
 		)
 	} else {
 		return (
-			<VideoModal {...{video, setVideos}}>
+			<VideoModal {...{video, setVideos, selectVideo}}>
 				<Card className="m-0 shadow-sm">
 					<div className="ratio ratio-16x9 overflow-hidden bg-black rounded-top">
 						<div className="iup-video-thumb" style={{backgroundImage: `url("${src}")`}}
