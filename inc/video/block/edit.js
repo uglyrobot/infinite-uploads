@@ -11,6 +11,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
  */
+import {useSelect} from '@wordpress/data';
 import {PanelBody, Placeholder, Spinner, Button} from '@wordpress/components';
 import {useBlockProps, InspectorControls} from '@wordpress/block-editor';
 import {media} from '@wordpress/icons';
@@ -38,8 +39,10 @@ import LibraryModal from "./components/LibraryModal";
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit({attributes, setAttributes}) {
+export default function Edit({clientId, attributes, setAttributes}) {
 	const blockProps = useBlockProps();
+	const isSelected = useSelect((select) => select('core/block-editor').isBlockSelected(clientId, true));
+
 
 	/* Possible video statuses
 	Created = 0
@@ -52,6 +55,14 @@ export default function Edit({attributes, setAttributes}) {
 	*/
 	const [video, setVideo] = useState(null);
 	const [isUploading, setUploading] = useState(false);
+	const [showOverlay, setShowOverlay] = useState(true);
+
+	//reenable the click overlay whenever the block is unselected so we can click back on it
+	useEffect(() => {
+		if (!isSelected) {
+			setShowOverlay(true);
+		}
+	}, [isSelected]);
 
 	useEffect(() => {
 		if (attributes.video_id) {
@@ -168,6 +179,7 @@ export default function Edit({attributes, setAttributes}) {
 								        sandbox="allow-scripts allow-same-origin allow-presentation" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen={true}></iframe>
 							</div>
 						</figure>
+						{showOverlay && <button className="iup-video-overlay" onClick={() => setShowOverlay(false)}/>}
 					</div>
 					<InspectorControls>
 						<PanelBody title={__('Settings')}>
@@ -193,18 +205,28 @@ export default function Edit({attributes, setAttributes}) {
 				label = sprintf(__('Video %d%% processed...', 'infinite-uploads'), video.encodeProgress);
 			}
 			return (
-				<div {...blockProps}>
-					<div className="ratio-16-9-outer">
-						<div className="ratio-16-9-inner" style={style}>
-							<div className="ratio-16-9-content">
-								<Spinner style={{
-									height: '0.9em',
-									width: '0.9em'
-								}}/> {label}
+				<>
+					<div {...blockProps}>
+						<div className="ratio-16-9-outer">
+							<div className="ratio-16-9-inner" style={style}>
+								<div className="ratio-16-9-content">
+									<Spinner style={{
+										height: '0.9em',
+										width: '0.9em'
+									}}/> {label}
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+					<InspectorControls>
+						<PanelBody title={__('Settings')}>
+							<VideoCommonSettings
+								setAttributes={setAttributes}
+								attributes={attributes}
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</>
 			);
 		}
 	} else {
