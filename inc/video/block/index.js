@@ -23,27 +23,26 @@ import Edit from './edit';
 import save from './save';
 import metadata from './block.json';
 
-
 /**
  * Every block starts by registering a new block type definition.
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
  */
 registerBlockType(metadata.name, {
-  /**
-   * Used to construct a preview for the block to be shown in the block inserter.
-   */
-  example: {
-    attributes: {
-      video_id: '',
-    },
-  },
-  /**
-   * @see ./edit.js
-   */
-  edit: Edit,
-  /**
-   * @see ./save.js
-   */
-  save,
+	/**
+	 * Used to construct a preview for the block to be shown in the block inserter.
+	 */
+	example: {
+		attributes: {
+			video_id: '',
+		},
+	},
+	/**
+	 * @see ./edit.js
+	 */
+	edit: Edit,
+	/**
+	 * @see ./save.js
+	 */
+	save,
 });

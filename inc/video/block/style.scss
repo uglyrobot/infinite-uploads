@@ -4,4 +4,18 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
+.wp-block-infinite-uploads-video {
+  .iup-video-embed-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+    min-width: var(--wp--style--global--content-size);
+  }
 
+  .iup-video-embed {
+    border: none;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+  }
+}

@@ -4,89 +4,91 @@
  *
  * @see https://uppy.io/docs/writing-plugins/#Example-of-a-custom-plugin
  */
-import {UIPlugin} from "@uppy/core";
+import {UIPlugin} from '@uppy/core';
 
 class UppyCreateVid extends UIPlugin {
-  constructor(uppy, opts) {
+	constructor(uppy, opts) {
+		super(uppy, {...{}, ...opts});
 
-    super(uppy, {...{}, ...opts})
+		this.id = this.opts.id || 'CreateVid';
+		this.type = 'modifier';
+	}
 
-    this.id = this.opts.id || 'CreateVid'
-    this.type = 'modifier'
-  }
+	createVideo(title) {
+		return new Promise((resolve, reject) => {
+			const formData = new FormData();
+			formData.append('title', title);
+			formData.append('nonce', IUP_VIDEO.nonce);
 
-  createVideo(title) {
+			const options = {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+				},
+				body: formData,
+			};
 
-    return new Promise((resolve, reject) => {
+			fetch(
+				`${ajaxurl}?action=infinite-uploads-video-create`,
+				options
+			)
+				.then((response) => response.json())
+				.then((data) => {
+					console.log(data);
+					if (data.success) {
+						resolve(data.data);
+					} else {
+						reject(data.data);
+					}
+				})
+				.catch((error) => {
+					console.log('Error:', error);
+					return reject(error);
+				});
+		});
+	}
 
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('nonce', IUP_VIDEO.nonce);
+	prepareUpload = (fileIDs) => {
+		const promises = fileIDs.map((fileID) => {
+			const file = this.uppy.getFile(fileID);
+			//get the title from the file name and remove the extension
+			const title = file.name.replace(/\.[^/.]+$/, '');
 
-      const options = {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: formData,
-      };
+			return this.createVideo(title)
+				.then((upload) => {
+					console.log(`Video ${upload.VideoId} created`);
+					this.opts.blockProps.videoAuth = upload;
+				})
+				.catch((err) => {
+					this.uppy.log(
+						`Video could not be created ${file.id}:`,
+						'warning'
+					);
+					this.uppy.log(err, 'warning');
+				});
+		});
 
-      fetch(`${ajaxurl}?action=infinite-uploads-video-create`, options)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.success) {
-            resolve(data.data);
-          } else {
-            reject(data.data);
-          }
-        })
-        .catch((error) => {
-          console.log('Error:', error);
-          return reject(error);
-        });
-    });
-  }
+		const emitPreprocessCompleteForAll = () => {
+			fileIDs.forEach((fileID) => {
+				const file = this.uppy.getFile(fileID);
+				this.uppy.emit('preprocess-complete', file);
+			});
+		};
 
-  prepareUpload = (fileIDs) => {
-    const promises = fileIDs.map((fileID) => {
-	    const file = this.uppy.getFile(fileID)
-	    //get the title from the file name and remove the extension
-	    const title = file.name.replace(/\.[^/.]+$/, "");
+		// Why emit `preprocess-complete` for all files at once, instead of
+		// above when each is processed?
+		// Because it leads to StatusBar showing a weird “upload 6 files” button,
+		// while waiting for all the files to complete pre-processing.
+		return Promise.all(promises).then(emitPreprocessCompleteForAll);
+	};
 
-	    return this.createVideo(title).then((upload) => {
-			    console.log(`Video ${upload.VideoId} created`);
-			    this.opts.blockProps.video_id = upload.VideoId;
-			    this.opts.blockProps.auth = upload;
-		    }
-	    ).catch((err) => {
-		    this.uppy.log(`Video could not be created ${file.id}:`, 'warning')
-		    this.uppy.log(err, 'warning')
-	    })
-    })
+	install() {
+		this.uppy.addPreProcessor(this.prepareUpload);
+	}
 
-    const emitPreprocessCompleteForAll = () => {
-      fileIDs.forEach((fileID) => {
-        const file = this.uppy.getFile(fileID)
-        this.uppy.emit('preprocess-complete', file)
-      })
-    }
-
-    // Why emit `preprocess-complete` for all files at once, instead of
-    // above when each is processed?
-    // Because it leads to StatusBar showing a weird “upload 6 files” button,
-    // while waiting for all the files to complete pre-processing.
-    return Promise.all(promises)
-      .then(emitPreprocessCompleteForAll)
-  }
-
-  install() {
-    this.uppy.addPreProcessor(this.prepareUpload)
-  }
-
-  uninstall() {
-    this.uppy.removePreProcessor(this.prepareUpload)
-  }
+	uninstall() {
+		this.uppy.removePreProcessor(this.prepareUpload);
+	}
 }
 
-export default UppyCreateVid
+export default UppyCreateVid;

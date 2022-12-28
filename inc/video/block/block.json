@@ -29,7 +29,13 @@
     }
   },
   "supports": {
-    "html": false
+    "html": false,
+    "anchor": true,
+    "align": true,
+    "spacing": {
+      "margin": true,
+      "padding": true
+    }
   },
   "textdomain": "infinite-uploads",
   "editorScript": "file:../../../build/block.js",

@@ -18,17 +18,23 @@ import {useBlockProps} from '@wordpress/block-editor';
  * @return {WPElement} Element to render.
  */
 export default function save({attributes}) {
-  const blockProps = useBlockProps.save();
-  if (attributes.video_id) {
-    return (
-      <figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio wp-block-embed is-type-video">
-        <div class="wp-block-embed__wrapper">
-          <iframe src={`https://iframe.mediadelivery.net/embed/${IUP_VIDEO.libraryId}/${attributes.video_id}?autoplay=${attributes.autoplay}&preload=${attributes.preload}&loop=${attributes.loop}&muted=${attributes.muted}`} loading="lazy" width="864" height="486" className="components-sandbox"
-                  sandbox="allow-scripts allow-same-origin allow-presentation" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowFullScreen={true}></iframe>
-        </div>
-      </figure>
-    );
-  } else {
-    return <div {...blockProps}></div>;
-  }
+	const blockProps = useBlockProps.save();
+	if (attributes.video_id) {
+		return (
+			<figure {...blockProps}>
+				<div className="iup-video-embed-wrapper">
+					<iframe
+						src={`https://iframe.mediadelivery.net/embed/${IUP_VIDEO.libraryId}/${attributes.video_id}?autoplay=${attributes.autoplay}&preload=${attributes.preload}&loop=${attributes.loop}&muted=${attributes.muted}`}
+						loading="lazy"
+						className="iup-video-embed"
+						sandbox="allow-scripts allow-same-origin allow-presentation"
+						allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+						allowFullScreen={true}
+					></iframe>
+				</div>
+			</figure>
+		);
+	} else {
+		return <div {...blockProps}></div>;
+	}
 }

@@ -262,7 +262,7 @@ class Infinite_Uploads_Video {
 	public function ajax_create_video() {
 		$this->ajax_check_permissions();
 
-		$result = $this->api_call( '/videos', [ 'title' => sanitize_text_field( $_REQUEST['title'] ) ] );
+		$result = $this->api_call( '/videos', [ 'title' => sanitize_text_field( wp_unslash( $_REQUEST['title'] ) ) ] );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result );
 		}
