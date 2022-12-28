@@ -12,9 +12,13 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
  */
 import {useSelect} from '@wordpress/data';
-import {PanelBody, Placeholder, Spinner, Button} from '@wordpress/components';
-import {useBlockProps, InspectorControls} from '@wordpress/block-editor';
-import {media} from '@wordpress/icons';
+import {
+	PanelBody, Placeholder, Spinner,
+	ToolbarButton,
+} from '@wordpress/components';
+import {useBlockProps, InspectorControls, BlockControls} from '@wordpress/block-editor';
+import {replace} from '@wordpress/icons';
+import {InfiniteUploadsIcon} from './components/Images';
 import {__, sprintf} from '@wordpress/i18n';
 import {useRef, useEffect, useState} from '@wordpress/element';
 import Uppy from '@uppy/core';
@@ -213,6 +217,13 @@ export default function Edit({clientId, attributes, setAttributes}) {
 							/>
 						)}
 					</div>
+					<BlockControls group="other">
+						<ToolbarButton
+							onClick={() => setAttributes({video_id: null})}
+							icon={replace}
+							label={__('Replace Video', 'infinite-uploads')}
+						/>
+					</BlockControls>
 					<InspectorControls>
 						<PanelBody title={__('Settings')}>
 							<VideoCommonSettings
@@ -276,7 +287,7 @@ export default function Edit({clientId, attributes, setAttributes}) {
 		return (
 			<div {...blockProps}>
 				<Placeholder
-					icon={media}
+					icon={InfiniteUploadsIcon}
 					instructions={__(
 						'Upload a new video direct to the cloud or select a video from your cloud library.',
 						'infinite-uploads'

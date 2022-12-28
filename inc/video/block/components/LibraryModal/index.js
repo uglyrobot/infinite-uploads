@@ -2,9 +2,8 @@ import {__, _x} from '@wordpress/i18n';
 import {Button, Modal} from '@wordpress/components';
 import {useState, useEffect} from '@wordpress/element';
 import Library from '../../../settings/index';
-import {cloud} from '@wordpress/icons';
+import {InfiniteUploadsIcon} from '../Images';
 import './styles.scss';
-import '../../../../assets/css/admin.css';
 
 export default function LibraryModal({selectVideo, ...props}) {
 	const [isOpen, setOpen] = useState(false);
@@ -21,7 +20,7 @@ export default function LibraryModal({selectVideo, ...props}) {
 					{...props}
 					isDismissible={true}
 					onRequestClose={closeModal}
-					icon={cloud}
+					icon={InfiniteUploadsIcon(false)}
 					style={{width: '98%'}}
 					title={__('Cloud Video Library', 'infinite-uploads')}
 					className="iup-block-library-model"

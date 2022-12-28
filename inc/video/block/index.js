@@ -22,6 +22,7 @@ import './editor.scss';
 import Edit from './edit';
 import save from './save';
 import metadata from './block.json';
+import {InfiniteUploadsIcon} from './components/Images';
 
 /**
  * Every block starts by registering a new block type definition.
@@ -45,4 +46,5 @@ registerBlockType(metadata.name, {
 	 * @see ./save.js
 	 */
 	save,
+	icon: InfiniteUploadsIcon(false),
 });
