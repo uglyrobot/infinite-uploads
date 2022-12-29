@@ -8,7 +8,7 @@ jQuery(document).ready(function ($) {
 	var iupAjaxCall = false;
 
 	//show a confirmation warning if leaving page during a bulk action
-	$(window).bind('beforeunload', function () {
+	$(window).on("unload", function () {
 		if (iupProcessingLoop) {
 			return iup_data.strings.leave_confirmation;
 		}

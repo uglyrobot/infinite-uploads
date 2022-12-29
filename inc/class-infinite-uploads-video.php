@@ -13,15 +13,21 @@ class Infinite_Uploads_Video {
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
 		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
+
 
 		//all write API calls we make on backend to not expose write API key
 		add_action( 'wp_ajax_infinite-uploads-video-create', [ &$this, 'ajax_create_video' ] );
 		add_action( 'wp_ajax_infinite-uploads-video-update', [ &$this, 'ajax_update_video' ] );
 		add_action( 'wp_ajax_infinite-uploads-video-delete', [ &$this, 'ajax_delete_video' ] );
+		add_action( 'wp_ajax_infinite-uploads-video-settings', [ &$this, 'ajax_update_settings' ] );
 
 		//gutenberg block
 		add_action( 'init', [ &$this, 'register_block' ] );
 		add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
+
+		//shortcode
+		add_shortcode( 'infinite-uploads-vid', [ &$this, 'shortcode' ] );
 
 		//for testing, override values that our API would normally provide TODO remove
 		add_filter( 'infinite_uploads_video_config', function ( $return, $key, $data ) {
@@ -331,19 +337,57 @@ class Infinite_Uploads_Video {
 	}
 
 	/**
+	 * Update video library settings via Infinite Uploads API.
+	 *
+	 * @see https://docs.bunny.net/reference/video_updatevideo
+	 *
+	 * @return void
+	 */
+	public function ajax_update_settings() {
+		$this->ajax_check_permissions();
+
+		$settings_json = sanitize_text_field( $_REQUEST['settings'] );
+
+		$result = $this->update_library_settings( $settings_json );
+
+		if ( ! $result ) {
+			wp_send_json_error( $result );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
 	 * Registers the video library page under Media.
 	 */
 	function admin_menu() {
 		$page = add_media_page(
 			__( 'Video Library - Infinite Uploads', 'infinite-uploads' ),
 			__( 'Video Library', 'infinite-uploads' ),
-			$this->iup_instance->capability,
+			'upload_files',
 			'infinite_uploads_vids',
 			[
 				$this,
-				'video_library_page',
+				'library_page',
 			],
 			1.1678 //for unique menu position above Add New.
+		);
+
+		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
+		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
+		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
+
+		//video settings page.
+		$page = add_submenu_page(
+			'infinite_uploads',
+			__( 'Infinite Uploads Video', 'infinite-uploads' ),
+			__( 'Video Cloud', 'infinite-uploads' ),
+			$this->iup_instance->capability,
+			'infinite_uploads_video_settings',
+			[
+				$this,
+				'settings_page',
+			]
 		);
 
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
@@ -359,39 +403,73 @@ class Infinite_Uploads_Video {
 	 * @todo adjust for the video library page.
 	 */
 	function admin_scripts() {
-		wp_enqueue_script( 'iup-settings-js', plugins_url( 'build/settings.js', __DIR__ ), array( 'wp-element', 'wp-i18n' ), time(), false );
-		wp_set_script_translations( 'iup-settings-js', 'infinite-uploads' );
-
-		$data            = [];
-		$data['base']    = plugins_url( 'assets', __FILE__ );
-		$data['strings'] = [
-			'leave_confirm'      => esc_html__( 'Are you sure you want to leave this tab? The current bulk action will be canceled and you will need to continue where it left off later.', 'infinite-uploads' ),
-			'ajax_error'         => esc_html__( 'Too many server errors. Please try again.', 'infinite-uploads' ),
-			'leave_confirmation' => esc_html__( 'If you leave this page the sync will be interrupted and you will have to continue where you left off later.', 'infinite-uploads' ),
-		];
-
-		//$data['nonce'] = wp_create_nonce( 'iup_video' );
-
-		wp_localize_script( 'iup-js', 'iup_data', $data );
+		wp_enqueue_script( 'iup-admin', plugins_url( 'build/admin.js', __DIR__ ), array( 'wp-element', 'wp-i18n' ), time(), false );
 	}
 
 	/**
 	 *
 	 */
 	function admin_styles() {
-		wp_enqueue_style( 'iup-settings-bootstrap', plugins_url( 'build/settings.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
+		wp_enqueue_style( 'iup-admin', plugins_url( 'build/admin.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
 	}
 
 	/**
 	 * Video library page display callback.
 	 */
-	function video_library_page() {
+	function library_page() {
 		?>
 		<div id="iup-videos-page" class="wrap iup-background">
 		</div>
 
 		<?php
 		require_once( dirname( __FILE__ ) . '/templates/footer.php' );
+	}
+
+	/**
+	 * Video library page display callback.
+	 */
+	function settings_page() {
+		?>
+		<div id="iup-video-settings-page" class="wrap iup-background">
+		</div>
+
+		<?php
+		require_once( dirname( __FILE__ ) . '/templates/footer.php' );
+	}
+
+	/**
+	 * Video embed shortcode.
+	 */
+	function shortcode( $atts ) {
+		$atts = shortcode_atts(
+			[
+				'id'       => '',
+				'autoplay' => false,
+				'loop'     => false,
+				'muted'    => false,
+				'preload'  => true,
+			],
+			$atts,
+			'infinite-uploads-vid'
+		);
+
+		$video_url = esc_url_raw( sprintf( 'https://iframe.mediadelivery.net/embed/%d/%s', $this->get_config( 'library_id' ), $atts['id'] ) );
+
+		unset( $atts['id'] );
+		$video_url = add_query_arg(
+			$atts,
+			$video_url
+		);
+
+		//fully escape now
+		$video_url = esc_url( $video_url );
+
+		return <<<HTML
+		<figure class="wp-block-video">
+			<div style="position: relative;padding-top: 56.25%;min-width: var(--wp--style--global--content-size);"><iframe src="$video_url" loading="lazy" style="border: none; position: absolute; top: 0; height: 100%; width: 100%;" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"></iframe></div>
+		</figure>
+		HTML;
+
 	}
 
 	/**

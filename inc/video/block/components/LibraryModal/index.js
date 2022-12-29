@@ -1,7 +1,7 @@
 import {__, _x} from '@wordpress/i18n';
 import {Button, Modal} from '@wordpress/components';
 import {useState, useEffect} from '@wordpress/element';
-import Library from '../../../settings/index';
+import Library from '../../../admin/components/Library';
 import {InfiniteUploadsIcon} from '../Images';
 import './styles.scss';
 

@@ -13,8 +13,8 @@ module.exports = {
   ...{
     entry: {
 	    block: path.resolve(process.cwd(), 'inc/video/block', 'index.js'),
-	    settings: [
-		    path.resolve(process.cwd(), 'inc/video/settings', 'settings.js'),
+	    admin: [
+		    path.resolve(process.cwd(), 'inc/video/admin', 'index.js'),
 		    path.resolve(process.cwd(), 'inc/assets/css', 'admin.css'),
 	    ],
     },

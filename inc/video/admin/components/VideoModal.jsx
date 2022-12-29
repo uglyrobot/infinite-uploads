@@ -524,7 +524,7 @@ export default function VideoModal({
 													type="text"
 													aria-label="Embed Code"
 													readOnly
-													value={`[infinite-uploads id="${video.guid}" ${embedParams}]`}
+													value={`[infinite-uploads-vid id="${video.guid}" ${embedParams}]`}
 													onClick={(e) => {
 														e.target.select();
 														document.execCommand(

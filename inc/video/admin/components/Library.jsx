@@ -1,11 +1,11 @@
 import {useEffect, useState} from '@wordpress/element';
 import {__, _x, _n, _nx} from '@wordpress/i18n';
-import VideoCard from './components/VideoCard';
+import VideoCard from './VideoCard';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Header from './components/Header';
-import Paginator from './components/Paginator';
+import Header from './Header';
+import Paginator from './Paginator';
 import Spinner from 'react-bootstrap/Spinner';
 
 export default function Library({selectVideo}) {

@@ -21,15 +21,17 @@ class Infinite_Uploads_Admin {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
-		//single site
-		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
-		add_action( 'load-media_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
-		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
-
-		//multisite
-		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
-		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
-		add_filter( 'network_admin_plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		if ( is_multisite() ) {
+			//multisite
+			add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
+			add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
+			add_filter( 'network_admin_plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		} else {
+			//single site
+			add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+			add_action( 'load-toplevel_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
+			add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		}
 
 		add_action( 'admin_init', [ &$this, 'privacy_policy' ] );
 		add_action( 'deactivate_plugin', [ &$this, 'block_bulk_deactivate' ] );
@@ -731,7 +733,7 @@ class Infinite_Uploads_Admin {
 		if ( is_multisite() ) {
 			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
 		} else {
-			$base = admin_url( 'options-general.php?page=infinite_uploads' );
+			$base = admin_url( 'admin.php?page=infinite_uploads' );
 		}
 
 		return add_query_arg( $args, $base );
@@ -758,30 +760,18 @@ class Infinite_Uploads_Admin {
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
-		if ( is_multisite() ) {
-			$page = add_submenu_page(
-				'settings.php',
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				$this->iup_instance->capability,
-				'infinite_uploads',
-				[
-					$this,
-					'settings_page',
-				]
-			);
-		} else {
-			$page = add_options_page(
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				$this->iup_instance->capability,
-				'infinite_uploads',
-				[
-					$this,
-					'settings_page',
-				]
-			);
-		}
+		$page = add_menu_page(
+			__( 'Infinite Uploads', 'infinite-uploads' ),
+			__( 'Infinite Uploads', 'infinite-uploads' ),
+			$this->iup_instance->capability,
+			'infinite_uploads',
+			[
+				$this,
+				'settings_page',
+			],
+			plugins_url( 'assets/img/iu-logo-blue-sm.svg', __FILE__ )
+		);
+
 
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
