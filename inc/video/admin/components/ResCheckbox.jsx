@@ -10,7 +10,7 @@ export default function ResCheckbox({px, bitrate, settings, setSettings}) {
 	const width = Math.round(px * 16 / 9);
 	const label = "(" + width + "x" + px + ")";
 	const bitrateLabel = bitrate ? bitrate + " kbps" : "";
-	const hdLabel = px >= 2160 ? "4K" : px >= 1440 ? "2K" : px >= 1080 ? "Full HD" : px >= 720 ? "HD" : "";
+	const hdLabel = px >= 2160 ? "4K UHD" : px >= 1440 ? "2K QHD" : px >= 1080 ? "Full HD" : px >= 720 ? "HD" : "";
 	const disabled = px >= 1440;
 
 	return (

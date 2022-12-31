@@ -35,7 +35,7 @@ export default function Settings() {
 			.then((response) => response.json())
 			.then((data) => {
 				if (data.success) {
-					setSettings(data);
+					setSettings(data.data);
 				} else {
 					console.error(data.data);
 				}

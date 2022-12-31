@@ -5,11 +5,27 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import {VideoSize} from "./VideoAttributes";
+import UploadModal from "./UploadModal";
 
-function Header({orderBy, setOrderBy, search, setSearch, selectVideo}) {
+function Header({orderBy, setOrderBy, search, setSearch, selectVideo, getVideos}) {
+
+	const sizeOf = function (bytes) {
+		if (bytes === 0) {
+			return '0 B';
+		}
+		var e = Math.floor(Math.log(bytes) / Math.log(1024));
+		return (
+			(bytes / Math.pow(1024, e)).toFixed(1) +
+			' ' +
+			' KMGTP'.charAt(e) +
+			'B'
+		);
+	};
+
 	return (
-		<Row>
-			<Col sm={8} md={3} className="mb-3">
+		<Row className="align-items-center">
+			<Col sm={8} md={3} className="mb-3 mb-lg-0">
 				<InputGroup>
 					<InputGroup.Text>
 						<span className="dashicons dashicons-search"></span>
@@ -22,7 +38,7 @@ function Header({orderBy, setOrderBy, search, setSearch, selectVideo}) {
 					/>
 				</InputGroup>
 			</Col>
-			<Col sm={4} md={2} className="mb-3">
+			<Col sm={4} md={2} className="mb-3 mb-lg-0">
 				<InputGroup>
 					<InputGroup.Text>
 						{__('Sort', 'infinite-uploads')}
@@ -45,14 +61,33 @@ function Header({orderBy, setOrderBy, search, setSearch, selectVideo}) {
 					</Form.Select>
 				</InputGroup>
 			</Col>
-			<Col className="d-flex justify-content-end mb-3">
+			<Col className="mb-3 mb-lg-0">
+				<Row className="justify-content-center flex-nowrap">
+					<Col className="col-auto">
+						<p className="mb-0">{__("Video Count", 'infinite-uploads')}</p>
+						<span className="h4 text-nowrap">{IUP_VIDEO.settings.VideoCount}</span>
+					</Col>
+					<Col className="col-auto">
+						<p className="mb-0">{__("Library Storage", 'infinite-uploads')}</p>
+						<span className="h4 text-nowrap">{sizeOf(IUP_VIDEO.settings.StorageUsage)}</span>
+					</Col>
+					<Col className="col-auto">
+						<p className="mb-0">{__("Video Bandwidth", 'infinite-uploads')}</p>
+						<span className="h4 text-nowrap">{sizeOf(IUP_VIDEO.settings.TrafficUsage)}</span>
+					</Col>
+				</Row>
+			</Col>
+			<Col className="d-flex justify-content-end mb-3 mb-lg-0">
+				<Button
+					variant="outline-secondary"
+					className="rounded-pill text-nowrap"
+					href={IUP_VIDEO.settingsUrl}
+				>
+					<span className="dashicons dashicons-admin-generic"></span>
+					{__('Settings', 'infinite-uploads')}
+				</Button>
 				{!selectVideo && (
-					<Button
-						variant="primary"
-						className="text-nowrap text-white px-3"
-					>
-						{__('New Video', 'infinite-uploads')}
-					</Button>
+					<UploadModal getVideos={getVideos}/>
 				)}
 			</Col>
 		</Row>

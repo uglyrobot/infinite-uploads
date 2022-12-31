@@ -79,7 +79,7 @@ export default function Library({selectVideo}) {
 						width="32"
 						className="me-2"
 					/>
-					{__('Video Library', 'infinite-uploads')}
+					{__('Cloud Video Library', 'infinite-uploads')}
 				</h1>
 			)}
 			<Container fluid>
@@ -90,6 +90,7 @@ export default function Library({selectVideo}) {
 						search,
 						setSearch,
 						selectVideo,
+						getVideos
 					}}
 				/>
 

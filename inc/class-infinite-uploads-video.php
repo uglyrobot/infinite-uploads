@@ -474,6 +474,7 @@ class Infinite_Uploads_Video {
 	 *
 	 */
 	function admin_styles() {
+		wp_enqueue_style( 'iup-uppy', plugins_url( 'build/style-admin.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION ); //Have no idea why webpack is putting uppy css in this file.
 		wp_enqueue_style( 'iup-admin', plugins_url( 'build/admin.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
 	}
 

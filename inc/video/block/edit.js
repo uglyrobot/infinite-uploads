@@ -61,6 +61,7 @@ export default function Edit({clientId, attributes, setAttributes}) {
 	const [video, setVideo] = useState(null);
 	const [isUploading, setUploading] = useState(false);
 	const [showOverlay, setShowOverlay] = useState(true);
+	const uploadAuth = useRef(null);
 
 	//reenable the click overlay whenever the block is unselected so we can click back on it
 	useEffect(() => {
@@ -101,32 +102,31 @@ export default function Edit({clientId, attributes, setAttributes}) {
 			.use(Tus, {
 				endpoint: 'https://video.bunnycdn.com/tusupload',
 				retryDelays: [0, 1000, 3000, 5000, 10000],
-				onBeforeRequest: (req) => {
-					console.log('Video Auth:', blockProps.videoAuth);
-					if (blockProps.videoAuth) {
+				onBeforeRequest: (req, file) => {
+					//console.log('Video Auth:', uploadAuth.current[file.id]);
+					if (uploadAuth.current[file.id]) {
 						setAttributes({
-							video_id: blockProps.videoAuth.VideoId,
+							video_id: uploadAuth.current[file.id].VideoId,
 						});
-						attributes.video_id = blockProps.videoAuth.VideoId; //I don't know why this is needed
+						attributes.video_id = uploadAuth.current[file.id].VideoId; //I don't know why this is needed
 					} else {
 						throw new Error('Error fetching auth.');
 						return false;
 					}
-					console.log('VideoId attr:', attributes.video_id);
 
 					req.setHeader(
 						'AuthorizationSignature',
-						blockProps.videoAuth.AuthorizationSignature
+						uploadAuth.current[file.id].AuthorizationSignature
 					);
 					req.setHeader(
 						'AuthorizationExpire',
-						blockProps.videoAuth.AuthorizationExpire
+						uploadAuth.current[file.id].AuthorizationExpire
 					);
-					req.setHeader('VideoId', blockProps.videoAuth.VideoId);
+					req.setHeader('VideoId', uploadAuth.current[file.id].VideoId);
 					req.setHeader('LibraryId', IUP_VIDEO.libraryId);
 				},
 			})
-			.use(UppyCreateVid, {blockProps}); //our custom plugin
+			.use(UppyCreateVid, {uploadAuth}); //our custom plugin
 	});
 
 	let uploadSuccess = useRef(false);

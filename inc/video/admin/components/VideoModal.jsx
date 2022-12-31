@@ -219,9 +219,9 @@ export default function VideoModal({
 					disabled={loading || uploading}
 					onClick={() => setThumbnail('thumbnail_' + i + '.jpg')}
 				>
-					<div className="ratio ratio-16x9 overflow-hidden bg-black">
+					<div className="ratio ratio-16x9 overflow-hidden bg-black rounded">
 						<div
-							className="iup-video-thumb"
+							className="iup-video-thumb rounded border-0"
 							style={{
 								backgroundImage: `url("${getThumbnail(
 									'thumbnail_' + i + '.jpg'
@@ -229,7 +229,7 @@ export default function VideoModal({
 							}}
 						></div>
 					</div>
-					<div className="card-img-overlay">
+					<div className="card-img-overlay rounded border-0">
 						<div className="card-title align-middle text-center text-white">
 							{__('Set', 'infinite-uploads')}
 						</div>
@@ -395,9 +395,9 @@ export default function VideoModal({
 											)}
 										</h6>
 										<Card className="bg-dark text-white w-100 p-0 mb-2">
-											<div className="ratio ratio-16x9 overflow-hidden bg-black">
+											<div className="ratio ratio-16x9 overflow-hidden bg-black rounded border-0">
 												<div
-													className="iup-video-thumb"
+													className="iup-video-thumb rounded border-0"
 													style={{
 														backgroundImage: `url("${getThumbnail(
 															video.thumbnailFileName

@@ -57,7 +57,7 @@ class UppyCreateVid extends UIPlugin {
 			return this.createVideo(title)
 				.then((upload) => {
 					console.log(`Video ${upload.VideoId} created`);
-					this.opts.blockProps.videoAuth = upload;
+					this.opts.uploadAuth.current = {...this.opts.uploadAuth.current, [fileID]: upload};
 				})
 				.catch((err) => {
 					this.uppy.log(

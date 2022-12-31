@@ -39,7 +39,7 @@
 			</div>
 			<div class="col text-center">
 				<p><?php esc_html_e( 'Manage cloud video library settings.', 'infinite-uploads' ); ?></p>
-				<a class="btn text-nowrap btn-info btn-lg" href="<?php echo esc_url( $this->video->settings_url() ); ?>" role="button"><span class="dashicons dashicons-admin-settings"></span> <?php esc_html_e( 'Settings', 'infinite-uploads' ); ?></a>
+				<a class="btn text-nowrap btn-info btn-lg" href="<?php echo esc_url( $this->video->settings_url() ); ?>" role="button"><span class="dashicons dashicons-admin-generic"></span> <?php esc_html_e( 'Settings', 'infinite-uploads' ); ?></a>
 			</div>
 		</div>
 	</div>
