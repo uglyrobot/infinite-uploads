@@ -397,7 +397,7 @@ class Infinite_Uploads {
 			return;
 		}
 
-		if ( get_current_screen()->id == 'media_page_infinite_uploads' || get_current_screen()->id == 'settings_page_infinite_uploads-network' ) {
+		if ( get_current_screen()->id == 'toplevel_page_infinite_uploads' || get_current_screen()->id == 'toplevel_page_infinite_uploads-network' ) {
 			return;
 		}
 		?>
@@ -405,7 +405,7 @@ class Infinite_Uploads {
 			<span style="display: inline-block;vertical-align: middle;white-space: normal;width: 80%;font-size: 15px;">
 				<strong><?php esc_html_e( 'Infinite Uploads is almost ready!', 'infinite-uploads' ); ?></strong>
 				<?php
-				esc_html_e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' );
+				esc_html_e( 'Create or connect your account to move your images, audio, and video to the cloud - with a click!', 'infinite-uploads' );
 				?>
 			</span>
 			<span style="display: inline-block;vertical-align: middle;width: 20%;text-align: right;">

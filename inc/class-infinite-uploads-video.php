@@ -12,23 +12,7 @@ class Infinite_Uploads_Video {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
 
-		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
-		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
-
-
-		//all write API calls we make on backend to not expose write API key
-		add_action( 'wp_ajax_infinite-uploads-video-create', [ &$this, 'ajax_create_video' ] );
-		add_action( 'wp_ajax_infinite-uploads-video-update', [ &$this, 'ajax_update_video' ] );
-		add_action( 'wp_ajax_infinite-uploads-video-delete', [ &$this, 'ajax_delete_video' ] );
-		add_action( 'wp_ajax_infinite-uploads-video-settings', [ &$this, 'ajax_update_settings' ] );
-
-		//gutenberg block
-		add_action( 'init', [ &$this, 'register_block' ] );
-		add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
-
-		//shortcode
-		add_shortcode( 'infinite-uploads-vid', [ &$this, 'shortcode' ] );
-
+		/*
 		//for testing, override values that our API would normally provide TODO remove
 		add_filter( 'infinite_uploads_video_config', function ( $return, $key, $data ) {
 			if ( 'library_id' === $key ) {
@@ -45,6 +29,27 @@ class Infinite_Uploads_Video {
 
 			return $return;
 		}, 10, 3 );
+		*/
+
+		add_action( 'wp_ajax_infinite-uploads-video-activate', [ &$this, 'ajax_activate_video' ] );
+
+		if ( $this->is_video_active() ) {
+			add_action( 'admin_menu', [ &$this, 'admin_menu' ], 20 );
+			add_action( 'network_admin_menu', [ &$this, 'admin_menu' ], 20 );
+
+			//all write API calls we make on backend to not expose write API key
+			add_action( 'wp_ajax_infinite-uploads-video-create', [ &$this, 'ajax_create_video' ] );
+			add_action( 'wp_ajax_infinite-uploads-video-update', [ &$this, 'ajax_update_video' ] );
+			add_action( 'wp_ajax_infinite-uploads-video-delete', [ &$this, 'ajax_delete_video' ] );
+			add_action( 'wp_ajax_infinite-uploads-video-settings', [ &$this, 'ajax_update_settings' ] );
+
+			//gutenberg block
+			add_action( 'init', [ &$this, 'register_block' ] );
+			add_action( 'enqueue_block_editor_assets', [ &$this, 'script_enqueue' ] );
+		}
+
+		//shortcode
+		add_shortcode( 'infinite-uploads-vid', [ &$this, 'shortcode' ] );
 	}
 
 	/**
@@ -100,7 +105,13 @@ class Infinite_Uploads_Video {
 	 * @return object|false
 	 */
 	public function update_library_settings( $args = [] ) {
-		return $this->api->call( "site/" . $this->api->get_site_id() . "/video", $args, 'POST' );
+		$new_settings = $this->api->call( "site/" . $this->api->get_site_id() . "/video", $args, 'POST' );
+		if ( $new_settings ) {
+			//TODO don't make another api call, just update the cache
+			return $this->get_library_settings( true );
+		}
+
+		return $new_settings;
 	}
 
 	/**
@@ -221,11 +232,14 @@ class Infinite_Uploads_Video {
 	 */
 	function script_enqueue() {
 		$data = array(
-			'libraryId' => $this->get_config( 'library_id' ),
-			'cdnUrl'    => $this->get_config( 'url' ), // This give us the base CDN url for the library for building media links.
-			'apiKey'    => $this->get_config( 'key_read' ), //we only expose the read key to the frontend. The write key is only used via backend ajax wrappers.
-			'nonce'     => wp_create_nonce( 'iup_video' ), //used to verify the request is coming from the frontend, CSRF.
-			'assetBase' => plugins_url( 'assets', __FILE__ ),
+			'libraryId'   => $this->get_config( 'library_id' ),
+			'cdnUrl'      => 'https://' . $this->get_config( 'url' ), // This give us the base CDN url for the library for building media links.
+			'apiKey'      => $this->get_config( 'key_write' ), //we only expose the read key to the frontend. The write key is only used via backend ajax wrappers.
+			'settings'    => $this->get_library_settings(),
+			'nonce'       => wp_create_nonce( 'iup_video' ), //used to verify the request is coming from the frontend, CSRF.
+			'assetBase'   => plugins_url( 'assets', __FILE__ ),
+			'settingsUrl' => $this->settings_url(),
+			'libraryUrl'  => $this->library_url(),
 		);
 		wp_register_script( 'iup-dummy-js-header', '' );
 		wp_enqueue_script( 'iup-dummy-js-header' );
@@ -252,7 +266,7 @@ class Infinite_Uploads_Video {
 		}
 
 		// return error if video is not enabled
-		if ( ! $this->is_video_enabled() ) {
+		if ( $this->is_video_active() && ! $this->is_video_enabled() ) {
 			wp_send_json_error( esc_html__( 'Infinite Uploads Video is disabled due to an issue with your account.', 'infinite-uploads' ) );
 		}
 	}
@@ -346,9 +360,28 @@ class Infinite_Uploads_Video {
 	public function ajax_update_settings() {
 		$this->ajax_check_permissions();
 
-		$settings_json = sanitize_text_field( $_REQUEST['settings'] );
+		//this is proxied to the Infinite Uploads API, and is sanitized/validated there.
+		$settings = json_decode( wp_unslash( $_REQUEST['settings'] ) );
+		$result   = $this->update_library_settings( $settings );
 
-		$result = $this->update_library_settings( $settings_json );
+		if ( ! $result ) {
+			wp_send_json_error( $result );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Update video library settings via Infinite Uploads API.
+	 *
+	 * @see https://docs.bunny.net/reference/video_updatevideo
+	 *
+	 * @return void
+	 */
+	public function ajax_activate_video() {
+		$this->ajax_check_permissions();
+
+		$result = $this->activate_video();
 
 		if ( ! $result ) {
 			wp_send_json_error( $result );
@@ -393,6 +426,37 @@ class Infinite_Uploads_Video {
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'script_enqueue' ] );
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
+	}
+
+
+	/**
+	 * Get the settings url with optional url args.
+	 *
+	 * @param array $args Optional. Same as for add_query_arg()
+	 *
+	 * @return string Unescaped url to settings page.
+	 */
+	function settings_url( $args = [] ) {
+		if ( is_multisite() ) {
+			$base = network_admin_url( 'admin.php?page=infinite_uploads_video_settings' );
+		} else {
+			$base = admin_url( 'admin.php?page=infinite_uploads_video_settings' );
+		}
+
+		return add_query_arg( $args, $base );
+	}
+
+	/**
+	 * Get the settings url with optional url args.
+	 *
+	 * @param array $args Optional. Same as for add_query_arg()
+	 *
+	 * @return string Unescaped url to settings page.
+	 */
+	function library_url( $args = [] ) {
+		$base = admin_url( 'upload.php?page=infinite_uploads_vids' );
+
+		return add_query_arg( $args, $base );
 	}
 
 	function register_block() {
@@ -441,6 +505,11 @@ class Infinite_Uploads_Video {
 	 * Video embed shortcode.
 	 */
 	function shortcode( $atts ) {
+		//hide shortcode when not logged in.
+		if ( ! $this->is_video_active() ) {
+			return '';
+		}
+
 		$atts = shortcode_atts(
 			[
 				'id'       => '',

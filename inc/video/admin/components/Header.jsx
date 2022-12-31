@@ -49,8 +49,7 @@ function Header({orderBy, setOrderBy, search, setSearch, selectVideo}) {
 				{!selectVideo && (
 					<Button
 						variant="primary"
-						size="lg"
-						className="text-nowrap text-white px-12"
+						className="text-nowrap text-white px-3"
 					>
 						{__('New Video', 'infinite-uploads')}
 					</Button>

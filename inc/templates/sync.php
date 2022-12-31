@@ -1,11 +1,11 @@
 <div class="card">
 	<div class="card-header">
 		<div class="d-flex align-items-center">
-			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Ready to Sync', 'infinite-uploads' ); ?></h5>
+			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Cloud Storage & CDN', 'infinite-uploads' ); ?></h5>
 			<?php require_once( dirname( __FILE__ ) . '/status-icon.php' ); ?>
 		</div>
 	</div>
-	<div class="card-body cloud p-md-5">
+	<div class="card-body cloud p-md-3">
 		<div class="row align-items-center justify-content-center mb-5">
 			<div class="col-lg col-xs-12">
 				<p class="lead mb-0"><?php esc_html_e( "Total Local Bytes / Files", 'infinite-uploads' ); ?></p>
@@ -27,9 +27,6 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-2 text-center d-none d-lg-block">
-				<img src="<?php echo esc_url( plugins_url( '/assets/img/arrow.svg', dirname( __FILE__ ) ) ); ?>" alt="Right sync arrow" height="31" width="56"/>
-			</div>
 			<div class="col-lg col-xs-12">
 				<?php if ( isset( $api_data->site ) && ! $api_data->site->upload_writeable ) { ?>
 					<div class="row justify-content-center mb-3 mt-4 mt-lg-0">
@@ -47,7 +44,7 @@
 						<div class="col text-center">
 							<img class="mb-4" src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-blue.svg', dirname( __FILE__ ) ) ); ?>" alt="Push to Cloud" height="76" width="76"/>
 							<p class="lead"><?php printf( esc_html__( 'You have %s of premium storage available!', 'infinite-uploads' ), $this->size_format_zero( ( $api_data->plan->storage_limit * GB_IN_BYTES ) - $api_data->stats->cloud->storage, 2 ) ); ?></p>
-							<p class="lead"><?php esc_html_e( 'Move your media library to the Infinite Uploads cloud.', 'infinite-uploads' ); ?></p>
+							<p class="lead"><?php esc_html_e( 'Optionally move your media library to the Infinite Uploads cloud and serve via our CDN.', 'infinite-uploads' ); ?></p>
 						</div>
 					</div>
 					<div class="row justify-content-center">

@@ -103,19 +103,27 @@ export default function Library({selectVideo}) {
 							xl={4}
 							xxl={5}
 						>
-							{videos.map((video, index) => {
-								return (
-									<Col key={index + video.guid}>
-										<VideoCard
-											{...{
-												video,
-												setVideos,
-												selectVideo,
-											}}
-										/>
-									</Col>
-								);
-							})}
+							{videos.length > 0 ? (
+								videos.map((video, index) => {
+									return (
+										<Col key={index + video.guid}>
+											<VideoCard
+												{...{
+													video,
+													setVideos,
+													selectVideo,
+												}}
+											/>
+										</Col>
+									);
+								})
+							) : (
+								<Container className="my-5 justify-content-center align-items-center">
+									<p className="text-muted text-center h5">
+										{__('No videos found.', 'infinite-uploads')}
+									</p>
+								</Container>
+							)}
 						</Row>
 						<Paginator
 							{...{page, setPage, totalItems, itemsPerPage}}

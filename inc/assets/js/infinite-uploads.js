@@ -540,6 +540,30 @@ jQuery(document).ready(function ($) {
 		});
 	});
 
+	//Enable video cloud
+	$('#iup-enable-video-button').on('click', function () {
+		$('#iup-enable-video-button').hide();
+		$('#iup-enable-video-spinner').removeClass('d-none').addClass('d-block');
+		$.post(
+			ajaxurl + '?action=infinite-uploads-video-activate',
+			{nonce: iup_data.nonce.video},
+			function (json) {
+				if (json.success) {
+					location.reload();
+					return true;
+				} else {
+					$('#iup-enable-video-spinner').addClass('d-none').removeClass('d-block');
+					$('#iup-enable-video-button').show();
+				}
+			},
+			'json'
+		).fail(function () {
+			showError(iup_data.strings.ajax_error);
+			$('#iup-enable-video-spinner').addClass('d-none').removeClass('d-block');
+			$('#iup-enable-video-button').show();
+		});
+	});
+
 	//refresh api data
 	$('.iup-refresh-icon .dashicons').on('click', function () {
 		$(this).hide();

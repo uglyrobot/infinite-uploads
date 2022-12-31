@@ -15,12 +15,7 @@ import Button from "react-bootstrap/Button";
 
 export default function Settings() {
 	const [loading, setLoading] = useState(false);
-	const [settings, setSettings] = useState({
-		PlayerKeyColor: '#6fa8dc',
-		UILanguage: 'en',
-		Controls: ['play', 'play-large', 'settings', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-		EnabledResolutions: ['240p', '360p', '480p', '720p', '1080p'],
-	});
+	const [settings, setSettings] = useState(IUP_VIDEO.settings);
 
 	function updateSettings() {
 		setLoading(true);
@@ -40,7 +35,7 @@ export default function Settings() {
 			.then((response) => response.json())
 			.then((data) => {
 				if (data.success) {
-					setSettings(data.settings);
+					setSettings(data);
 				} else {
 					console.error(data.data);
 				}
@@ -52,23 +47,38 @@ export default function Settings() {
 			});
 	}
 
+	if (!settings) {
+		return (
+			<h2>{__('Video library not yet connected.', 'infinite-uploads')}</h2>
+		)
+	}
+
 	return (
 		<Container fluid>
-			<h1 className="text-muted mb-3">
-				<img
-					src={IUP_VIDEO.assetBase + '/img/iu-logo-gray.svg'}
-					alt="Infinite Uploads Logo"
-					height="32"
-					width="32"
-					className="me-2"
-				/>
-				{__('Infinite Uploads Video Settings', 'infinite-uploads')}
-			</h1>
+			<Row className="justify-content-between align-items-center">
+				<Col>
+					<h1 className="text-muted mb-3">
+						<img
+							src={IUP_VIDEO.assetBase + '/img/iu-logo-gray.svg'}
+							alt="Infinite Uploads Logo"
+							height="32"
+							width="32"
+							className="me-2"
+						/>
+						{__('Infinite Uploads Video Settings', 'infinite-uploads')}
+					</h1>
+				</Col>
+				<Col>
+					<Button variant="primary" className="float-end" href={IUP_VIDEO.libraryUrl}>
+						{__('Video Library', 'infinite-uploads')}
+					</Button>
+				</Col>
+			</Row>
 
 			<Card>
 				<Card.Body>
 					<Tabs
-						defaultActiveKey="encoding"
+						defaultActiveKey="player"
 						id="video-settings-tabs"
 						className="mb-3"
 					>
@@ -167,7 +177,7 @@ export default function Settings() {
 
 					<Row className="justify-content-center mb-3">
 						<Col className="text-center">
-							<Button variant="primary" className="text-nowrap text-white px-4" onClick={updateSettings} disabled={loading}>{__('Save Settings', 'infinite-uploads')}</Button>
+							<Button variant="info" className="text-nowrap text-white px-4" onClick={updateSettings} disabled={loading}>{__('Save Settings', 'infinite-uploads')}</Button>
 						</Col>
 					</Row>
 				</Card.Body>

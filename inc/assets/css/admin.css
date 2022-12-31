@@ -13,14 +13,15 @@ body.mobile.modal-open #wpwrap {
 }
 
 .card {
-  margin-top: inherit;
-  padding: inherit;
-  min-width: inherit;
-  max-width: inherit;
-  box-shadow: inherit;
-  background: inherit;
-  box-sizing: inherit;
-  background-color: #ffffff;
+    margin-top: inherit;
+    padding: 0;
+    min-width: inherit;
+    max-width: 100%;
+    box-shadow: inherit;
+    background: inherit;
+    box-sizing: inherit;
+    background-color: #ffffff;
+    width: 100%;
 }
 
 .card-header {
@@ -140,12 +141,8 @@ body.mobile.modal-open #wpwrap {
   font-size: 25px;
 }
 
-.iup-enabled-status .dashicons-cloud-saved {
-  color: rgba(38, 169, 224, 1);
-}
-
-.iup-enabled-status .dashicons-cloud-upload {
-  color: #EE7C1E;
+.iup-enabled-status .dashicons-cloud-saved, .iup-enabled-status .dashicons-video-alt3 {
+    color: rgba(38, 169, 224, 1);
 }
 
 p.lead {

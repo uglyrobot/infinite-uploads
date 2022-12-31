@@ -15,11 +15,13 @@ class Infinite_Uploads_Admin {
 	public $ajax_timelimit = 20;
 	private $iup_instance;
 	private $api;
+	private $video;
 	private $auth_error;
 
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
+		$this->video        = Infinite_Uploads_Video::get_instance();
 
 		if ( is_multisite() ) {
 			//multisite
@@ -731,7 +733,7 @@ class Infinite_Uploads_Admin {
 	 */
 	function settings_url( $args = [] ) {
 		if ( is_multisite() ) {
-			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
+			$base = network_admin_url( 'admin.php?page=infinite_uploads' );
 		} else {
 			$base = admin_url( 'admin.php?page=infinite_uploads' );
 		}
@@ -772,7 +774,6 @@ class Infinite_Uploads_Admin {
 			plugins_url( 'assets/img/iu-logo-blue-sm.svg', __FILE__ )
 		);
 
-
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
 	}
@@ -805,6 +806,7 @@ class Infinite_Uploads_Admin {
 			'delete'   => wp_create_nonce( 'iup_delete' ),
 			'download' => wp_create_nonce( 'iup_download' ),
 			'toggle'   => wp_create_nonce( 'iup_toggle' ),
+			'video'    => wp_create_nonce( 'iup_video' ),
 		];
 
 		wp_localize_script( 'iup-js', 'iup_data', $data );
@@ -886,7 +888,7 @@ class Infinite_Uploads_Admin {
 		<div id="iup-settings-page" class="wrap iup-background">
 
 			<h1>
-				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
+				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="50" width="200"/>
 			</h1>
 
 			<?php if ( $this->auth_error ) { ?>
@@ -935,10 +937,10 @@ class Infinite_Uploads_Admin {
 					$cloud_files      = $api_data->stats->site->files;
 					$cloud_total_size = $api_data->stats->cloud->storage;
 				}
-				if ( infinite_uploads_enabled() ) {
-					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
-				} else {
-					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
+
+				require_once( dirname( __FILE__ ) . '/templates/header-columns.php' );
+
+				if ( ! infinite_uploads_enabled() ) {
 					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 					if ( isset( $api_data->site ) && $api_data->site->upload_writeable ) {
 						require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );
@@ -951,8 +953,6 @@ class Infinite_Uploads_Admin {
 				require_once( dirname( __FILE__ ) . '/templates/modal-remote-scan.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-delete.php' );
 				require_once( dirname( __FILE__ ) . '/templates/modal-download.php' );
-
-				require_once( dirname( __FILE__ ) . '/templates/video-settings.php' );
 
 			} else {
 				if ( ! empty( $stats['files_finished'] ) && $stats['files_finished'] >= ( time() - DAY_IN_SECONDS ) ) {
