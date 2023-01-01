@@ -16,6 +16,7 @@ export default function Library({selectVideo}) {
 	const [page, setPage] = useState(1);
 	const [totalItems, setTotalItems] = useState(0);
 	const [itemsPerPage, setItemsPerPage] = useState(40);
+	const [refreshInterval, setRefreshInterval] = useState(60000);
 
 	//get videos on render
 	useEffect(() => {
@@ -33,13 +34,23 @@ export default function Library({selectVideo}) {
 		}
 	}, [search]);
 
+	useEffect(() => {
+		//check the videos array if any of the video objects are currently processing or transcoding
+		const processing = videos.find((video) => (video.status === 2 || video.status === 3));
+		if (processing) {
+			setRefreshInterval(10000);
+		} else {
+			setRefreshInterval(60000);
+		}
+	}, [videos]);
+
 	//fetch videos on a 30s interval
 	useEffect(() => {
 		const interval = setInterval(() => {
 			getVideos();
-		}, 30000);
+		}, refreshInterval);
 		return () => clearInterval(interval);
-	}, [orderBy, page, search]);
+	}, [orderBy, page, search, refreshInterval]);
 
 	function getVideos() {
 		const options = {
