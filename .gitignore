@@ -1,5 +1,6 @@
 /bin/
 /node_modules/
 /build/
+/inc/video/block/build/
 .idea
 .DS_Store

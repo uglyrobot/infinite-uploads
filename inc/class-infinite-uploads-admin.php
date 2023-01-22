@@ -15,21 +15,25 @@ class Infinite_Uploads_Admin {
 	public $ajax_timelimit = 20;
 	private $iup_instance;
 	private $api;
+	private $video;
 	private $auth_error;
 
 	public function __construct() {
 		$this->iup_instance = Infinite_Uploads::get_instance();
 		$this->api          = Infinite_Uploads_Api_Handler::get_instance();
+		$this->video        = Infinite_Uploads_Video::get_instance();
 
-		//single site
-		add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
-		add_action( 'load-media_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
-		add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
-
-		//multisite
-		add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
-		add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
-		add_filter( 'network_admin_plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		if ( is_multisite() ) {
+			//multisite
+			add_action( 'network_admin_menu', [ &$this, 'admin_menu' ] );
+			add_action( 'load-settings_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
+			add_filter( 'network_admin_plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		} else {
+			//single site
+			add_action( 'admin_menu', [ &$this, 'admin_menu' ] );
+			add_action( 'load-toplevel_page_infinite_uploads', [ &$this, 'intercept_auth' ] );
+			add_filter( 'plugin_action_links_infinite-uploads/infinite-uploads.php', [ &$this, 'plugins_list_links' ] );
+		}
 
 		add_action( 'admin_init', [ &$this, 'privacy_policy' ] );
 		add_action( 'deactivate_plugin', [ &$this, 'block_bulk_deactivate' ] );
@@ -729,9 +733,9 @@ class Infinite_Uploads_Admin {
 	 */
 	function settings_url( $args = [] ) {
 		if ( is_multisite() ) {
-			$base = network_admin_url( 'settings.php?page=infinite_uploads' );
+			$base = network_admin_url( 'admin.php?page=infinite_uploads' );
 		} else {
-			$base = admin_url( 'upload.php?page=infinite_uploads' );
+			$base = admin_url( 'admin.php?page=infinite_uploads' );
 		}
 
 		return add_query_arg( $args, $base );
@@ -758,30 +762,17 @@ class Infinite_Uploads_Admin {
 	 * Registers a new settings page under Settings.
 	 */
 	function admin_menu() {
-		if ( is_multisite() ) {
-			$page = add_submenu_page(
-				'settings.php',
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				$this->iup_instance->capability,
-				'infinite_uploads',
-				[
-					$this,
-					'settings_page',
-				]
-			);
-		} else {
-			$page = add_media_page(
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				__( 'Infinite Uploads', 'infinite-uploads' ),
-				$this->iup_instance->capability,
-				'infinite_uploads',
-				[
-					$this,
-					'settings_page',
-				]
-			);
-		}
+		$page = add_menu_page(
+			__( 'Infinite Uploads', 'infinite-uploads' ),
+			__( 'Infinite Uploads', 'infinite-uploads' ),
+			$this->iup_instance->capability,
+			'infinite_uploads',
+			[
+				$this,
+				'settings_page',
+			],
+			plugins_url( 'assets/img/iu-logo-blue-sm.svg', __FILE__ )
+		);
 
 		add_action( 'admin_print_scripts-' . $page, [ &$this, 'admin_scripts' ] );
 		add_action( 'admin_print_styles-' . $page, [ &$this, 'admin_styles' ] );
@@ -793,7 +784,7 @@ class Infinite_Uploads_Admin {
 	function admin_scripts() {
 		wp_enqueue_script( 'iup-bootstrap', plugins_url( 'assets/bootstrap/js/bootstrap.bundle.min.js', __FILE__ ), [ 'jquery' ], INFINITE_UPLOADS_VERSION );
 		wp_enqueue_script( 'iup-chartjs', plugins_url( 'assets/js/Chart.min.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
-		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [], INFINITE_UPLOADS_VERSION );
+		wp_enqueue_script( 'iup-js', plugins_url( 'assets/js/infinite-uploads.js', __FILE__ ), [ 'wp-color-picker' ], INFINITE_UPLOADS_VERSION );
 
 		$data            = [];
 		$data['strings'] = [
@@ -815,6 +806,7 @@ class Infinite_Uploads_Admin {
 			'delete'   => wp_create_nonce( 'iup_delete' ),
 			'download' => wp_create_nonce( 'iup_download' ),
 			'toggle'   => wp_create_nonce( 'iup_toggle' ),
+			'video'    => wp_create_nonce( 'iup_video' ),
 		];
 
 		wp_localize_script( 'iup-js', 'iup_data', $data );
@@ -836,7 +828,7 @@ class Infinite_Uploads_Admin {
 	 *
 	 */
 	function admin_styles() {
-
+		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'iup-bootstrap', plugins_url( 'assets/bootstrap/css/bootstrap.min.css', __FILE__ ), false, INFINITE_UPLOADS_VERSION );
 		wp_enqueue_style( 'iup-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), [ 'iup-bootstrap' ], INFINITE_UPLOADS_VERSION );
 
@@ -893,10 +885,10 @@ class Infinite_Uploads_Admin {
 		$stats    = $this->iup_instance->get_sync_stats();
 		$api_data = $this->api->get_site_data();
 		?>
-		<div id="container" class="wrap iup-background">
+		<div id="iup-settings-page" class="wrap iup-background">
 
 			<h1>
-				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="75" width="300"/>
+				<img src="<?php echo esc_url( plugins_url( '/assets/img/iu-logo-words.svg', __FILE__ ) ); ?>" alt="Infinite Uploads Logo" height="50" width="200"/>
 			</h1>
 
 			<?php if ( $this->auth_error ) { ?>
@@ -945,10 +937,10 @@ class Infinite_Uploads_Admin {
 					$cloud_files      = $api_data->stats->site->files;
 					$cloud_total_size = $api_data->stats->cloud->storage;
 				}
-				if ( infinite_uploads_enabled() ) {
-					require_once( dirname( __FILE__ ) . '/templates/cloud-overview.php' );
-				} else {
-					require_once( dirname( __FILE__ ) . '/templates/sync.php' );
+
+				require_once( dirname( __FILE__ ) . '/templates/header-columns.php' );
+
+				if ( ! infinite_uploads_enabled() ) {
 					require_once( dirname( __FILE__ ) . '/templates/modal-scan.php' );
 					if ( isset( $api_data->site ) && $api_data->site->upload_writeable ) {
 						require_once( dirname( __FILE__ ) . '/templates/modal-upload.php' );

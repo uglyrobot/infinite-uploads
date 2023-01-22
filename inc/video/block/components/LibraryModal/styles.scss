@@ -1,0 +1,33 @@
+//scope bootstrap styles to library modal only
+.iup-block-library-model {
+  @import '~bootstrap/scss/bootstrap';
+
+  .components-modal__header-heading {
+    margin-bottom: 0;
+    margin-left: 0.5em;
+  }
+
+  .bg-black {
+    background-color: #000 !important;
+  }
+
+  .text-secondary {
+    color: #6c757d !important;
+    font-size: 16px;
+  }
+
+  .rounded-top {
+    border-top-left-radius: 0.375rem !important;
+    border-top-right-radius: 0.375rem !important;
+  }
+
+  .btn .dashicons {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-right: 0.5rem;
+  }
+
+  .rounded-pill {
+    border-radius: 50rem !important;
+  }
+}

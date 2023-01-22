@@ -1,11 +1,11 @@
 <div class="card">
 	<div class="card-header">
 		<div class="d-flex align-items-center">
-			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Cloud Storage Overview', 'infinite-uploads' ); ?></h5>
+			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Cloud Storage & CDN Overview', 'infinite-uploads' ); ?></h5>
 			<?php require_once( dirname( __FILE__ ) . '/status-icon.php' ); ?>
 		</div>
 	</div>
-	<div class="card-body cloud p-md-5">
+	<div class="card-body cloud p-md-3">
 		<div class="row align-items-center justify-content-center mb-5">
 			<div class="col-lg col-xs-12 mx-sm-0">
 				<p class="lead mb-0"><?php esc_html_e( "This Site's Cloud Bytes / Files", 'infinite-uploads' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Recalculated every 24 hours', 'infinite-uploads' ); ?>"></span></p>

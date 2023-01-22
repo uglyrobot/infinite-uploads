@@ -34,7 +34,7 @@
 		<div class="row justify-content-center mb-3">
 			<div class="col text-center">
 				<h4><?php esc_html_e( 'Ready to Connect!', 'infinite-uploads' ); ?></h4>
-				<p class="lead"><?php esc_html_e( 'Get smart plan recommendations, create or connect to existing account, and sync to the cloud.', 'infinite-uploads' ); ?></p>
+				<p class="lead"><?php esc_html_e( 'Get smart plan recommendations, create or connect to existing account, and enable video or sync to the cloud.', 'infinite-uploads' ); ?></p>
 			</div>
 		</div>
 		<div class="row justify-content-center mb-5">

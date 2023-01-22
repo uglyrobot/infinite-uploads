@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card mt-0">
 	<div class="card-header h5">
 		<div class="d-flex align-items-center">
 			<h5 class="m-0 mr-auto p-0"><?php esc_html_e( 'Account & Settings', 'infinite-uploads' ); ?> <span class="dashicons dashicons-info text-muted" data-toggle="tooltip" title="<?php esc_attr_e( 'Includes usage data for all connected sites', 'infinite-uploads' ); ?>"></span></h5>

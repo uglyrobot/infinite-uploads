@@ -1,13 +1,13 @@
 <?php
 /*
  * Plugin Name: Infinite Uploads
- * Description: Infinitely scalable cloud storage and delivery for your uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 1.1.6
+ * Description: Infinitely scalable cloud storage and delivery for your videos and uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
+ * Version: 2.0
  * Author: Infinite Uploads
  * Author URI: https://infiniteuploads.com/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin&utm_content=meta
  * Text Domain: infinite-uploads
  * Requires at least: 5.3
- * Requires PHP: 5.5
+ * Requires PHP: 7.0
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Network: true
@@ -17,7 +17,7 @@
  * Copyright 2021 UglyRobot, LLC
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '1.1.6' );
+define( 'INFINITE_UPLOADS_VERSION', '2.0' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';

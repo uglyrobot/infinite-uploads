@@ -92,8 +92,9 @@ class Infinite_Uploads {
 	 */
 	public function setup() {
 
-		$this->admin = Infinite_Uploads_Admin::get_instance();
-		$this->api   = Infinite_Uploads_Api_Handler::get_instance();
+		$this->admin  = Infinite_Uploads_Admin::get_instance();
+		$this->api    = Infinite_Uploads_Api_Handler::get_instance();
+		$this->stream = Infinite_Uploads_Video::get_instance();
 
 		//Add cloud permissions if present
 		$api_data = $this->api->get_site_data();
@@ -123,7 +124,7 @@ class Infinite_Uploads {
 		add_filter( 'infinite_uploads_sync_exclusions', [ $this, 'compatibility_exclusions' ] );
 
 		// don't register all this until we've enabled rewriting.
-		if ( ! infinite_uploads_enabled() ) {
+		if ( ! $this->api->has_token() ) {
 			add_action( 'admin_notices', [ $this, 'setup_notice' ] );
 			add_action( 'network_admin_notices', [ $this, 'setup_notice' ] );
 
@@ -396,7 +397,7 @@ class Infinite_Uploads {
 			return;
 		}
 
-		if ( get_current_screen()->id == 'media_page_infinite_uploads' || get_current_screen()->id == 'settings_page_infinite_uploads-network' ) {
+		if ( get_current_screen()->id == 'toplevel_page_infinite_uploads' || get_current_screen()->id == 'toplevel_page_infinite_uploads-network' ) {
 			return;
 		}
 		?>
@@ -404,11 +405,7 @@ class Infinite_Uploads {
 			<span style="display: inline-block;vertical-align: middle;white-space: normal;width: 80%;font-size: 15px;">
 				<strong><?php esc_html_e( 'Infinite Uploads is almost ready!', 'infinite-uploads' ); ?></strong>
 				<?php
-				if ( $this->api->has_token() ) {
-					esc_html_e( 'Finish syncing your images, audio, video, and documents to the cloud to enable.', 'infinite-uploads' );
-				} else {
-					esc_html_e( 'Create or connect your account to move your images, audio, video, and documents to the cloud - with a click!', 'infinite-uploads' );
-				}
+				esc_html_e( 'Create or connect your account to move your images, audio, and video to the cloud - with a click!', 'infinite-uploads' );
 				?>
 			</span>
 			<span style="display: inline-block;vertical-align: middle;width: 20%;text-align: right;">
