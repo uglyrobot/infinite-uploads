@@ -467,14 +467,14 @@ class Infinite_Uploads_Video {
 	 * @todo adjust for the video library page.
 	 */
 	function admin_scripts() {
-		wp_enqueue_script( 'iup-admin', plugins_url( 'build/admin.js', __DIR__ ), array( 'wp-element', 'wp-i18n' ), time(), false );
+		wp_enqueue_script( 'iup-admin', plugins_url( 'build/admin.js', __DIR__ ), array( 'wp-element', 'wp-i18n' ), ( wp_get_environment_type() !== 'production' ? time() : INFINITE_UPLOADS_VERSION ), false );
 	}
 
 	/**
 	 *
 	 */
 	function admin_styles() {
-		wp_enqueue_style( 'iup-uppy', plugins_url( 'build/style-admin.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION ); //Have no idea why webpack is putting uppy css in this file.
+		wp_enqueue_style( 'iup-uppy', plugins_url( 'build/style-block.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION ); //Have no idea why webpack is putting uppy css in this file.
 		wp_enqueue_style( 'iup-admin', plugins_url( 'build/admin.css', __DIR__ ), false, INFINITE_UPLOADS_VERSION );
 	}
 
