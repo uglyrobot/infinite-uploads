@@ -137,6 +137,9 @@ class Infinite_Uploads {
 		$uploads_url = $this->get_original_upload_dir(); //prime the cached value before filtering
 		add_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
 
+		//bypass cloud during updates
+		add_action( 'load-update.php', [ $this, 'tear_down' ] );
+
 		//block uploads if permissions are only read/delete
 		if ( ! $api_data->site->upload_writeable ) {
 			add_filter( 'pre-upload-ui', [ $this, 'blocked_uploads_header' ] );
@@ -419,10 +422,10 @@ class Infinite_Uploads {
 	 * Tear down the hooks, url filtering etc for Infinite Uploads
 	 */
 	public function tear_down() {
-
-		stream_wrapper_unregister( 'iu' );
 		remove_filter( 'upload_dir', [ $this, 'filter_upload_dir' ] );
 		remove_filter( 'wp_image_editors', [ $this, 'filter_editors' ], 9 );
+		remove_filter( 'pre_wp_unique_filename_file_list', [ $this, 'get_files_for_unique_filename_file_list' ], 10 );
+		remove_action( 'delete_attachment', [ $this, 'delete_attachment_files' ] );
 	}
 
 	public function get_sync_stats() {
@@ -941,7 +944,7 @@ class Infinite_Uploads {
 	function wpmdb_upload_info() {
 		return array(
 			'path' => WP_CONTENT_DIR . '/wp-migrate-db', // note missing end trailing slash
-			'url'  => WP_CONTENT_URL . '/wp-migrate-db' // note missing end trailing slash
+			'url'  => WP_CONTENT_URL . '/wp-migrate-db', // note missing end trailing slash
 		);
 	}
 
