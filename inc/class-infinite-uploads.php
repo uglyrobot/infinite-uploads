@@ -108,6 +108,7 @@ class Infinite_Uploads {
 			add_filter( 'infinite_uploads_s3_client_params', function ( $params ) use ( $api_data ) {
 				$params['endpoint']                = $api_data->site->upload_endpoint;
 				$params['use_path_style_endpoint'] = true;
+				$params['use_aws_shared_config_files'] = false;
 				//$params['debug'] = [
 				//	'logfn'        => 'error_log',
 				//	'stream_size'  => 0,
@@ -173,6 +174,7 @@ class Infinite_Uploads {
 		add_action( 'wp_privacy_personal_data_export_file_created', [ $this, 'move_temp_personal_data_to_s3', 1000 ] );
 
 		$this->plugin_compatibility();
+
 
 		if ( ( ! defined( 'INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL' ) || ! INFINITE_UPLOADS_DISABLE_REPLACE_UPLOAD_URL ) && $api_data->site->cdn_enabled ) {
 			//makes this work with pre 3.5 MU ms_files rewriting (ie domain.com/files/filename.jpg)

@@ -930,7 +930,7 @@ class Infinite_Uploads_Stream_Wrapper {
 			//Cache the stat for this file so we don't have to do another HeadObject in the same request
 			$cache_key = "iu://{$params['Bucket']}/{$params['Key']}";
 			if ( $bool ) {
-				$this->getCacheStorage()->set( $cache_key, $this->formatUrlStat( [ 'ContentLength' => $params['Body']->getSize(), 'LastModified' => time() ] ) );
+				$this->getCacheStorage()->set( $cache_key, $this->formatUrlStat( [ 'ContentLength' => 0, 'LastModified' => time() ] ) );
 				$this->debug_cache( 'SET', $cache_key );
 				//purposely don't cache this 0-length fake file
 			}
