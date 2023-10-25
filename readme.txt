@@ -1,8 +1,8 @@
 === Infinite Uploads - Offload Media and Video to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 6.1.1
-Stable tag: 2.0
+Tested up to: 6.4
+Stable tag: 2.0.1
 Requires PHP: 5.6
 Contributors: uglyrobot, jdailey
 Tags: cloud storage, media cloud, encoding, offload, video, streaming, s3, google cloud storage, spaces, storage, cdn, cloud sync
@@ -169,6 +169,11 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 8. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
+
+2.0.1 - 2023-10-24
+----------------------------------------------------------------------
+- Speed up head objects
+- Fix aws config error message in PHP safe mode
 
 2.0 - 2022-01-22
 ----------------------------------------------------------------------
