@@ -172,6 +172,8 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 
 2.0.1 - 2023-10-24
 ----------------------------------------------------------------------
+- Fix corrupt unzipping errors on manual plugin upgrades
+- Fix incorrect error log entries when disconnecting from cloud
 - Speed up head objects
 - Fix aws config error message in PHP safe mode
 
