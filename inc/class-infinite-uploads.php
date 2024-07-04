@@ -124,12 +124,16 @@ class Infinite_Uploads {
 
 		add_filter( 'infinite_uploads_sync_exclusions', [ $this, 'compatibility_exclusions' ] );
 
-		// don't register all this until we've enabled rewriting.
 		if ( ! $this->api->has_token() ) {
 			add_action( 'admin_notices', [ $this, 'setup_notice' ] );
 			add_action( 'network_admin_notices', [ $this, 'setup_notice' ] );
 
 			return true;
+		}
+
+		// don't register all this until we've enabled rewriting.
+		if ( ! infinite_uploads_enabled() ) {
+			return false;
 		}
 
 		$this->register_stream_wrapper();

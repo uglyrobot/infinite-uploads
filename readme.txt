@@ -1,9 +1,9 @@
 === Infinite Uploads - Offload Media and Video to Cloud Storage ===
 
 Requires at least: 5.3
-Tested up to: 6.4
-Stable tag: 2.0.1
-Requires PHP: 5.6
+Tested up to: 6.6
+Stable tag: 2.0.2
+Requires PHP: 7.0
 Contributors: uglyrobot, jdailey
 Tags: cloud storage, media cloud, encoding, offload, video, streaming, s3, google cloud storage, spaces, storage, cdn, cloud sync
 License: GPLv2
@@ -152,7 +152,7 @@ Infinite Uploads is a hybrid custom stack built and hosted with multiple enterpr
 
 = Why can't I just use AWS S3, Google Cloud Storage, Azure, etc? =
 
-There are plugins for that, but they all have expensive per-site or per file annual license fees. And then you have to figure out how to signup for and configure complicated cloud providers and CDNs.
+There are plugins for that, but they all have expensive per-site or per-file annual license fees. And then you have to figure out how to signup for and configure complicated cloud providers and CDNs.
 Finally, while the per/GB prices of cloud storage may seem cheap, there are all the hidden costs you don't realize like class A/B/C/D API transaction costs, and bandwidth x3 (to cloud > to cdn > to user). Bandwidth costs alone can often total 8x more than your storage bill!
 Infinite Uploads makes the power of the cloud simple and affordable for non-cloud architects like you.
 
@@ -169,6 +169,10 @@ Infinite Uploads makes the power of the cloud simple and affordable for non-clou
 8. Create a custom CDN URL, track storage, and free up space.
 
 == Changelog ==
+
+2.0.2 - 2024-07-03
+----------------------------------------------------------------------
+- Fix rewriting of URLs until initial sync is complete
 
 2.0.1 - 2023-10-24
 ----------------------------------------------------------------------
@@ -243,6 +247,8 @@ Learn how to get the most out of your cloud-hosted files on our blog:
 [Infinite Uploads Blog, Tips, Tricks, How-tos, and News](https://infiniteuploads.com/blog/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iup_readme&utm_term=blog)
 
 [Contribute to the plugin's development on Github!](https://github.com/uglyrobot/infinite-uploads/)
+
+Want to use your WordPress site to train an AI chatbot to provide instant answers to your customers? Check out our sister project [DocsBot AI](https://docsbot.ai/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=iu_readme)!
 
 Enjoy!
 

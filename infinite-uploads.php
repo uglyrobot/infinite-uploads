@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Infinite Uploads
  * Description: Infinitely scalable cloud storage and delivery for your videos and uploads made easy! Upload directly to cloud storage and manage your files right from the WordPress Media Library.
- * Version: 2.0.1
+ * Version: 2.0.2
  * Author: Infinite Uploads
  * Author URI: https://infiniteuploads.com/?utm_source=iup_plugin&utm_medium=plugin&utm_campaign=iup_plugin&utm_content=meta
  * Text Domain: infinite-uploads
@@ -14,10 +14,10 @@
  *
  * Inspired by AWS PHP SDK stream wrapper code from the S3 Uploads plugin by Human Made https://github.com/humanmade/S3-Uploads.
  *
- * Copyright 2021 UglyRobot, LLC
+ * Copyright 2021-2024 UglyRobot, LLC
 */
 
-define( 'INFINITE_UPLOADS_VERSION', '2.0.1' );
+define( 'INFINITE_UPLOADS_VERSION', '2.0.2' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/class-infinite-uploads-wp-cli-command.php';
