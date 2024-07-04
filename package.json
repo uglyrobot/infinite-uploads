@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@wordpress/scripts": "^28.2.0",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-wp-pot": "^2.5.0",
     "gulp-zip": "^5.0.2"
   },
